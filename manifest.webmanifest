@@ -1,12 +1,12 @@
 {
- "name": "TALL&small players",
- "short_name": "TALL&small",
+ "name": "T&s players",
+ "short_name": "T&s players",
  "description": "Retrouve le footballeur à partir de sa carrière, saison après saison.",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
- "background_color": "#141414",
+ "background_color": "#1d5a2c",
  "theme_color": "#1d5a2c",
  "lang": "fr",
  "icons": [
