@@ -256,7 +256,7 @@ body:not(.home-bg) .playcount{display:none}
       <ul class="small rules">
         <li><b>Pour tous les jeux :</b> retrouve le joueur à partir de sa carrière en club. Le nom de famille suffit ; une faute de frappe est tolérée sur les noms longs.</li>
         <li><b>Défi du jour et jeu libre :</b> 100 points au 1<sup>er</sup> essai, 60 au 2<sup>e</sup>, 30 au 3<sup>e</sup>. Indice poste −10, indice nationalité −25, faute d'orthographe −10. Un joueur trouvé rapporte au moins 10 points.</li>
-        <li><b>Jeu libre :</b> 5 minutes pour marquer le plus de points. Un joueur moyen compte ×1,5, un difficile ×2. Classement du jour sur le meilleur score.</li>
+        <li><b>Jeu libre :</b> 5 minutes pour marquer le plus de points. Un joueur moyen compte ×1,5, un difficile ×2. Classement général sur le meilleur score, conservé d'un jour à l'autre.</li>
         <li><b>Contre-la-montre :</b> 2 minutes, une seule proposition et 20 secondes par fiche. On compte les joueurs trouvés.</li>
         <li><b>Défi entre amis :</b> 2 essais, sans indice. Le plus rapide gagne.</li>
       </ul>
@@ -269,7 +269,7 @@ body:not(.home-bg) .playcount{display:none}
         <h3>Défi entre amis</h3>
         <p>Choisis un joueur et envoie le lien. Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer ». Pas de limite de temps : chacun joue quand il veut. Le classement range ceux qui ont trouvé, du plus rapide au plus lent ; le temps compte de « Commencer » à la bonne réponse. Le créateur du défi n'est pas classé.</p>
         <h3>Jeu libre</h3>
-        <p>Une partie dure 5 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis. Trois propositions au maximum par joueur ; « Passer » donne la réponse et 0 point et fait gagner du temps. Les points d'un joueur moyen sont multipliés par 1,5, ceux d'un difficile par 2 (indices et fautes compris) : un difficile trouvé du premier coup rapporte 200 points. Le classement du jour retient le meilleur score de chaque joueur ; on peut rejouer autant de fois qu'on veut. Une partie quittée avant la fin n'est pas classée.</p>
+        <p>Une partie dure 5 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis. Trois propositions au maximum par joueur ; « Passer » donne la réponse et 0 point et fait gagner du temps. Les points d'un joueur moyen sont multipliés par 1,5, ceux d'un difficile par 2 (indices et fautes compris) : un difficile trouvé du premier coup rapporte 200 points. Le classement général retient le meilleur score de chaque joueur depuis le lancement ; il n'est pas remis à zéro chaque jour et on peut rejouer autant de fois qu'on veut. Une partie quittée avant la fin n'est pas classée.</p>
         <h3>Saisie et statistiques</h3>
         <p>Accents et majuscules sont ignorés. Une faute est tolérée à partir de 5 lettres, deux à partir de 10 ; une réponse acceptée avec une faute coûte 10 points. Les statistiques correspondent aux matchs et buts en championnat ; une saison avec un prêt ou un transfert apparaît sur deux lignes. Le niveau d'un joueur est facile, moyen ou difficile ; son époque correspond à la décennie où il a disputé le plus de matchs.</p>
       </div>
@@ -1115,7 +1115,7 @@ function soloEnd(){
   $("resHome").classList.remove("hide");
   SESSION.key = todayKey();
   const best = lsGet("ts_solo_best", null);
-  if (!best || best.key !== SESSION.key || SESSION.total > best.points) lsSet("ts_solo_best", { key: SESSION.key, points: SESSION.total });
+  if (!best || SESSION.total > best.points) lsSet("ts_solo_best", { key: SESSION.key, points: SESSION.total });
   showSoloRank($("rankBox"));
 }
 async function showSoloRank(el){
@@ -1124,7 +1124,7 @@ async function showSoloRank(el){
   const ps = lsGet("ts_pseudo", "");
   if (!SESSION.sent) {
     if (!ps) {
-      el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
+      el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement.</div>
         <div class="row"><input id="soloPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="soloSend">Publier mon score</button></div><div class="msg bad small" id="soloMsg"></div>`;
       $("soloSend").onclick = () => { const v = $("soloPseudo").value.trim(); if (!v) { $("soloMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showSoloRank(el); };
@@ -1141,7 +1141,7 @@ async function showSoloRank(el){
   } else el.innerHTML = H3 + `<div class="small muted">Chargement du classement…</div>`;
   let rows;
   try {
-    const r = await fetch(SB_URL + "/solo_ranking?day=eq." + SESSION.key + "&select=pseudo,points,found,played&order=points.desc,found.desc&limit=1000", { headers: { apikey: SB_KEY } });
+    const r = await fetch(SB_URL + "/solo_ranking_all?select=pseudo,points,found,played&order=points.desc,found.desc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
   const best = lsGet("ts_solo_best", { points: SESSION.total });
@@ -1151,7 +1151,7 @@ async function showSoloRank(el){
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = H3 + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Meilleur score du jour de chaque joueur, sur 5 minutes. Il évolue au fil de la journée.</div>
+    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur depuis le lancement, sur 5 minutes. Le classement est conservé d'un jour à l'autre.</div>
     <div class="row"><button id="${el.id}SoloRefresh">Actualiser</button></div>`;
   $(el.id + "SoloRefresh").onclick = () => showSoloRank(el);
 }
