@@ -126,7 +126,20 @@
   .back{background:none;border:none;color:var(--muted);padding:0;margin-bottom:12px}
   .back:hover{color:var(--text)}
 
-  /* Accueil compact */
+  /* Résultat : bouton suivant à côté du titre */
+.resHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap;margin-bottom:6px}
+.resHead h2{margin:0;flex:1 1 auto;min-width:0;font-size:1.25rem;line-height:1.2}
+.resHead #nextBtn{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
+.resFoot{gap:8px}
+.resFoot button.mini{flex:0 0 auto;padding:6px 11px !important;font-size:.8rem !important;min-height:0 !important}
+.rank .msg:empty{display:none}
+#clmLive{margin:-4px 0 8px}
+#clmTime{display:flex;flex-wrap:wrap;justify-content:space-between;gap:3px 10px;font-weight:600;font-size:.85rem}
+#clmTime .clmbar{flex-basis:100%;height:4px;margin:0}
+#clmFlash{margin-top:4px;font-size:.85rem;line-height:1.2}
+#clmFlash:empty{display:none}
+#clmFlash.good{color:var(--good,#7bd88f)}#clmFlash.bad{color:var(--bad)}
+/* Accueil compact */
   body.home-bg .wrap{padding-top:10px}
   body.home-bg h1.brand{gap:6px;margin-bottom:6px}
   body.home-bg h1.brand img{height:38px}
@@ -260,8 +273,9 @@
     </div>
 
     <div class="card" id="guessCard">
+      <div id="clmLive" class="hide"><div id="clmTime"></div><div id="clmFlash"></div></div>
       <form id="guessForm" class="row">
-        <input id="guessInput" placeholder="Nom du joueur" autocomplete="off">
+        <input id="guessInput" name="reponse-footballeur" placeholder="Votre réponse" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
         <button class="primary" type="submit">Valider</button>
       </form>
       <div class="hints" id="hints"></div>
@@ -273,18 +287,17 @@
     </div>
 
     <div class="card result hide" id="resultCard">
-      <h2 id="resultTitle"></h2>
+      <div class="resHead"><h2 id="resultTitle"></h2><button class="primary" id="nextBtn">Joueur suivant</button></div>
       <p id="resultText" style="margin:0 0 12px"></p>
       <div class="row hide" id="shareRow" style="margin-bottom:10px">
         <a class="btnlink primary" id="shareWa" target="_blank" rel="noopener">Envoyer mon résultat sur WhatsApp</a>
-        <button id="shareCopy" style="flex:0 0 auto">Copier</button>
+        <button id="shareCopy" class="hide" style="flex:0 0 auto">Copier</button>
       </div>
       <div class="small muted" id="shareMsg" style="margin-bottom:8px"></div>
       <div class="rank hide" id="rankBox"></div>
-      <div class="row" style="margin-bottom:10px"><button id="shareImg" style="flex:0 0 auto">📸 Partager mon score en image</button></div>
-      <div class="row">
-        <button class="primary" id="nextBtn" style="flex:0 0 auto">Joueur suivant</button>
-        <button data-home style="flex:0 0 auto">Accueil</button>
+      <div class="row resFoot">
+        <button id="shareImg" class="mini">📸 Partager mon score à des amis</button>
+        <button data-home class="mini" id="resHome">Accueil</button>
       </div>
     </div>
   </section>
@@ -830,8 +843,9 @@ function computeScore(){
   return Math.max(MIN_FOUND, Math.round(BASE * f) - hints - (G.approx ? TYPO_COST : 0));   // minimum garanti si le joueur est trouvé
 }
 function startGame(player, mode){
+  $("clmLive").classList.add("hide");
   $("rankBox").classList.add("hide");
-  $("shareImg").parentElement.classList.remove("hide");
+  $("shareImg").classList.remove("hide");
   G = { p: player, mode, score: 100, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   if (mode === "chrono") { G.start = performance.now(); G.defi = DEFI; clearInterval(window._tick); window._tick = setInterval(renderScore, 100); }
   const badge = player.d ? `<span class="badge ${player.d}">${player.d}</span>` : "";
@@ -841,6 +855,7 @@ function startGame(player, mode){
   $("guessInput").value = ""; $("msg").textContent = ""; $("msg").className = "msg";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
   $("nextBtn").textContent = mode === "solo" ? "Joueur suivant" : mode === "daily" ? (DAILY.idx + 1 < DAILY.list.length ? "Joueur suivant" : "Retour à l'accueil") : "Retour à l'accueil";
+  $("resHome").classList.toggle("hide", $("nextBtn").textContent === "Retour à l'accueil");
   $("shareRow").classList.add("hide"); $("shareMsg").textContent = "";
   $("shareWa").textContent = "Envoyer mon résultat sur WhatsApp";
   $("giveUp").parentElement.classList.toggle("hide", false);
@@ -1258,7 +1273,9 @@ function clmNext(){
   const badge = p.d ? `<span class="badge ${p.d}">${p.d}</span>` : "";
   $("gameLabel").innerHTML = `Contre-la-montre${CLM.ranked ? "" : " · hors classement"} · fiche ${CLM.seen}` + badge;
   $("guessInput").value = "";
-  $("msg").textContent = CLM.flash; $("msg").className = "msg" + (CLM.flash ? (CLM.flashOk ? " good" : " bad") : "");
+  $("msg").textContent = ""; $("msg").className = "msg";
+  $("clmLive").classList.remove("hide");
+  $("clmFlash").textContent = CLM.flash; $("clmFlash").className = CLM.flash ? (CLM.flashOk ? "good" : "bad") : "";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
   $("giveUp").parentElement.classList.add("hide");
   $("hints").innerHTML = ""; $("tries").textContent = "";
@@ -1273,6 +1290,8 @@ function clmRender(){
   const s = Math.ceil(left / 1000);
   $("score").innerHTML = `${CLM.found} <small>trouvé${CLM.found>1?"s":""}</small>`;
   $("sessionTotal").innerHTML = `⏱ ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")} · fiche : ${Math.ceil(card/1000)} s`
+    + `<div class="clmbar"><div style="width:${(card / CLM_CARD * 100).toFixed(1)}%"></div></div>`;
+  $("clmTime").innerHTML = `<span>⏱ ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span><span>fiche : ${Math.ceil(card/1000)} s</span><span>${CLM.found} trouvé${CLM.found>1?"s":""}</span>`
     + `<div class="clmbar"><div style="width:${(card / CLM_CARD * 100).toFixed(1)}%"></div></div>`;
 }
 function clmTick(){
@@ -1308,8 +1327,9 @@ function clmEnd(quit){
   G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
-  $("shareImg").parentElement.classList.add("hide");
+  $("shareImg").classList.add("hide");
   $("nextBtn").textContent = "Rejouer (hors classement)";
+  $("resHome").classList.remove("hide");
   showClmRank($("rankBox"));
 }
 async function showClmRank(el){
@@ -1398,9 +1418,6 @@ function dailyEnd(won){
     const f = DAILY.res.filter(r=>r.won).length;
     $("resultText").textContent += ` Défi du jour terminé : ${f}/${DAILY.list.length} trouvés, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}. ${DAILY.res.map(SYMB).join("")}`;
     G.shareText = dailyShareText(DAILY.key, DAILY.res, DAILY.end - DAILY.start) + "\n" + baseUrl();
-    $("shareWa").textContent = "Envoyer mon score sur WhatsApp";
-    $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
-    $("shareRow").classList.remove("hide");
     showRank($("rankBox"));
   }
 }
@@ -1542,7 +1559,7 @@ function roundRect(x, a, b, w, h, r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+
 let shareFile = null;
 async function trySharePng(){
   try {
-    const text = "Mon score sur TALL&small players" + (PUBLIC_URL ? " : " + PUBLIC_URL : "");
+    const text = (G.mode === "daily" && G.shareText) ? G.shareText : "Mon score sur TALL&small players" + (PUBLIC_URL ? " : " + PUBLIC_URL : "");
     if (navigator.canShare && navigator.canShare({ files: [shareFile] })) { await navigator.share({ files: [shareFile], text }); $("shareImgMsg").textContent = ""; return true; }
   } catch(e){ if (e && e.name === "AbortError") return true; }
   $("shareImgMsg").textContent = "Le partage direct n'est pas disponible ici. Faites un appui long sur l'image pour l'enregistrer ou la partager (WhatsApp, Messages, TikTok…).";
