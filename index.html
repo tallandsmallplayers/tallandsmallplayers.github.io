@@ -82,7 +82,9 @@
   .total small{color:var(--muted);font-weight:500;font-size:14px}
   .hint-val{display:inline-block;background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:14px}
   .msg{margin-top:12px;min-height:22px}
-  .msg.bad{color:var(--bad)}.msg.good{color:var(--ok)}
+  .msg.bad{color:var(--bad)}
+  .clmbar{height:6px;border-radius:3px;background:rgba(255,255,255,.15);margin-top:4px;overflow:hidden;width:140px;margin-left:auto}
+  .clmbar div{height:100%;background:var(--accent);transition:width .1s linear}.msg.good{color:var(--ok)}
   .tries{color:var(--muted);font-size:14px;margin-top:6px}
   .result{border-left:4px solid var(--ok)}
   .result.lost{border-left-color:var(--bad)}
@@ -138,6 +140,7 @@
       <button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button>
       <button class="big" id="btnSolo"><strong>Jeu libre</strong><small>Un joueur tiré au hasard dans la base</small></button>
       <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisissez un joueur et envoyez le lien sur WhatsApp</small></button>
+      <button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 10 secondes</small></button>
     </div>
     <div class="card rank hide" id="homeRank" style="margin-top:16px"></div>
     <div class="card" style="margin-top:16px;padding:14px 18px">
@@ -158,6 +161,23 @@
       </div>
       <div class="small muted" id="levelCount" style="margin-top:8px"></div>
     </div>
+    <div class="card" style="margin-top:16px;padding:14px 18px">
+      <h2 style="margin-bottom:8px">Consulter une fiche</h2>
+      <form id="viewForm" class="row">
+        <input id="viewInput" list="viewList" placeholder="Nom d'un joueur de la base" autocomplete="off" style="flex:1 1 160px">
+        <button class="primary" type="submit" style="flex:0 0 auto">Afficher</button>
+      </form>
+      <datalist id="viewList"></datalist>
+      <div class="msg bad small" id="viewMsg"></div>
+      <div id="viewOut" class="hide" style="margin-top:10px">
+        <div id="viewHead"></div>
+        <table style="margin-top:6px">
+          <thead><tr><th>Saison</th><th>Club</th><th class="n">Matchs</th><th class="n">Buts</th></tr></thead>
+          <tbody id="viewBody"></tbody>
+        </table>
+        <div class="row" style="margin-top:8px"><button id="viewClose" style="flex:0 0 auto">Fermer la fiche</button></div>
+      </div>
+    </div>
     <div class="card" style="margin-top:16px">
       <h2>Règles</h2>
       <ul class="small rules">
@@ -172,6 +192,8 @@
         <p>Joueurs tirés au hasard selon le niveau et l'époque choisis. Trois propositions au maximum par joueur ; « Dis-moi le nom du joueur » donne la réponse et 0 point. Le total de la partie s'additionne joueur après joueur.</p>
         <h3>Défis entre amis</h3>
         <p>Choisissez un joueur et envoyez le lien. Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer ». Le défi est officiel pendant 10 minutes : le plus rapide parmi ceux qui trouvent dans ce délai gagne. Après, on peut encore jouer, mais hors délai. Le créateur du défi n'est pas classé.</p>
+        <h3>Contre-la-montre</h3>
+        <p>Deux minutes pour trouver le plus de joueurs possible. Chaque fiche reste 10 secondes ; une seule proposition par fiche, juste ou fausse, et la fiche suivante arrive. Le bouton « Passer » fait venir la suivante tout de suite. Les fiches sont les mêmes pour tout le monde dans la journée ; seule la première partie du jour compte pour le classement, classé par nombre de joueurs trouvés puis par temps moyen de réponse. Une partie quittée en cours compte comme jouée.</p>
         <h3>Saisie et statistiques</h3>
         <p>Accents et majuscules sont ignorés. Une faute est tolérée à partir de 5 lettres, deux à partir de 10 ; une réponse acceptée avec une faute coûte 10 points. Les statistiques correspondent aux matchs et buts en championnat ; une saison avec un prêt ou un transfert apparaît sur deux lignes. Le niveau d'un joueur est facile, moyen ou difficile ; son époque correspond à la décennie où il a disputé le plus de matchs.</p>
       </div>
@@ -666,6 +688,7 @@ function computeScore(){
 }
 function startGame(player, mode){
   $("rankBox").classList.add("hide");
+  $("shareImg").parentElement.classList.remove("hide");
   G = { p: player, mode, score: 100, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   if (mode === "chrono") { G.start = performance.now(); G.defi = DEFI; clearInterval(window._tick); window._tick = setInterval(renderScore, 100); }
   const badge = player.d ? `<span class="badge ${player.d}">${player.d}</span>` : "";
@@ -706,7 +729,7 @@ function renderCareer(){
 
 /* Réduit la taille du nom du club jusqu'à ce qu'il tienne sur la ligne ; en dernier recours, passage à la ligne */
 function fitClubs(){
-  document.querySelectorAll("#careerBody td.club").forEach(td => {
+  document.querySelectorAll("#careerBody td.club, #viewBody td.club").forEach(td => {
     td.style.fontSize = ""; td.classList.remove("wrap");
     let size = parseFloat(getComputedStyle(td).fontSize);
     while (td.scrollWidth > td.clientWidth && size > 10) { size -= 0.5; td.style.fontSize = size + "px"; }
@@ -768,6 +791,7 @@ $("guessForm").onsubmit = e => {
   e.preventDefault();
   if (!G || G.over) return;
   const v = $("guessInput").value.trim(); if (!v) return;
+  if (G.mode === "clm") { clmAnswer(v); return; }
   const res = checkGuess(v, G.p);
   if (res) { G.approx = (res === "approx") ? v : null; G.score = computeScore(); endGame(true); return; }
   G.tries.push(v); G.score = computeScore();
@@ -777,7 +801,10 @@ $("guessForm").onsubmit = e => {
   $("msg").textContent = left === 1 ? "Ce n'est pas lui. Dernier essai." : `Ce n'est pas lui. Encore ${left} essais.`; $("msg").className = "msg bad";
   $("guessInput").value = ""; renderScore(); renderTries();
 };
-$("giveUp").onclick = () => { if (G && !G.over) { G.score = 0; endGame(false); } };
+$("giveUp").onclick = () => {
+  if (G && G.mode === "clm") { if (!CLM.over) { CLM.flash = `Passé : c'était ${G.p.n}.`; CLM.flashOk = false; clmNext(); } return; }
+  if (G && !G.over) { G.score = 0; endGame(false); }
+};
 
 function endGame(won){
   G.over = true;
@@ -802,6 +829,7 @@ function endGame(won){
   }
 }
 $("nextBtn").onclick = () => {
+  if (G.mode === "clm") { clmStart(); return; }
   if (G.mode === "solo") nextSolo();
   else if (G.mode === "daily" && DAILY.idx + 1 < DAILY.list.length) { DAILY.idx++; dailyStart(); }
   else show("home");
@@ -1009,6 +1037,184 @@ $("shareCopy").onclick = async () => {
   try { await navigator.clipboard.writeText(G.shareText); $("shareMsg").textContent = "Résultat copié : collez-le dans le groupe."; }
   catch(e){ $("shareMsg").textContent = G.shareText; }
 };
+
+
+/* ---------- consultation d'une fiche ---------- */
+$("viewList").innerHTML = PLAYERS.map(p => p.n).sort((a,b) => a.localeCompare(b, "fr")).map(n => `<option value="${esc(n)}">`).join("");
+function viewFind(q){
+  const g = norm(q); if (!g) return [];
+  const exact = PLAYERS.filter(p => norm(p.n) === g);
+  if (exact.length) return exact;
+  const hits = PLAYERS.filter(p => checkGuess(q, p) === "exact");
+  if (hits.length) return hits;
+  const part = PLAYERS.filter(p => norm(p.n).includes(g) || (p.a||[]).some(a => norm(a).includes(g)));
+  if (part.length) return part;
+  return PLAYERS.filter(p => checkGuess(q, p));
+}
+function viewShow(p){
+  const ERA_TXT = { "90": "années 1990", "00": "années 2000", "10": "années 2010", "20": "années 2020" };
+  const m = p.r.reduce((s,r) => s + (Number(r[3])||0), 0), b = p.r.reduce((s,r) => s + (Number(r[4])||0), 0);
+  const info = [p.p, p.c, ERA_TXT[mainEra(p)]].filter(Boolean).join(" · ");
+  $("viewHead").innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:600">${esc(p.n)} ${p.d ? `<span class="badge ${p.d}">${p.d}</span>` : ""}</div>
+    <div class="small muted">${esc(info)}</div>
+    <div class="small" style="margin-top:4px">${m} matchs et ${b} buts en championnat sur ${p.r.length} saison${p.r.length>1?"s":""} renseignée${p.r.length>1?"s":""}.</div>`;
+  $("viewBody").innerHTML = p.r.map(r => {
+    const flag = clubFlag(r[1], r[2]);
+    return `<tr><td class="season">${esc(r[0])}</td><td class="club">${flag ? `<span class="flag">${flag}</span>` : ""}${esc(r[1])}</td><td class="n">${r[3]===""?"-":esc(r[3])}</td><td class="n">${r[4]===""?"-":esc(r[4])}</td></tr>`;
+  }).join("");
+  $("viewOut").classList.remove("hide"); $("viewMsg").textContent = "";
+  fitClubs();
+}
+$("viewForm").onsubmit = e => {
+  e.preventDefault();
+  const q = $("viewInput").value.trim(); if (!q) return;
+  const found = viewFind(q);
+  if (!found.length) { $("viewOut").classList.add("hide"); $("viewMsg").textContent = "Ce joueur n'est pas dans la base."; return; }
+  if (found.length === 1) { viewShow(found[0]); $("viewInput").blur(); return; }
+  $("viewOut").classList.add("hide");
+  $("viewMsg").className = "msg small"; $("viewMsg").innerHTML = "Plusieurs joueurs correspondent : " + found.slice(0, 8).map((p,i) => `<button type="button" data-v="${PLAYERS.indexOf(p)}" style="margin:4px 4px 0 0">${esc(p.n)}</button>`).join("");
+  $("viewMsg").querySelectorAll("button").forEach(bt => bt.onclick = () => { $("viewMsg").className = "msg bad small"; viewShow(PLAYERS[+bt.dataset.v]); });
+};
+$("viewClose").onclick = () => { $("viewOut").classList.add("hide"); $("viewInput").value = ""; };
+
+/* ---------- contre-la-montre ---------- */
+const CLM_TOTAL = 120000, CLM_CARD = 10000;
+let CLM = null;
+function clmSaved(){ const s = lsGet("ts_clm", null); return s && s.key === todayKey() ? s : null; }
+function clmSub(){
+  const s = clmSaved();
+  $("clmSub").textContent = s && s.done
+    ? `Joué aujourd'hui : ${s.found} trouvé${s.found>1?"s":""}. Rejouer hors classement.`
+    : "2 minutes, une nouvelle fiche toutes les 10 secondes";
+}
+function clmList(ranked){
+  const pool = PLAYERS.slice().sort((a,b) => a.n.localeCompare(b.n));
+  const rnd = ranked ? seededRand("TALLsmall-clm-" + todayKey()) : Math.random;
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool;
+}
+function clmStart(){
+  const s = clmSaved();
+  const ranked = !s;
+  CLM = { ranked, key: todayKey(), list: clmList(ranked), idx: -1, found: 0, ms: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
+  if (ranked) lsSet("ts_clm", { key: CLM.key, found: 0, avg: 0, seen: 0, done: false });
+  clearInterval(window._clmTick);
+  window._clmTick = setInterval(clmTick, 100);
+  clmNext();
+}
+function clmPersist(done){
+  if (!CLM || !CLM.ranked) return;
+  const avg = CLM.ms.length ? Math.round(CLM.ms.reduce((a,b)=>a+b,0) / CLM.ms.length) : 0;
+  const prev = clmSaved() || {};
+  lsSet("ts_clm", { ...prev, key: CLM.key, found: CLM.found, avg, seen: CLM.seen, done: !!done });
+}
+function clmNext(){
+  CLM.idx++; CLM.seen++; CLM.cardStart = Date.now();
+  const p = CLM.list[CLM.idx % CLM.list.length];
+  G = { p, mode: "clm", score: 0, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
+  $("rankBox").classList.add("hide");
+  const badge = p.d ? `<span class="badge ${p.d}">${p.d}</span>` : "";
+  $("gameLabel").innerHTML = `Contre-la-montre${CLM.ranked ? "" : " · hors classement"} · fiche ${CLM.seen}` + badge;
+  $("guessInput").value = "";
+  $("msg").textContent = CLM.flash; $("msg").className = "msg" + (CLM.flash ? (CLM.flashOk ? " good" : " bad") : "");
+  $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
+  $("giveUp").parentElement.classList.remove("hide"); $("giveUp").textContent = "Passer";
+  $("hints").innerHTML = ""; $("tries").textContent = "";
+  renderCareer(); clmRender();
+  if ($("game").classList.contains("hide")) show("game");
+  $("guessInput").focus();
+}
+function clmRender(){
+  const now = Date.now();
+  const left = Math.max(0, CLM_TOTAL - (now - CLM.start));
+  const card = Math.max(0, CLM_CARD - (now - CLM.cardStart));
+  const s = Math.ceil(left / 1000);
+  $("score").innerHTML = `${CLM.found} <small>trouvé${CLM.found>1?"s":""}</small>`;
+  $("sessionTotal").innerHTML = `⏱ ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")} · fiche : ${Math.ceil(card/1000)} s`
+    + `<div class="clmbar"><div style="width:${(card / CLM_CARD * 100).toFixed(1)}%"></div></div>`;
+}
+function clmTick(){
+  if (!CLM || CLM.over) { clearInterval(window._clmTick); return; }
+  if ($("game").classList.contains("hide")) { clmEnd(true); return; }   // partie quittée : on clôt
+  const now = Date.now();
+  if (now - CLM.start >= CLM_TOTAL) { clmEnd(false); return; }
+  if (now - CLM.cardStart >= CLM_CARD) { CLM.flash = `Temps écoulé : c'était ${G.p.n}.`; CLM.flashOk = false; clmNext(); return; }
+  clmRender();
+}
+function clmAnswer(v){
+  const res = checkGuess(v, G.p);
+  if (res) { CLM.found++; CLM.ms.push(Date.now() - CLM.cardStart); CLM.flash = `Bravo : ${G.p.n}.`; CLM.flashOk = true; }
+  else { CLM.flash = `Non : c'était ${G.p.n}.`; CLM.flashOk = false; }
+  clmPersist(false);
+  clmNext();
+}
+function clmEnd(quit){
+  CLM.over = true; clearInterval(window._clmTick);
+  CLM.seen = Math.max(0, CLM.seen - 1);   // la fiche en cours au coup de sifflet ne compte pas
+  clmPersist(true); clmSub();
+  if (quit) return;
+  G.over = true; renderCareer();
+  const avg = CLM.ms.length ? CLM.ms.reduce((a,b)=>a+b,0) / CLM.ms.length : 0;
+  $("score").innerHTML = `${CLM.found} <small>trouvé${CLM.found>1?"s":""}</small>`;
+  $("sessionTotal").textContent = "⏱ 0:00";
+  $("guessCard").classList.add("hide");
+  const rc = $("resultCard"); rc.classList.remove("hide"); rc.classList.remove("lost");
+  $("resultTitle").textContent = "Temps écoulé !";
+  $("resultText").textContent = `${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} sur ${CLM.seen} fiche${CLM.seen>1?"s":""}`
+    + (CLM.found ? `, en ${fmtTime(avg)} en moyenne.` : ".") + ` La dernière fiche était ${G.p.n}.`
+    + (CLM.ranked ? "" : " Partie hors classement.");
+  G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
+  $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
+  $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
+  $("shareImg").parentElement.classList.add("hide");
+  $("nextBtn").textContent = "Rejouer (hors classement)";
+  showClmRank($("rankBox"));
+}
+async function showClmRank(el){
+  const s = clmSaved();
+  if (!s || !s.done) { el.classList.add("hide"); return; }
+  el.classList.remove("hide");
+  if (!s.sent) {
+    const ps = lsGet("ts_pseudo", "");
+    if (!ps) {
+      el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Choisissez un pseudo pour apparaître dans le classement du jour.</div>
+        <div class="row"><input id="clmPseudo" maxlength="20" placeholder="Votre pseudo" autocomplete="nickname" style="flex:1 1 140px">
+        <button class="primary" id="clmSend">Publier mon score</button></div><div class="msg bad small" id="clmMsg"></div>`;
+      $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indiquez un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el); };
+      return;
+    }
+    el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Envoi de votre score…</div>`;
+    try {
+      const r = await fetch(SB_URL + "/clm_scores", { method: "POST",
+        headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen }) });
+      if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
+      s.sent = { pseudo: ps, found: s.found, avg: s.avg }; lsSet("ts_clm", s);
+    } catch(e) { el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment. Votre score sera envoyé à la prochaine ouverture du contre-la-montre.</div>`; return; }
+  } else el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Chargement du classement…</div>`;
+  let rows;
+  try {
+    const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&select=pseudo,found,avg_ms&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
+    if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
+  } catch(e) { el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  const me = s.sent;
+  const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.avg_ms === me.avg);
+  const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">${r.found ? fmtTime(r.avg_ms) : "–"}</td></tr>`;
+  let body = rows.slice(0, 10).map(line).join("");
+  if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
+  el.innerHTML = `<h3>Classement du contre-la-montre</h3>
+    <div class="me-line">${mi >= 0 ? `Vous êtes ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <table>${body}</table>
+    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches pour tout le monde aujourd'hui.</div>
+    <div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`;
+  $(el.id + "ClmRefresh").onclick = () => showClmRank(el);
+}
+$("btnClm").onclick = () => {
+  const s = clmSaved();
+  if (s && !s.done) { s.done = true; lsSet("ts_clm", s); }   // partie classée interrompue : elle compte
+  clmStart();
+};
+{ const s = clmSaved(); if (s && !s.done) { s.done = true; lsSet("ts_clm", s); } clmSub(); }
 
 /* ---------- série du jour ---------- */
 let DAILY = { list: [], idx: 0, res: [], key: "", start: 0, end: 0 };
