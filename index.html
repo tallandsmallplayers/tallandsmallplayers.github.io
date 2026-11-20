@@ -203,10 +203,9 @@
     <div class="card compact">
       <h2>Consulter une fiche</h2>
       <form id="viewForm" class="row">
-        <input id="viewInput" list="viewList" placeholder="Nom d'un joueur de la base" autocomplete="off" style="flex:1 1 160px">
+        <input id="viewInput" name="fiche-footballeur" placeholder="Nom d'un joueur de la base" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" style="flex:1 1 160px">
         <button class="primary" type="submit" style="flex:0 0 auto">Afficher</button>
       </form>
-      <datalist id="viewList"></datalist>
       <div class="msg bad small" id="viewMsg"></div>
       <div id="viewOut" class="hide" style="margin-top:10px">
         <div id="viewHead"></div>
@@ -1197,7 +1196,6 @@ $("shareCopy").onclick = async () => {
 
 
 /* ---------- consultation d'une fiche ---------- */
-$("viewList").innerHTML = PLAYERS.map(p => p.n).sort((a,b) => a.localeCompare(b, "fr")).map(n => `<option value="${esc(n)}">`).join("");
 function viewFind(q){
   const g = norm(q); if (!g) return [];
   const exact = PLAYERS.filter(p => norm(p.n) === g);
