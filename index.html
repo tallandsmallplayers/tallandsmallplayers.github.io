@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Retrouvez le footballeur à partir de sa carrière, saison par saison.">
+<meta name="description" content="Retrouve le footballeur à partir de sa carrière, saison par saison.">
 <meta property="og:title" content="TALL&amp;small players">
-<meta property="og:description" content="Retrouvez le footballeur à partir de sa carrière, saison par saison.">
+<meta property="og:description" content="Retrouve le footballeur à partir de sa carrière, saison par saison.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tallandsmallplayers.github.io/">
 <meta property="og:image" content="https://tallandsmallplayers.github.io/apercu.jpg">
@@ -74,7 +74,7 @@
   tr.total td{font-weight:700;border-bottom:none;color:#ddd}
   .hints{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   .hints button,.hints .hint-val{font-size:13px;padding:6px 10px}
-  #guessCard{position:sticky;bottom:0;z-index:5;background:rgba(5,24,11,.97);padding:10px 12px;margin-bottom:0;box-shadow:0 -6px 18px rgba(0,0,0,.45);border-radius:10px 10px 0 0}
+  #guessCard{position:sticky;top:0;z-index:5;background:rgba(5,24,11,.97);padding:10px 12px;margin-bottom:10px;box-shadow:0 6px 18px rgba(0,0,0,.45);border-radius:0 0 10px 10px}
   #guessCard .msg{margin-top:6px;min-height:0}
   #guessCard .tries{margin-top:2px}
   #guessCard #giveUp{font-size:13px;padding:6px 10px}
@@ -139,6 +139,19 @@
 #clmFlash{margin-top:4px;font-size:.85rem;line-height:1.2}
 #clmFlash:empty{display:none}
 #clmFlash.good{color:var(--good,#7bd88f)}#clmFlash.bad{color:var(--bad)}
+/* Saisie fixée en haut, compacte */
+#guessCard .gcTools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+#guessCard .gcTools .hints{margin:0}
+#guessCard .gcTools .row{margin:0 0 0 auto}
+#guessCard .hints button,#guessCard .hints .hint-val,#guessCard #giveUp{font-size:12px;padding:4px 7px}
+#guessCard .gcTools{gap:5px}#guessCard .hints{gap:5px}
+#guessCard .msg{font-size:14px;margin-top:6px;line-height:1.25}
+#guessCard .msg:empty{display:none}
+#guessCard .tries{font-size:12px;margin-top:2px}
+#guessCard .msg,#guessCard .tries{display:inline-block;margin-right:8px;vertical-align:baseline}
+#guessCard .tries:empty{display:none}
+#guessCard .gcTools:has(.hints:empty):has(.row.hide){display:none}
+#guessCard #giveUp{font-size:14.5px;font-weight:700;padding:7px 12px;color:#f2c94c;border:1.5px solid #f2c94c;background:rgba(242,201,76,.12)}
 /* Accueil compact */
   body.home-bg .wrap{padding-top:10px}
   body.home-bg h1.brand{gap:6px;margin-bottom:6px}
@@ -177,9 +190,9 @@
   <section id="home">
     <div class="grid">
       <button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button>
-      <button class="big" id="btnSolo"><strong>Jeu libre</strong><small>Des joueurs tirés au hasard dans la base</small></button>
-      <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisissez un joueur et envoyez le lien sur WhatsApp</small></button>
       <button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 15 secondes</small></button>
+      <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
+      <button class="big" id="btnSolo"><strong>Jeu libre</strong><small>Des joueurs tirés au hasard dans la base</small></button>
     </div>
     <div class="card rank hide" id="homeRank" style="margin-top:16px"></div>
     <div class="card compact">
@@ -227,9 +240,9 @@
         <h3>Le défi du jour</h3>
         <p>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile), une seule fois par jour. Le classement se fait d'abord au nombre de joueurs trouvés, puis aux points (500 au maximum), puis au temps total le plus court : le chrono tourne du premier au dernier joueur, pauses comprises. Le résultat se partage dans WhatsApp sans dévoiler les réponses.</p>
         <h3>Jeu libre</h3>
-        <p>Joueurs tirés au hasard selon le niveau et l'époque choisis. Trois propositions au maximum par joueur ; « Dis-moi le nom du joueur » donne la réponse et 0 point. Le total de la partie s'additionne joueur après joueur.</p>
+        <p>Joueurs tirés au hasard selon le niveau et l'époque choisis. Trois propositions au maximum par joueur ; « Passer » donne la réponse et 0 point. Le total de la partie s'additionne joueur après joueur.</p>
         <h3>Défis entre amis</h3>
-        <p>Choisissez un joueur et envoyez le lien. Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer ». Le défi est officiel pendant 10 minutes : le plus rapide parmi ceux qui trouvent dans ce délai gagne. Après, on peut encore jouer, mais hors délai. Le créateur du défi n'est pas classé.</p>
+        <p>Choisis un joueur et envoie le lien. Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer ». Pas de limite de temps : chacun joue quand il veut. Le classement range ceux qui ont trouvé, du plus rapide au plus lent ; le temps compte de « Commencer » à la bonne réponse. Le créateur du défi n'est pas classé.</p>
         <h3>Contre-la-montre</h3>
         <p>Deux minutes pour trouver le plus de joueurs possible. Chaque fiche reste 15 secondes ; une seule proposition par fiche, juste ou fausse, et la fiche suivante arrive. Les fiches sont les mêmes pour tout le monde dans la journée ; seule la première partie du jour compte pour le classement, classé par nombre de joueurs trouvés puis par temps moyen de réponse. Une partie quittée en cours compte comme jouée.</p>
         <h3>Saisie et statistiques</h3>
@@ -242,10 +255,10 @@
   <section id="intro" class="hide">
     <div class="card">
       <h2>Défi entre amis</h2>
-      <p style="margin:0 0 10px">Retrouvez le footballeur à partir de sa carrière en club. Vous avez <strong>2 essais</strong>. Le chrono démarre quand vous appuyez sur « Commencer ».</p>
+      <p style="margin:0 0 10px">Retrouve le footballeur à partir de sa carrière en club. Tu as <strong>2 essais</strong>. Le chrono démarre quand tu appuies sur « Commencer ».</p>
       <p class="small" id="introDeadline" style="margin:0 0 6px"></p>
       <p class="small muted" id="introCreator" style="margin:0 0 6px"></p>
-      <label for="pseudo">Votre pseudo</label>
+      <label for="pseudo">Ton pseudo</label>
       <input id="pseudo" maxlength="20" placeholder="Ex. : Max" autocomplete="nickname">
       <div class="msg bad" id="introMsg"></div>
       <div class="row" style="margin-top:8px">
@@ -264,24 +277,20 @@
       <div class="total" id="sessionTotal"></div>
       <div class="muted small" id="gameLabel" style="width:100%"></div>
     </div>
-    <div class="card" style="padding:8px 10px">
-      <table>
-        <thead><tr><th>Saison</th><th>Club</th><th class="n">Matchs</th><th class="n">Buts</th></tr></thead>
-        <tbody id="careerBody"></tbody>
-      </table>
-    </div>
 
     <div class="card" id="guessCard">
       <div id="clmLive" class="hide"><div id="clmTime"></div><div id="clmFlash"></div></div>
       <form id="guessForm" class="row">
-        <input id="guessInput" name="reponse-footballeur" placeholder="Votre réponse" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
+        <input id="guessInput" name="reponse-footballeur" placeholder="Ta réponse" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
         <button class="primary" type="submit">Valider</button>
       </form>
-      <div class="hints" id="hints"></div>
       <div class="msg" id="msg"></div>
       <div class="tries" id="tries"></div>
-      <div class="row" style="margin-top:8px">
-        <button id="giveUp" style="flex:0 0 auto">Abandonner</button>
+      <div class="gcTools">
+        <div class="hints" id="hints"></div>
+        <div class="row">
+          <button id="giveUp" style="flex:0 0 auto">Abandonner</button>
+        </div>
       </div>
     </div>
 
@@ -298,6 +307,12 @@
         <button id="shareImg" class="mini">📸 Partager mon score à des amis</button>
         <button data-home class="mini" id="resHome">Accueil</button>
       </div>
+    </div>
+    <div class="card" style="padding:8px 10px">
+      <table>
+        <thead><tr><th>Saison</th><th>Club</th><th class="n">Matchs</th><th class="n">Buts</th></tr></thead>
+        <tbody id="careerBody"></tbody>
+      </table>
     </div>
   </section>
 
@@ -327,7 +342,6 @@
       <div id="codeBox" class="hide" style="margin-top:14px">
         <label>Lien à envoyer</label>
         <code class="code" id="codeOut"></code>
-        <p class="small muted" style="margin:6px 0 0">Le défi est officiel pendant 10 minutes à partir de maintenant.</p>
         <div class="row" style="margin-top:8px">
           <a class="btnlink primary" id="sendWa" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>
           <button id="copyCode" style="flex:0 0 auto">Copier le lien</button>
@@ -775,7 +789,7 @@ function decode(code){ return JSON.parse(decodeURIComponent(escape(atob(code.rep
 
 /* ---------- liens de défi ---------- */
 const PUBLIC_URL = "https://tallandsmallplayers.github.io/";            // adresse publique du jeu, à renseigner une fois hébergé
-const DEFI_DELAI = 10 * 60;       // durée officielle d'un défi, en secondes
+const DEFI_DELAI = 0;             // 0 = pas de délai officiel : tout le monde est classé
 const KEY = "TALL&small players";
 function xorBytes(bytes){ const k = new TextEncoder().encode(KEY); return bytes.map((b,i) => b ^ k[i % k.length] ^ (i*31 & 255)); }
 function packToken(obj){
@@ -858,7 +872,7 @@ function startGame(player, mode){
   $("shareRow").classList.add("hide"); $("shareMsg").textContent = "";
   $("shareWa").textContent = "Envoyer mon résultat sur WhatsApp";
   $("giveUp").parentElement.classList.toggle("hide", false);
-  $("giveUp").textContent = mode === "chrono" ? "Abandonner" : "Dis-moi le nom du joueur (0 point)";
+  $("giveUp").textContent = mode === "chrono" ? "Abandonner" : "Passer (0 pt)";
   renderCareer(); renderHints(); renderScore(); renderTries(); renderSession();
   show("game"); $("guessInput").focus();
 }
@@ -903,7 +917,7 @@ function renderHints(){
     if (G.hintsUsed[k] || G.over){
       const s = document.createElement("span"); s.className = "hint-val"; s.textContent = `${label} : ${G.p[k]}`; box.appendChild(s);
     } else {
-      const btn = document.createElement("button"); btn.textContent = `Indice : ${label.toLowerCase()} (−${HINT_COST[k]})`;
+      const btn = document.createElement("button"); btn.textContent = `${label} (−${HINT_COST[k]})`;
       btn.onclick = () => { G.hintsUsed[k] = true; G.score = computeScore(); renderHints(); renderScore(); };
       box.appendChild(btn);
     }
@@ -991,7 +1005,7 @@ $("nextBtn").onclick = () => {
   else show("home");
 };
 
-let level = "tous", era = "toutes";
+let levels = new Set(), eras = new Set();   // vide = tous / toutes
 /* Décennie principale : celle où le joueur a disputé le plus de matchs (années 80 rattachées aux années 90) */
 function mainEra(p){
   const c = {};
@@ -999,18 +1013,22 @@ function mainEra(p){
   return Object.entries(c).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]))[0]?.[0] || "90";
 }
 PLAYERS.forEach(p => { if (!p.e) p.e = mainEra(p); });
-const pool = () => PLAYERS.map((p,i)=>[p,i]).filter(([p]) => (level === "tous" || p.d === level) && (era === "toutes" || p.e === era)).map(([,i])=>i);
+const pool = () => PLAYERS.map((p,i)=>[p,i]).filter(([p]) => (!levels.size || levels.has(p.d)) && (!eras.size || eras.has(p.e))).map(([,i])=>i);
 function renderLevelCount(){ const n = pool().length; $("levelCount").textContent = `${n} joueur${n>1?"s":""} disponible${n>1?"s":""}`; }
-document.querySelectorAll("#levels button").forEach(b => b.onclick = () => {
-  level = b.dataset.level;
-  document.querySelectorAll("#levels button").forEach(x => x.classList.toggle("on", x === b));
-  renderLevelCount();
-});
-document.querySelectorAll("#eras button").forEach(b => b.onclick = () => {
-  era = b.dataset.era;
-  document.querySelectorAll("#eras button").forEach(x => x.classList.toggle("on", x === b));
-  renderLevelCount();
-});
+/* Choix multiples : « Tous » / « Toutes » annule la sélection ; tout cocher revient à « Tous » */
+function multiSelect(boxId, attr, allVal, set){
+  const btns = [...document.querySelectorAll(`#${boxId} button`)];
+  const n = btns.length - 1;
+  const paint = () => btns.forEach(x => x.classList.toggle("on", x.dataset[attr] === allVal ? !set.size : set.has(x.dataset[attr])));
+  btns.forEach(b => b.onclick = () => {
+    const v = b.dataset[attr];
+    if (v === allVal) set.clear();
+    else { set.has(v) ? set.delete(v) : set.add(v); if (set.size === n) set.clear(); }
+    paint(); order = []; orderIdx = 0; renderLevelCount();
+  });
+}
+multiSelect("levels", "level", "tous", levels);
+multiSelect("eras", "era", "toutes", eras);
 renderLevelCount();
 
 let SESSION = { total: 0, played: 0, found: 0, res: [] };
@@ -1026,7 +1044,7 @@ function nextSolo(){
   startGame(JSON.parse(JSON.stringify(p)), "solo");
 }
 $("btnSolo").onclick = () => {
-  if (!pool().length) { $("levelCount").textContent = "Aucun joueur pour cette combinaison : changez le niveau ou l'époque."; return; }
+  if (!pool().length) { $("levelCount").textContent = "Aucun joueur pour cette combinaison : change le niveau ou l'époque."; return; }
   SESSION = { total: 0, played: 0, found: 0, res: [], start: Date.now(), end: 0 };
   order = shuffle(pool()); orderIdx = 0; nextSolo();
 };
@@ -1042,7 +1060,7 @@ function fillPreset(){
   });
   if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
   const n = pool().length;
-  $("presetLabel").textContent = `Choisir un joueur de la base (niveau : ${LEVEL_LABEL[level]}, époque : ${ERA_LABEL[era]}, ${n} joueur${n>1?"s":""})`;
+  $("presetLabel").textContent = `Choisir un joueur de la base (niveau : ${levels.size ? [...levels].map(x=>LEVEL_LABEL[x]).join(", ") : LEVEL_LABEL.tous}, époque : ${eras.size ? [...eras].sort((a,b)=>["90","00","10","20"].indexOf(a)-["90","00","10","20"].indexOf(b)).map(x=>ERA_LABEL[x]).join(", ") : ERA_LABEL.toutes}, ${n} joueur${n>1?"s":""})`;
 }
 $("btnCreate").onclick = () => { fillPreset(); show("create"); };
 $("preset").onchange = () => {
@@ -1054,8 +1072,8 @@ $("preset").onchange = () => {
 function readChallenge(){
   const name = $("cName").value.trim();
   const lines = $("cRows").value.split("\n").map(l => l.trim()).filter(Boolean);
-  if (!name) throw "Indiquez le nom du joueur.";
-  if (!lines.length) throw "Saisissez au moins une saison.";
+  if (!name) throw "Indique le nom du joueur.";
+  if (!lines.length) throw "Saisis au moins une saison.";
   const rows = lines.map((l, idx) => {
     const f = l.split(/[;\t]/).map(x => x.trim());
     if (f.length === 4) f.splice(2, 0, "");
@@ -1076,7 +1094,7 @@ $("genCode").onclick = () => {
     const link = defiLink(tok);
     const mine = lsGet("ts_crees", []); mine.push(tok); lsSet("ts_crees", mine.slice(-100));
     $("codeOut").textContent = link;
-    $("sendWa").href = "https://wa.me/?text=" + encodeURIComponent("Défi TALL&small players : retrouve ce footballeur à partir de sa carrière. 2 essais, le plus rapide gagne. Défi officiel jusqu'à " + hhmm(t + DEFI_DELAI) + ".\n" + link);
+    $("sendWa").href = "https://wa.me/?text=" + encodeURIComponent("Défi TALL&small players : retrouve ce footballeur à partir de sa carrière. 2 essais, le plus rapide gagne.\n" + link);
     $("codeBox").classList.remove("hide"); $("copyMsg").textContent = "";
   }
   catch(err){ $("createMsg").textContent = err; }
@@ -1087,7 +1105,7 @@ $("testCode").onclick = () => {
 };
 $("copyCode").onclick = async () => {
   try { await navigator.clipboard.writeText($("codeOut").textContent); $("copyMsg").textContent = "Lien copié."; }
-  catch(e){ $("copyMsg").textContent = "Copie impossible ici : sélectionnez le lien et copiez-le manuellement."; }
+  catch(e){ $("copyMsg").textContent = "Copie impossible ici : sélectionne le lien et copie-le manuellement."; }
 };
 
 
@@ -1113,7 +1131,7 @@ async function showDefiRank(el, d, mine){
     else el.classList.add("hide");
     return;
   }
-  const fin = d.t ? (d.t + DEFI_DELAI) * 1000 : 0;
+  const fin = d.t && DEFI_DELAI ? (d.t + DEFI_DELAI) * 1000 : 0;
   rows.forEach(r => { r.off = !r.createur && (!fin || Date.parse(r.created_at) <= fin); });
   const cls = r => r.won && r.off ? 0 : r.won ? 1 : 2;
   rows.sort((a,b) => cls(a) - cls(b) || (cls(a) < 2 ? a.ms - b.ms : 0));
@@ -1122,17 +1140,18 @@ async function showDefiRank(el, d, mine){
   const winners = rows.filter(r => cls(r) === 0);
   const mi = mine ? rows.findIndex(r => r.pseudo === mine.pseudo && r.ms === mine.ms && r.won === mine.won) : -1;
   let head;
-  if (mi >= 0 && cls(rows[mi]) === 0) head = mi === 0 ? `Vous êtes en tête (${winners.length} dans le délai)` : `Vous êtes ${rangTxt(mi+1)} sur ${winners.length} dans le délai`;
+  const dl = fin ? " dans le délai" : "";
+  if (mi >= 0 && cls(rows[mi]) === 0) head = mi === 0 ? `Tu es en tête (${winners.length} joueur${winners.length>1?"s ont":" a"} trouvé${dl})` : `Tu es ${rangTxt(mi+1)} sur ${winners.length}${dl}`;
   else if (winners.length) head = `En tête : ${esc(winners[0].pseudo)} (${fmtTime(winners[0].ms)})`;
-  else head = rows.length ? "Personne n'a encore trouvé dans le délai" : "Aucun résultat pour l'instant";
+  else head = rows.length ? "Personne n'a encore trouvé" + (fin ? " dans le délai" : "") : "Aucun résultat pour l'instant";
   const etat = r => r.createur ? "créateur" : !r.won ? "pas trouvé" : r.off ? fmtTime(r.ms) : fmtTime(r.ms) + " (hors délai)";
   let n = 0;
   const body = rows.map((r,i) => {
     const rang = cls(r) === 0 ? rangTxt(++n) : "–";
     return `<tr class="${i === mi ? "me" : ""}"><td>${rang}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.won ? (r.essai === 1 ? "1er essai" : "2e essai") : ""}</td><td class="n">${etat(r)}</td></tr>`;
   }).join("");
-  const live = fin && Date.now() < fin + 60000;
-  const note = !fin ? "" : Date.now() < fin
+  const live = fin ? Date.now() < fin + 60000 : true;
+  const note = !fin ? "Classement du plus rapide au plus lent, de « Commencer » à la bonne réponse. Il se met à jour automatiquement." : Date.now() < fin
     ? `Défi officiel jusqu'à ${hhmm(fin/1000)}. Le classement se met à jour automatiquement.`
     : `Délai officiel terminé à ${hhmm(fin/1000)}.`;
   el.innerHTML = `<h3>Classement du défi</h3><div class="me-line">${head}</div>
@@ -1147,12 +1166,12 @@ let DEFI = null;
 function openDefi(d){
   DEFI = d;
   const now = Math.floor(Date.now()/1000);
-  const fin = d.t ? d.t + DEFI_DELAI : 0;
-  $("introDeadline").textContent = !d.t ? "" : now < fin
+  const fin = d.t && DEFI_DELAI ? d.t + DEFI_DELAI : 0;
+  $("introDeadline").textContent = !fin ? "" : now < fin
     ? `Défi officiel jusqu'à ${hhmm(fin)} : le plus rapide parmi ceux qui trouvent avant cette heure gagne.`
-    : `Le délai officiel s'est terminé à ${hhmm(fin)}. Vous pouvez jouer, mais votre résultat sera hors délai.`;
+    : `Le délai officiel s'est terminé à ${hhmm(fin)}. Tu peux jouer, mais ton résultat sera hors délai.`;
   const mine = lsGet("ts_crees", []);
-  $("introCreator").textContent = mine.includes(d.tok) ? "Vous avez créé ce défi : vous connaissez la réponse, votre résultat ne comptera pas." : "";
+  $("introCreator").textContent = mine.includes(d.tok) ? "Tu as créé ce défi : tu connais la réponse, ton résultat ne comptera pas." : "";
   $("pseudo").value = lsGet("ts_pseudo", "");
   $("introMsg").textContent = "";
   show("intro");
@@ -1161,13 +1180,13 @@ function openDefi(d){
 }
 $("startDefi").onclick = () => {
   const ps = $("pseudo").value.trim();
-  if (!ps) { $("introMsg").textContent = "Indiquez un pseudo."; return; }
+  if (!ps) { $("introMsg").textContent = "Indique un pseudo."; return; }
   lsSet("ts_pseudo", ps);
   startGame(DEFI.player, "chrono");
 };
 function endDefi(won){
   const ms = G.end - G.start;
-  const fin = DEFI.t ? DEFI.t + DEFI_DELAI : 0;
+  const fin = DEFI.t && DEFI_DELAI ? DEFI.t + DEFI_DELAI : 0;
   const now = Math.floor(Date.now()/1000);
   const horsDelai = fin && now > fin;
   const createur = lsGet("ts_crees", []).includes(DEFI.tok);
@@ -1185,12 +1204,12 @@ function endDefi(won){
   $("shareRow").classList.remove("hide");
   const mine = { pseudo: ps, ms: Math.round(ms), won };
   const box = $("rankBox"); box.classList.remove("hide");
-  box.innerHTML = `<h3>Classement du défi</h3><div class="small muted">Envoi de votre résultat…</div>`;
+  box.innerHTML = `<h3>Classement du défi</h3><div class="small muted">Envoi de ton résultat…</div>`;
   sbDefiSend({ defi: DEFI.tok, device: deviceId(), pseudo: ps, won, essai: won ? essai : 0, ms: mine.ms, createur: !!createur })
     .catch(() => {}).finally(() => showDefiRank(box, DEFI, mine));
 }
 $("shareCopy").onclick = async () => {
-  try { await navigator.clipboard.writeText(G.shareText); $("shareMsg").textContent = "Résultat copié : collez-le dans le groupe."; }
+  try { await navigator.clipboard.writeText(G.shareText); $("shareMsg").textContent = "Résultat copié : colle-le dans le groupe."; }
   catch(e){ $("shareMsg").textContent = G.shareText; }
 };
 
@@ -1239,7 +1258,8 @@ function clmSaved(){ const s = lsGet("ts_clm", null); return s && s.key === toda
 function clmSub(){
   const s = clmSaved();
   $("clmSub").textContent = s && s.done
-    ? `Joué aujourd'hui : ${s.found} trouvé${s.found>1?"s":""}. Rejouer hors classement.`
+    ? `Déjà joué aujourd'hui : ${s.found}${s.seen ? "/" + s.seen : ""} trouvé${s.found>1?"s":""}` + (s.found && s.avg ? ` · ${fmtTime(s.avg)} en moyenne` : "")
+      + (s.res && s.res.length ? " " + s.res.map(x => x ? "🟩" : "⬛").join("") : "") + " · Rejouer hors classement."
     : "2 minutes, une nouvelle fiche toutes les 15 secondes";
 }
 function clmList(ranked){
@@ -1251,7 +1271,7 @@ function clmList(ranked){
 function clmStart(){
   const s = clmSaved();
   const ranked = !s;
-  CLM = { ranked, key: todayKey(), list: clmList(ranked), idx: -1, found: 0, ms: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
+  CLM = { ranked, key: todayKey(), list: clmList(ranked), idx: -1, found: 0, ms: [], res: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
   if (ranked) lsSet("ts_clm", { key: CLM.key, found: 0, avg: 0, seen: 0, done: false });
   clearInterval(window._clmTick);
   window._clmTick = setInterval(clmTick, 100);
@@ -1261,7 +1281,7 @@ function clmPersist(done){
   if (!CLM || !CLM.ranked) return;
   const avg = CLM.ms.length ? Math.round(CLM.ms.reduce((a,b)=>a+b,0) / CLM.ms.length) : 0;
   const prev = clmSaved() || {};
-  lsSet("ts_clm", { ...prev, key: CLM.key, found: CLM.found, avg, seen: CLM.seen, done: !!done });
+  lsSet("ts_clm", { ...prev, key: CLM.key, found: CLM.found, avg, seen: CLM.seen, res: CLM.res.slice(), done: !!done });
 }
 function clmNext(){
   CLM.idx++; CLM.seen++; CLM.cardStart = Date.now();
@@ -1297,11 +1317,12 @@ function clmTick(){
   if ($("game").classList.contains("hide")) { clmEnd(true); return; }   // partie quittée : on clôt
   const now = Date.now();
   if (now - CLM.start >= CLM_TOTAL) { clmEnd(false); return; }
-  if (now - CLM.cardStart >= CLM_CARD) { CLM.flash = `Temps écoulé : c'était ${G.p.n}.`; CLM.flashOk = false; clmNext(); return; }
+  if (now - CLM.cardStart >= CLM_CARD) { CLM.res.push(0); CLM.flash = `Temps écoulé : c'était ${G.p.n}.`; CLM.flashOk = false; clmNext(); return; }
   clmRender();
 }
 function clmAnswer(v){
   const res = checkGuess(v, G.p);
+  CLM.res.push(res ? 1 : 0);
   if (res) { CLM.found++; CLM.ms.push(Date.now() - CLM.cardStart); CLM.flash = `Bravo : ${G.p.n}.`; CLM.flashOk = true; }
   else { CLM.flash = `Non : c'était ${G.p.n}.`; CLM.flashOk = false; }
   clmPersist(false);
@@ -1337,20 +1358,20 @@ async function showClmRank(el){
   if (!s.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
-      el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Choisissez un pseudo pour apparaître dans le classement du jour.</div>
-        <div class="row"><input id="clmPseudo" maxlength="20" placeholder="Votre pseudo" autocomplete="nickname" style="flex:1 1 140px">
+      el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
+        <div class="row"><input id="clmPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="clmSend">Publier mon score</button></div><div class="msg bad small" id="clmMsg"></div>`;
-      $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indiquez un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el); };
+      $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el); };
       return;
     }
-    el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Envoi de votre score…</div>`;
+    el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/clm_scores", { method: "POST",
         headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
         body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen }) });
       if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
       s.sent = { pseudo: ps, found: s.found, avg: s.avg }; lsSet("ts_clm", s);
-    } catch(e) { el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment. Votre score sera envoyé à la prochaine ouverture du contre-la-montre.</div>`; return; }
+    } catch(e) { el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du contre-la-montre.</div>`; return; }
   } else el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Chargement du classement…</div>`;
   let rows;
   try {
@@ -1363,7 +1384,7 @@ async function showClmRank(el){
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = `<h3>Classement du contre-la-montre</h3>
-    <div class="me-line">${mi >= 0 ? `Vous êtes ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches pour tout le monde aujourd'hui.</div>
     <div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`;
@@ -1458,19 +1479,19 @@ async function showRank(el){
   if (!saved.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
-      el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Choisissez un pseudo pour apparaître dans le classement de tous les joueurs.</div>
-        <div class="row"><input id="rkPseudo" maxlength="20" placeholder="Votre pseudo" autocomplete="nickname" style="flex:1 1 140px">
+      el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
+        <div class="row"><input id="rkPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="rkSend">Publier mon score</button></div><div class="msg bad small" id="rkMsg"></div>`;
       $("rkSend").onclick = () => {
         const v = $("rkPseudo").value.trim();
-        if (!v) { $("rkMsg").textContent = "Indiquez un pseudo."; return; }
+        if (!v) { $("rkMsg").textContent = "Indique un pseudo."; return; }
         lsSet("ts_pseudo", v); showRank(el);
       };
       return;
     }
-    el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Envoi de votre score…</div>`;
+    el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Envoi de ton score…</div>`;
     try { await sbSend(saved, ps); }
-    catch(e){ el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Classement indisponible pour le moment. Votre score sera envoyé à la prochaine ouverture du défi du jour.</div>`; return; }
+    catch(e){ el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du défi du jour.</div>`; return; }
   } else {
     el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Chargement du classement…</div>`;
   }
@@ -1483,7 +1504,7 @@ async function showRank(el){
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = `<h3>Classement du jour</h3>
-    <div class="me-line">${mi >= 0 ? `Vous êtes ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée.</div>
     <div class="row"><button id="rkRefresh">Actualiser</button></div>`;
@@ -1498,9 +1519,8 @@ $("btnDaily").onclick = () => {
       const t = saved.res.reduce((s,r)=>s+r.pts,0);
       const ms = (saved.end || 0) - (saved.start || 0);
       const f = saved.res.filter(r=>r.won).length;
-      $("dailySub").textContent = `Déjà jouée aujourd'hui : ${f}/${DAILY.list.length} trouvés · ${t} pts · ${fmtDur(ms)} ${saved.res.map(SYMB).join("")}. Nouvelle série demain.`;
+      $("dailySub").textContent = `Déjà joué aujourd'hui : ${f}/${DAILY.list.length} trouvés · ${t} pts · ${fmtDur(ms)} ${saved.res.map(SYMB).join("")} · Nouvelle série demain.`;
       G = { mode: "daily", shareText: dailyShareText(key, saved.res, ms) + "\n" + baseUrl() };
-      try { navigator.clipboard.writeText(G.shareText).then(() => { $("dailySub").textContent += " Résultat copié."; }).catch(()=>{}); } catch(e){}
       showRank($("homeRank"));
       return;
     }
@@ -1550,7 +1570,7 @@ function drawScoreCard(){
   const n = d.res.length, s = Math.min(70, Math.floor((W-300) / Math.max(n,1)) - 12), tot = n*(s+12)-12;
   d.res.forEach((r,i) => { x.fillStyle = col(r); roundRect(x, (W-tot)/2 + i*(s+12), 990, s, s, 10); x.fill(); });
   if (d.time) { x.fillStyle = "#cfdcd2"; x.font = "500 36px Barlow, Arial, sans-serif"; x.fillText(`⏱ ${fmtDur(d.time)}`, W/2, 990 + s + 60); }
-  x.fillStyle = "#f2c94c"; x.font = "600 46px Barlow, Arial, sans-serif"; x.fillText("Saurez-vous faire mieux ?", W/2, 1250);
+  x.fillStyle = "#f2c94c"; x.font = "600 46px Barlow, Arial, sans-serif"; x.fillText("Sauras-tu faire mieux ?", W/2, 1250);
   return c;
 }
 function roundRect(x, a, b, w, h, r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
@@ -1560,7 +1580,7 @@ async function trySharePng(){
     const text = (G.mode === "daily" && G.shareText) ? G.shareText : "Mon score sur TALL&small players" + (PUBLIC_URL ? " : " + PUBLIC_URL : "");
     if (navigator.canShare && navigator.canShare({ files: [shareFile] })) { await navigator.share({ files: [shareFile], text }); $("shareImgMsg").textContent = ""; return true; }
   } catch(e){ if (e && e.name === "AbortError") return true; }
-  $("shareImgMsg").textContent = "Le partage direct n'est pas disponible ici. Faites un appui long sur l'image pour l'enregistrer ou la partager (WhatsApp, Messages, TikTok…).";
+  $("shareImgMsg").textContent = "Le partage direct n'est pas disponible ici. Fais un appui long sur l'image pour l'enregistrer ou la partager (WhatsApp, Messages, TikTok…).";
   return false;
 }
 $("shareImg").onclick = () => {
