@@ -193,6 +193,7 @@
         <button data-home style="flex:0 0 auto">Accueil</button>
       </div>
     </div>
+    <div class="card rank hide" id="introRank" style="margin-top:16px"></div>
   </section>
 
   <!-- PARTIE -->
@@ -906,6 +907,57 @@ $("copyCode").onclick = async () => {
 };
 
 
+/* ---------- classement commun d'un défi entre amis ---------- */
+let DEFI_TIMER = null;
+async function sbDefiSend(row){
+  const r = await fetch(SB_URL + "/defi_scores", { method: "POST",
+    headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(row) });
+  if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
+}
+async function sbDefiRows(tok){
+  const r = await fetch(SB_URL + "/defi_ranking?defi=eq." + encodeURIComponent(tok) + "&select=pseudo,won,essai,ms,createur,created_at&order=created_at.asc&limit=500", { headers: { apikey: SB_KEY } });
+  if (!r.ok) throw new Error("lecture " + r.status);
+  return r.json();
+}
+async function showDefiRank(el, d, mine){
+  if (DEFI_TIMER) { clearTimeout(DEFI_TIMER); DEFI_TIMER = null; }
+  let rows;
+  try { rows = await sbDefiRows(d.tok); }
+  catch(e){
+    if (mine) { el.classList.remove("hide"); el.innerHTML = `<h3>Classement du défi</h3><div class="small muted">Classement indisponible pour le moment.</div>`; }
+    else el.classList.add("hide");
+    return;
+  }
+  const fin = d.t ? (d.t + DEFI_DELAI) * 1000 : 0;
+  rows.forEach(r => { r.off = !r.createur && (!fin || Date.parse(r.created_at) <= fin); });
+  const cls = r => r.won && r.off ? 0 : r.won ? 1 : 2;
+  rows.sort((a,b) => cls(a) - cls(b) || (cls(a) < 2 ? a.ms - b.ms : 0));
+  if (!rows.length && !mine) { el.classList.add("hide"); return; }
+  el.classList.remove("hide");
+  const winners = rows.filter(r => cls(r) === 0);
+  const mi = mine ? rows.findIndex(r => r.pseudo === mine.pseudo && r.ms === mine.ms && r.won === mine.won) : -1;
+  let head;
+  if (mi >= 0 && cls(rows[mi]) === 0) head = mi === 0 ? `Vous êtes en tête (${winners.length} dans le délai)` : `Vous êtes ${rangTxt(mi+1)} sur ${winners.length} dans le délai`;
+  else if (winners.length) head = `En tête : ${esc(winners[0].pseudo)} (${fmtTime(winners[0].ms)})`;
+  else head = rows.length ? "Personne n'a encore trouvé dans le délai" : "Aucun résultat pour l'instant";
+  const etat = r => r.createur ? "créateur" : !r.won ? "pas trouvé" : r.off ? fmtTime(r.ms) : fmtTime(r.ms) + " (hors délai)";
+  let n = 0;
+  const body = rows.map((r,i) => {
+    const rang = cls(r) === 0 ? rangTxt(++n) : "–";
+    return `<tr class="${i === mi ? "me" : ""}"><td>${rang}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.won ? (r.essai === 1 ? "1er essai" : "2e essai") : ""}</td><td class="n">${etat(r)}</td></tr>`;
+  }).join("");
+  const live = fin && Date.now() < fin + 60000;
+  const note = !fin ? "" : Date.now() < fin
+    ? `Défi officiel jusqu'à ${hhmm(fin/1000)}. Le classement se met à jour automatiquement.`
+    : `Délai officiel terminé à ${hhmm(fin/1000)}.`;
+  el.innerHTML = `<h3>Classement du défi</h3><div class="me-line">${head}</div>
+    ${rows.length ? `<table>${body}</table>` : ""}
+    <div class="small muted" style="margin-top:6px">${note}</div>
+    <div class="row"><button id="${el.id}Refresh">Actualiser</button></div>`;
+  $(el.id + "Refresh").onclick = () => showDefiRank(el, d, mine);
+  if (live) DEFI_TIMER = setTimeout(() => { if (el.offsetParent !== null) showDefiRank(el, d, mine); }, 15000);
+}
 /* ---------- défi chronométré ---------- */
 let DEFI = null;
 function openDefi(d){
@@ -920,6 +972,8 @@ function openDefi(d){
   $("pseudo").value = lsGet("ts_pseudo", "");
   $("introMsg").textContent = "";
   show("intro");
+  $("introRank").classList.add("hide");
+  showDefiRank($("introRank"), d, null);
 }
 $("startDefi").onclick = () => {
   const ps = $("pseudo").value.trim();
@@ -945,6 +999,11 @@ function endDefi(won){
   G.shareText = txt + "\n" + defiLink(DEFI.tok);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide");
+  const mine = { pseudo: ps, ms: Math.round(ms), won };
+  const box = $("rankBox"); box.classList.remove("hide");
+  box.innerHTML = `<h3>Classement du défi</h3><div class="small muted">Envoi de votre résultat…</div>`;
+  sbDefiSend({ defi: DEFI.tok, device: deviceId(), pseudo: ps, won, essai: won ? essai : 0, ms: mine.ms, createur: !!createur })
+    .catch(() => {}).finally(() => showDefiRank(box, DEFI, mine));
 }
 $("shareCopy").onclick = async () => {
   try { await navigator.clipboard.writeText(G.shareText); $("shareMsg").textContent = "Résultat copié : collez-le dans le groupe."; }
