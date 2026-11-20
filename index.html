@@ -169,6 +169,8 @@
 .soloBlock{margin-top:22px;display:flex;flex-direction:column}
 .soloBlock #btnSolo{width:100%;margin:0;border-bottom-left-radius:0;border-bottom-right-radius:0}
 .soloBlock .soloSettings{margin:0 !important;border-top-left-radius:0;border-top-right-radius:0;border-top:none}
+.playcount{text-align:center;font-size:13px;color:var(--accent);margin:12px 0 0;font-weight:600}
+body:not(.home-bg) .playcount{display:none}
 /* Accueil compact */
   body.home-bg .wrap{padding-top:10px}
   body.home-bg h1.brand{gap:6px;margin-bottom:6px}
@@ -232,6 +234,7 @@
       <div class="lbl" id="levelCount" style="margin:6px 0 0"></div>
     </div>
     </div>
+    <p class="playcount hide" id="playCount"></p>
     <div class="card compact">
       <h2>Consulter une fiche</h2>
       <form id="viewForm" class="row">
@@ -812,7 +815,7 @@ const PLAYERS = [
 const $ = id => document.getElementById(id);
 const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’'`\-\.]/g," ").replace(/\s+/g," ").trim();
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-function show(id){ ["home","intro","game","create"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); }
+function show(id){ ["home","intro","game","create"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") loadPlayCount(); }
 document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
 
 function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
@@ -1079,6 +1082,7 @@ function nextSolo(){
 $("btnSolo").onclick = () => {
   if (!pool().length) { $("levelCount").textContent = "Aucun joueur pour cette combinaison : change le niveau ou l'époque."; return; }
   SESSION = { total: 0, played: 0, found: 0, res: [], start: Date.now(), end: 0 };
+  logPlay("solo");
   order = shuffle(pool()); orderIdx = 0; nextSolo();
 };
 
@@ -1236,6 +1240,7 @@ $("startDefi").onclick = () => {
   const ps = $("pseudo").value.trim();
   if (!ps) { $("introMsg").textContent = "Indique un pseudo."; return; }
   lsSet("ts_pseudo", ps);
+  logPlay("defi");
   startGame(DEFI.player, "chrono");
 };
 function endDefi(won){
@@ -1329,6 +1334,7 @@ function clmList(ranked){
   return pool;
 }
 function clmStart(){
+  logPlay("clm");
   const s = clmSaved();
   const ranked = !s;
   CLM = { ranked, key: todayKey(), list: clmList(ranked), idx: -1, found: 0, ms: [], res: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
@@ -1586,6 +1592,7 @@ $("btnDaily").onclick = () => {
     }
     DAILY.res = saved.res || []; DAILY.idx = saved.res.length; DAILY.start = saved.start || Date.now();   // reprise : le chrono continue depuis le début de la série
   }
+  if (!(saved && saved.key === key && saved.start)) logPlay("daily");
   if (!DAILY.res.length) lsSet("ts_daily", { key, res: [], start: DAILY.start, end: 0 });
   dailyStart();
 };
@@ -1688,6 +1695,25 @@ $("shareImgClose").onclick = () => $("shareOverlay").classList.add("hide");
     st.classList.toggle("hide");
   };
 })();
+
+/* ---------- compteur de parties ---------- */
+function logPlay(mode){
+  try { fetch(SB_URL + "/game_plays", { method: "POST", keepalive: true,
+    headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({ mode, device: deviceId() }) }).catch(() => {}); } catch(e){}
+}
+async function loadPlayCount(){
+  const el = $("playCount"); if (!el) return;
+  try {
+    const r = await fetch(SB_URL + "/play_stats?select=total,today", { headers: { apikey: SB_KEY } });
+    if (!r.ok) throw 0;
+    const [s] = await r.json(); if (!s) throw 0;
+    const f = n => String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
+    el.textContent = `⚽ ${f(s.total)} partie${s.total>1?"s":""} jouée${s.total>1?"s":""} · ${f(s.today)} aujourd'hui`;
+    el.classList.remove("hide");
+  } catch(e){ el.classList.add("hide"); }
+}
+loadPlayCount();
 </script>
 </body>
 </html>
