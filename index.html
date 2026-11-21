@@ -98,6 +98,7 @@
   .dailyWrap{display:flex;flex-direction:column;position:relative}
   #home .big{text-align:center;align-items:center}
   #home .big strong,#home .big small{text-align:center;width:100%}
+  #home .big small .sq{display:block;text-align:center;margin-top:3px;letter-spacing:1px}
   .dailyWrap .big{flex:1 1 auto;width:100%}
   .dailyWrap.hasRank .big{padding-bottom:36px !important}
   .rankBtn{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;color:var(--accent);border:1px solid var(--accent);background:rgba(242,201,76,.10);line-height:1.4;z-index:1}
@@ -129,6 +130,11 @@
   .trioClubs .flag{font-size:20px}
   #trioLevels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   #trioLevels button{padding:12px 4px;font-weight:600}
+  #clmLv,#clmEra{display:grid;gap:6px}
+  #clmLv{grid-template-columns:repeat(4,1fr)} #clmEra{grid-template-columns:repeat(5,1fr)}
+  #clmLv button,#clmEra button{padding:8px 2px;font-size:14px;min-width:0}
+  .clmSel{display:flex;gap:6px;margin:4px 0 8px}
+  .clmSel select{flex:1;min-width:0;padding:5px 6px;border-radius:8px;background:rgba(255,255,255,.08);color:var(--text);border:1px solid var(--line);font:inherit;font-size:13px}
   .trioCount{text-align:center;color:var(--accent);font-weight:600;font-size:14px;margin-bottom:10px}
   #trioPass{font-size:14.5px;font-weight:700;padding:7px 12px;color:#f2c94c;border:1.5px solid #f2c94c;background:rgba(242,201,76,.12)}
   #trioMsg.flash{color:var(--muted)}
@@ -233,7 +239,7 @@ body:not(.home-bg) .playcount{display:none}
     <div class="grid">
       <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
       <div class="dailyWrap"><button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
-      <div class="dailyWrap"><button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 20 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 30 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnTrio"><strong>Qui a joué dans ces 3 clubs ?</strong><small>3 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
     </div>
     <div class="soloBlock">
@@ -338,6 +344,25 @@ body:not(.home-bg) .playcount{display:none}
     </div>
   </section>
 
+  <!-- CONTRE-LA-MONTRE : CHOIX -->
+  <section id="clmPick" class="hide">
+    <button class="back" data-home>← Accueil</button>
+    <div class="card clmPickCard">
+      <h2>Contre-la-montre</h2>
+      <p class="small muted" style="margin:0 0 10px">2 minutes, une nouvelle fiche toutes les 30 secondes. Chaque combinaison de niveau et d'époque a ses propres fiches du jour et son propre classement.</p>
+      <div class="lbl">Niveau</div>
+      <div class="levels" id="clmLv">
+        <button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button>
+      </div>
+      <div class="lbl" style="margin-top:8px">Époque (années)</div>
+      <div class="levels" id="clmEra">
+        <button data-v="toutes">Toutes</button><button data-v="90">1990</button><button data-v="00">2000</button><button data-v="10">2010</button><button data-v="20">2020</button>
+      </div>
+      <div class="small muted" id="clmPickInfo" style="margin:10px 0"></div>
+      <button class="primary" id="clmGo" style="width:100%">Commencer</button>
+    </div>
+  </section>
+
   <!-- RÈGLES -->
   <section id="rulesView" class="hide">
     <div class="card rulespage">
@@ -361,9 +386,9 @@ body:not(.home-bg) .playcount{display:none}
       </ul>
       <h3>Contre-la-montre</h3>
       <ul>
-        <li>2 minutes pour trouver le plus de joueurs possible. Une nouvelle fiche arrive toutes les 20 secondes.</li>
+        <li>2 minutes pour trouver le plus de joueurs possible. Une nouvelle fiche arrive toutes les 30 secondes. Avant de jouer, choisis un niveau et une époque (ou « Tous » et « Toutes »).</li>
         <li>Une seule proposition par fiche, sans indice : juste ou fausse, la fiche suivante arrive.</li>
-        <li>Les fiches sont les mêmes pour tout le monde dans la journée. Seule la première partie du jour est classée, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement.</li>
+        <li>Pour une même combinaison de niveau et d'époque, les fiches sont les mêmes pour tout le monde dans la journée, avec un classement propre à cette combinaison. Seule la première partie du jour de chaque combinaison est classée, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement.</li>
       </ul>
       <h3>Défi entre amis</h3>
       <ul>
@@ -961,7 +986,6 @@ const PLAYERS = [
  {n:"Antonio Rüdiger", b:"1993-03-03", d:"moyen", a:["rudiger", "ruediger"], p:"Défenseur", c:"Allemagne", r:[["2011-12", "VfB Stuttgart II", "3. Liga", 17, 1],["2011-12", "VfB Stuttgart", "Bundesliga", 1, 0],["2012-13", "VfB Stuttgart II", "3. Liga", 4, 2],["2012-13", "VfB Stuttgart", "Bundesliga", 16, 0],["2013-14", "VfB Stuttgart", "Bundesliga", 30, 2],["2014-15", "VfB Stuttgart II", "3. Liga", 1, 0],["2014-15", "VfB Stuttgart", "Bundesliga", 19, 0],["2015-16", "AS Rome (prêt)", "Serie A", 30, 2],["2016-17", "AS Rome", "Serie A", 26, 0],["2017-18", "Chelsea", "Premier League", 27, 2],["2018-19", "Chelsea", "Premier League", 33, 1],["2019-20", "Chelsea", "Premier League", 20, 2],["2020-21", "Chelsea", "Premier League", 19, 1],["2021-22", "Chelsea", "Premier League", 34, 3],["2022-23", "Real Madrid", "Liga", 33, 1],["2023-24", "Real Madrid", "Liga", 33, 1],["2024-25", "Real Madrid", "Liga", 29, 0],["2025-26", "Real Madrid", "Liga", 18, 1],["2026-27", "Real Madrid", "Liga", 4, 1]]},
  {n:"David Alaba", b:"1992-06-24", d:"facile", a:["alaba"], p:"Défenseur", c:"Autriche", r:[["2009-10", "Bayern Munich II", "3. Liga", 23, 1],["2009-10", "Bayern Munich", "Bundesliga", 3, 0],["2010-11", "Bayern Munich II", "3. Liga", 10, 0],["2010-11", "Bayern Munich", "Bundesliga", 2, 0],["2010-11", "TSG Hoffenheim (prêt)", "Bundesliga", 17, 2],["2011-12", "Bayern Munich", "Bundesliga", 30, 2],["2012-13", "Bayern Munich", "Bundesliga", 23, 3],["2013-14", "Bayern Munich", "Bundesliga", 28, 2],["2014-15", "Bayern Munich", "Bundesliga", 19, 2],["2015-16", "Bayern Munich", "Bundesliga", 30, 1],["2016-17", "Bayern Munich", "Bundesliga", 32, 4],["2017-18", "Bayern Munich", "Bundesliga", 23, 2],["2018-19", "Bayern Munich", "Bundesliga", 31, 3],["2019-20", "Bayern Munich", "Bundesliga", 28, 1],["2020-21", "Bayern Munich", "Bundesliga", 33, 2],["2021-22", "Real Madrid", "Liga", 30, 2],["2022-23", "Real Madrid", "Liga", 23, 1],["2023-24", "Real Madrid", "Liga", 14, 0],["2024-25", "Real Madrid", "Liga", 7, 0],["2025-26", "Real Madrid", "Liga", 11, 0],["2026-27", "Udinese", "Serie A", 2, 0]]},
  {n:"William Saliba", b:"2001-03-24", d:"facile", a:["saliba"], p:"Défenseur", c:"France", r:[["2017-18", "AS Saint-Étienne II", "National 3", 1, 0],["2018-19", "AS Saint-Étienne II", "National 2", 2, 0],["2018-19", "AS Saint-Étienne", "Ligue 1", 16, 0],["2019-20", "AS Saint-Étienne (prêt)", "Ligue 1", 12, 0],["2020-21", "OGC Nice (prêt)", "Ligue 1", 20, 1],["2021-22", "Olympique de Marseille (prêt)", "Ligue 1", 36, 0],["2022-23", "Arsenal", "Premier League", 27, 2],["2023-24", "Arsenal", "Premier League", 38, 2],["2024-25", "Arsenal", "Premier League", 35, 2],["2025-26", "Arsenal", "Premier League", 31, 1]]},
- {n:"Alessandro Bastoni", b:"1999-04-13", d:"moyen", a:["bastoni"], p:"Défenseur", c:"Italie", r:[["2016-17", "Atalanta", "Serie A", 3, 0],["2017-18", "Atalanta (prêt)", "Serie A", 4, 0],["2018-19", "Parme (prêt)", "Serie A", 24, 1],["2019-20", "Inter Milan", "Serie A", 25, 2],["2020-21", "Inter Milan", "Serie A", 33, 0],["2021-22", "Inter Milan", "Serie A", 31, 1],["2022-23", "Inter Milan", "Serie A", 29, 0],["2023-24", "Inter Milan", "Serie A", 28, 1],["2024-25", "Inter Milan", "Serie A", 33, 1],["2025-26", "Inter Milan", "Serie A", 28, 1],["2026-27", "Inter Milan", "Serie A", 10, 1]]},
  {n:"Milan Škriniar", b:"1995-02-11", d:"moyen", a:["skriniar"], p:"Défenseur", c:"Slovaquie", r:[["2011-12", "Žilina", "Slovaquie D1", 2, 0],["2012-13", "Žilina", "Slovaquie D1", 10, 1],["2012-13", "Zlaté Moravce (prêt)", "Slovaquie D1", 7, 0],["2013-14", "Žilina", "Slovaquie D1", 15, 1],["2014-15", "Žilina", "Slovaquie D1", 32, 6],["2015-16", "Žilina", "Slovaquie D1", 18, 4],["2015-16", "Sampdoria", "Serie A", 3, 0],["2016-17", "Sampdoria", "Serie A", 35, 0],["2017-18", "Inter Milan", "Serie A", 38, 4],["2018-19", "Inter Milan", "Serie A", 35, 0],["2019-20", "Inter Milan", "Serie A", 32, 0],["2020-21", "Inter Milan", "Serie A", 32, 3],["2021-22", "Inter Milan", "Serie A", 35, 3],["2022-23", "Inter Milan", "Serie A", 21, 0],["2023-24", "Paris SG", "Ligue 1", 24, 0],["2024-25", "Paris SG", "Ligue 1", 5, 0],["2024-25", "Fenerbahçe (prêt)", "Süper Lig", 16, 3],["2025-26", "Fenerbahçe", "Süper Lig", 24, 2],["2026-27", "Fenerbahçe", "Süper Lig", 11, 1]]},
  {n:"Filipe Luís", b:"1985-08-09", d:"moyen", a:["filipe luis"], p:"Défenseur", c:"Brésil", r:[["2003", "Figueirense", "Série A", 7, 1],["2004", "Figueirense", "Série A", 17, 0],["2005-06", "Real Madrid B (prêt)", "Segunda División", 37, 0],["2006-07", "Deportivo La Corogne (prêt)", "Liga", 19, 0],["2007-08", "Deportivo La Corogne (prêt)", "Liga", 33, 1],["2008-09", "Deportivo La Corogne", "Liga", 38, 2],["2009-10", "Deportivo La Corogne", "Liga", 21, 3],["2010-11", "Atlético Madrid", "Liga", 27, 1],["2011-12", "Atlético Madrid", "Liga", 36, 0],["2012-13", "Atlético Madrid", "Liga", 32, 1],["2013-14", "Atlético Madrid", "Liga", 32, 0],["2014-15", "Chelsea", "Premier League", 15, 0],["2015-16", "Atlético Madrid", "Liga", 32, 1],["2016-17", "Atlético Madrid", "Liga", 34, 3],["2017-18", "Atlético Madrid", "Liga", 20, 1],["2018-19", "Atlético Madrid", "Liga", 27, 2],["2019", "Flamengo", "Série A", 16, 0],["2020", "Flamengo", "Série A", 31, 2],["2021", "Flamengo", "Série A", 22, 0],["2022", "Flamengo", "Série A", 10, 0],["2023", "Flamengo", "Série A", 10, 0]]},
  {n:"Míchel Salgado", b:"1975-10-22", d:"moyen", a:["salgado"], p:"Défenseur", c:"Espagne", r:[["1993-94", "Celta Vigo B", "Segunda División B", 20, 1],["1994-95", "Celta Vigo", "Liga", 14, 0],["1995-96", "Celta Vigo", "Liga", 18, 0],["1996-97", "UD Salamanque (prêt)", "Segunda División", 36, 1],["1997-98", "Celta Vigo", "Liga", 25, 0],["1998-99", "Celta Vigo", "Liga", 35, 3],["1999-00", "Real Madrid", "Liga", 29, 0],["2000-01", "Real Madrid", "Liga", 27, 1],["2001-02", "Real Madrid", "Liga", 35, 0],["2002-03", "Real Madrid", "Liga", 35, 0],["2003-04", "Real Madrid", "Liga", 35, 1],["2004-05", "Real Madrid", "Liga", 30, 2],["2005-06", "Real Madrid", "Liga", 27, 0],["2006-07", "Real Madrid", "Liga", 16, 0],["2007-08", "Real Madrid", "Liga", 8, 0],["2008-09", "Real Madrid", "Liga", 9, 0],["2009-10", "Blackburn Rovers", "Premier League", 21, 0],["2010-11", "Blackburn Rovers", "Premier League", 36, 0],["2011-12", "Blackburn Rovers", "Premier League", 9, 0],["2017-18", "Independiente", "Argentine D1", 1, 0]]},
@@ -1153,7 +1177,7 @@ const PLAYERS = [
 const $ = id => document.getElementById(id);
 const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’'`\-\.]/g," ").replace(/\s+/g," ").trim();
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView","rulesView","trio"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
+function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView","rulesView","trio","clmPick"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
 document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
 
 function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
@@ -1377,7 +1401,7 @@ function endGame(won){
   }
 }
 $("nextBtn").onclick = () => {
-  if (G.mode === "clm") { clmStart(); return; }
+  if (G.mode === "clm") { clmPick(); return; }
   if (G.mode === "solo") { if (SESSION.over) $("btnSolo").onclick(); else nextSolo(); }
   else if (G.mode === "daily" && DAILY.idx + 1 < DAILY.list.length) { DAILY.idx++; dailyStart(); }
   else show("home");
@@ -1736,28 +1760,59 @@ $("viewForm").onsubmit = e => {
 $("viewClose").onclick = () => { $("viewOut").classList.add("hide"); $("viewInput").value = ""; };
 
 /* ---------- contre-la-montre ---------- */
-const CLM_TOTAL = 120000, CLM_CARD = 20000;
+const CLM_TOTAL = 120000, CLM_CARD = 30000;
 let CLM = null;
-function clmSaved(){ const s = lsGet("ts_clm", null); return s && s.key === todayKey() ? s : null; }
+const CLM_LV = { tous: "Tous niveaux", facile: "Facile", moyen: "Moyen", difficile: "Difficile" };
+const CLM_ERA = { toutes: "toutes époques", "90": "années 1990", "00": "années 2000", "10": "années 2010", "20": "années 2020" };
+const CLM_ERA_ORDER = ["toutes","90","00","10","20"];
+let CLM_SEL = lsGet("ts_clm_sel", { lv: "tous", era: "toutes" });
+const clmCombo = sel => `${sel.lv}-${sel.era}`;
+const clmLabel = combo => { const [lv, era] = combo.split("-"); return `${CLM_LV[lv]} · ${CLM_ERA[era]}`; };
+function clmDay(){
+  let s = lsGet("ts_clm", null);
+  if (s && !s.games && s.key) s = { key: s.key, games: { "tous-toutes": { found: s.found, avg: s.avg, seen: s.seen, res: s.res, done: s.done, sent: s.sent } }, last: "tous-toutes" };   // ancien format
+  return s && s.key === todayKey() ? s : { key: todayKey(), games: {}, last: null };
+}
+function clmGame(combo){ return clmDay().games[combo] || null; }
+function clmSaved(){ const d = clmDay(); return d.last ? Object.assign({ key: d.key, combo: d.last }, d.games[d.last]) : null; }
 function clmSub(){
   const s = clmSaved();
-  $("clmSub").textContent = s && s.done
-    ? `Déjà joué aujourd'hui : ${s.found}${s.seen ? "/" + s.seen : ""} trouvé${s.found>1?"s":""}`
-      + (s.res && s.res.length ? " " + s.res.map(x => x ? "🟩" : "⬛").join("") : "") + " · Rejouer hors classement."
-    : "2 minutes, une nouvelle fiche toutes les 20 secondes";
+  $("clmSub").innerHTML = s && s.done
+    ? `Dernière partie (${esc(clmLabel(s.combo))}) : ${s.found}${s.seen ? "/" + s.seen : ""} trouvé${s.found>1?"s":""}`
+      + (s.res && s.res.length ? `<span class="sq">${s.res.map(x => x ? "🟩" : "⬛").join("")}</span>` : "")
+    : "2 minutes, une nouvelle fiche toutes les 30 secondes";
 }
-function clmList(ranked){
-  const pool = PLAYERS.slice().sort((a,b) => a.n.localeCompare(b.n));
-  const rnd = ranked ? seededRand("TALLsmall-clm-" + todayKey()) : Math.random;
+const clmPool = sel => PLAYERS.filter(p => (sel.lv === "tous" || p.d === sel.lv) && (sel.era === "toutes" || p.e === sel.era));
+function clmList(ranked, sel){
+  const pool = clmPool(sel).sort((a,b) => a.n.localeCompare(b.n));
+  const combo = clmCombo(sel);
+  const rnd = ranked ? seededRand("TALLsmall-clm-" + todayKey() + (combo === "tous-toutes" ? "" : "-" + combo)) : Math.random;
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   return pool;
 }
+function clmPickRender(){
+  document.querySelectorAll("#clmLv button").forEach(b => b.classList.toggle("on", b.dataset.v === CLM_SEL.lv));
+  document.querySelectorAll("#clmEra button").forEach(b => b.classList.toggle("on", b.dataset.v === CLM_SEL.era));
+  const n = clmPool(CLM_SEL).length, g = clmGame(clmCombo(CLM_SEL));
+  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (g && g.done ? "Déjà jouée aujourd'hui : partie hors classement." : "Partie classée : tes fiches du jour sont les mêmes que celles des autres joueurs qui choisissent cette combinaison.");
+  $("clmGo").disabled = n < 4;
+  $("clmGo").textContent = n < 4 ? "Pas assez de joueurs" : (g && g.done ? "Rejouer (hors classement)" : "Commencer");
+}
+function clmPick(){
+  const d = clmDay(); let ch = false;
+  Object.values(d.games).forEach(g => { if (!g.done) { g.done = true; ch = true; } });   // partie classée interrompue : elle compte
+  if (ch) lsSet("ts_clm", d);
+  show("clmPick"); clmPickRender();
+}
+document.querySelectorAll("#clmLv button").forEach(b => b.onclick = () => { CLM_SEL.lv = b.dataset.v; lsSet("ts_clm_sel", CLM_SEL); clmPickRender(); });
+document.querySelectorAll("#clmEra button").forEach(b => b.onclick = () => { CLM_SEL.era = b.dataset.v; lsSet("ts_clm_sel", CLM_SEL); clmPickRender(); });
 function clmStart(){
+  const sel = Object.assign({}, CLM_SEL), combo = clmCombo(sel);
   logPlay("clm");
-  const s = clmSaved();
-  const ranked = !s;
-  CLM = { ranked, key: todayKey(), list: clmList(ranked), idx: -1, found: 0, ms: [], res: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
-  if (ranked) lsSet("ts_clm", { key: CLM.key, found: 0, avg: 0, seen: 0, done: false });
+  const g = clmGame(combo);
+  const ranked = !g || !g.done;
+  CLM = { ranked, combo, sel, key: todayKey(), list: clmList(ranked, sel), idx: -1, found: 0, ms: [], res: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
+  if (ranked) { const d = clmDay(); d.games[combo] = { found: 0, avg: 0, seen: 0, done: false }; d.last = combo; lsSet("ts_clm", d); }
   clearInterval(window._clmTick);
   window._clmTick = setInterval(clmTick, 100);
   clmNext();
@@ -1765,8 +1820,9 @@ function clmStart(){
 function clmPersist(done){
   if (!CLM || !CLM.ranked) return;
   const avg = CLM.ms.length ? Math.round(CLM.ms.reduce((a,b)=>a+b,0) / CLM.ms.length) : 0;
-  const prev = clmSaved() || {};
-  lsSet("ts_clm", { ...prev, key: CLM.key, found: CLM.found, avg, seen: CLM.seen, res: CLM.res.slice(), done: !!done });
+  const d = clmDay(); const prev = d.games[CLM.combo] || {};
+  d.games[CLM.combo] = { ...prev, found: CLM.found, avg, seen: CLM.seen, res: CLM.res.slice(), done: !!done }; d.last = CLM.combo;
+  lsSet("ts_clm", d);
 }
 function clmNext(){
   CLM.idx++; CLM.seen++; CLM.cardStart = Date.now();
@@ -1774,7 +1830,7 @@ function clmNext(){
   G = { p, mode: "clm", score: 0, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   $("rankBox").classList.add("hide");
   const badge = p.d ? `<span class="badge ${p.d}">${p.d}</span>` : "";
-  $("gameLabel").innerHTML = `Contre-la-montre${CLM.ranked ? "" : " · hors classement"} · fiche ${CLM.seen}` + badge;
+  $("gameLabel").innerHTML = `Contre-la-montre · ${clmLabel(CLM.combo)}${CLM.ranked ? "" : " · hors classement"} · fiche ${CLM.seen}` + badge;
   $("guessInput").value = "";
   $("msg").textContent = ""; $("msg").className = "msg";
   $("clmLive").classList.remove("hide");
@@ -1827,60 +1883,66 @@ function clmEnd(quit){
   $("resultTitle").textContent = "Temps écoulé !";
   $("resultText").textContent = `${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} sur ${CLM.seen} fiche${CLM.seen>1?"s":""}`
     + (CLM.found ? `, en ${fmtTime(avg)} en moyenne.` : ".") + ` La dernière fiche était ${G.p.n}.`
-    + (CLM.ranked ? "" : " Partie hors classement.");
-  G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
+    + ` (${clmLabel(CLM.combo)})` + (CLM.ranked ? "" : " Partie hors classement.");
+  G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} (${clmLabel(CLM.combo)}) : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
   $("shareImg").classList.add("hide");
   $("nextBtn").textContent = "Rejouer (hors classement)";
   $("resHome").classList.remove("hide");
-  showClmRank($("rankBox"));
+  showClmRank($("rankBox"), false, CLM.combo);
 }
-async function showClmRank(el, quiet){
-  const s = clmSaved();
-  if (!s || !s.done) { el.classList.add("hide"); return; }
+async function showClmRank(el, quiet, combo){
+  const d = clmDay();
+  combo = combo || (el.dataset.combo) || d.last || clmCombo(CLM_SEL);
+  el.dataset.combo = combo;
+  const s = Object.assign({ key: d.key, combo }, d.games[combo] || {});
   el.classList.remove("hide");
-  if (!s.sent) {
+  const H3 = `<h3>Classement du Contre-la-montre</h3>`;
+  const sel = () => { const [lv, era] = combo.split("-");
+    return `<div class="clmSel"><select id="${el.id}ClmLv">${Object.entries(CLM_LV).map(([k,v]) => `<option value="${k}" ${k===lv?"selected":""}>${v}</option>`).join("")}</select>`
+      + `<select id="${el.id}ClmEra">${CLM_ERA_ORDER.map(k => [k, CLM_ERA[k]]).map(([k,v]) => `<option value="${k}" ${k===era?"selected":""}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join("")}</select></div>`; };
+  const bindSel = () => { const f = () => showClmRank(el, false, $(el.id+"ClmLv").value + "-" + $(el.id+"ClmEra").value); if ($(el.id+"ClmLv")) { $(el.id+"ClmLv").onchange = f; $(el.id+"ClmEra").onchange = f; } };
+  if (s.done && !s.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
-      el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
+      el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
         <div class="row"><input id="clmPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="clmSend">Publier mon score</button></div><div class="msg bad small" id="clmMsg"></div>`;
-      $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el); };
+      $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el, false, combo); };
       return;
     }
-    el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Envoi de ton score…</div>`;
+    el.innerHTML = H3 + `<div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/clm_scores", { method: "POST",
         headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen }) });
+        body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen, combo }) });
       if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
-      s.sent = { pseudo: ps, found: s.found, avg: s.avg }; lsSet("ts_clm", s);
-    } catch(e) { el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du contre-la-montre.</div>`; return; }
-  } else if (!quiet) el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Chargement du classement…</div>`;
+      const d2 = clmDay(); d2.games[combo].sent = { pseudo: ps, found: s.found, avg: s.avg }; lsSet("ts_clm", d2); s.sent = d2.games[combo].sent;
+    } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du classement.</div>`; return; }
+  } else if (!quiet) el.innerHTML = H3 + sel() + `<div class="small muted">Chargement du classement…</div>`;
+  bindSel();
   let rows;
   try {
-    const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&select=pseudo,found,avg_ms&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
+    const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&combo=eq." + combo + "&select=pseudo,found,avg_ms&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
-  } catch(e) { if (!quiet) el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
-  const me = s.sent;
+  } catch(e) { if (!quiet) { el.innerHTML = H3 + sel() + `<div class="small muted">Classement indisponible pour le moment.</div>`; bindSel(); } return; }
+  const me = s.sent || {};
   const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.avg_ms === me.avg);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">${r.found ? fmtTime(r.avg_ms) : "–"}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
-  el.innerHTML = `<h3>Classement du Contre-la-montre</h3>
-    <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+  el.innerHTML = H3 + sel() + `
+    <div class="me-line">${!rows.length ? "Personne n'a encore joué cette combinaison aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches pour tout le monde aujourd'hui.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
+    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches aujourd'hui pour tous ceux qui choisissent ${clmLabel(combo).toLowerCase()}.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     <div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`;
-  $(el.id + "ClmRefresh").onclick = () => showClmRank(el);
+  bindSel();
+  $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
 }
-$("btnClm").onclick = () => {
-  const s = clmSaved();
-  if (s && !s.done) { s.done = true; lsSet("ts_clm", s); }   // partie classée interrompue : elle compte
-  clmStart();
-};
-{ const s = clmSaved(); if (s && !s.done) { s.done = true; lsSet("ts_clm", s); } clmSub(); }
+$("btnClm").onclick = clmPick;
+$("clmGo").onclick = clmStart;
+{ const d = clmDay(); let ch = false; Object.values(d.games).forEach(g => { if (!g.done) { g.done = true; ch = true; } }); if (ch) lsSet("ts_clm", d); clmSub(); }
 
 /* ---------- série du jour ---------- */
 let DAILY = { list: [], idx: 0, res: [], key: "", start: 0, end: 0 };
@@ -2001,7 +2063,7 @@ function dailyDoneSub(saved){
   $("dailyRankBtn").classList.toggle("hide", !done); $("dailyRankBtn").parentElement.classList.toggle("hasRank", !!done);
   if (!done) { $("dailySub").textContent = "Les mêmes 5 joueurs pour tout le monde aujourd'hui"; return; }
   const t = saved.res.reduce((s,r)=>s+r.pts,0), ms = (saved.end || 0) - (saved.start || 0), f = saved.res.filter(r=>r.won).length;
-  $("dailySub").textContent = `Déjà joué aujourd'hui : ${f}/${n} trouvés · ${t} pts · ${fmtDur(ms)} ${saved.res.map(SYMB).join("")} · Nouvelle série demain.`;
+  $("dailySub").innerHTML = `Déjà joué aujourd'hui : ${f}/${n} trouvés · ${t} pts · ${fmtDur(ms)}<span class="sq">${saved.res.map(SYMB).join("")}</span>`;
 }
 function openRank(render){
   show("rankView");
@@ -2184,7 +2246,7 @@ function rankBtns(){
   $("trioRankBtn").classList.toggle("hide", !lsGet("ts_trio_best", null));
 }
 $("dailyRankBtn").onclick = () => openRank((el, q) => showRank(el, q));
-$("clmRankBtn").onclick = () => openRank((el, q) => showClmRank(el, q));
+$("clmRankBtn").onclick = () => openRank((el, q) => showClmRank(el, q, q ? undefined : clmDay().last));
 $("soloRankBtn").onclick = () => openRank((el, q) => showSoloRank(el, q, true));
 $("btnDaily").onclick = () => {
   const key = todayKey();
