@@ -118,6 +118,11 @@
   ul.rules{margin:0;padding-left:18px;color:var(--muted)}
   ul.rules li{margin:2px 0}
   .rules-more{color:var(--muted);margin-top:10px}
+  .rulesBtn{display:block;width:100%;margin-top:8px}
+  .rulespage h3{font-family:"Barlow Condensed",sans-serif;font-size:18px;margin:14px 0 4px;color:var(--accent)}
+  .rulespage p{margin:0 0 6px;color:var(--muted);font-size:14px}
+  .rulespage ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.4}
+  .rulespage li{margin:3px 0}
   .rules-more h3{font-family:"Barlow Condensed",sans-serif;color:var(--text);font-size:17px;margin:12px 0 2px}
   .rules-more p{margin:0}
   #eras{flex-wrap:nowrap;gap:6px}
@@ -254,29 +259,7 @@ body:not(.home-bg) .playcount{display:none}
         <div class="row" style="margin-top:8px"><button id="viewClose" style="flex:0 0 auto">Fermer la fiche</button></div>
       </div>
     </div>
-    <div class="card compact rulescard">
-      <h2>Règles</h2>
-      <ul class="small rules">
-        <li><b>Pour tous les jeux :</b> retrouve le joueur à partir de sa carrière en club. Le nom de famille suffit ; une faute de frappe est tolérée sur les noms longs.</li>
-        <li><b>Défi du jour et jeu libre :</b> 100 points au 1<sup>er</sup> essai, 60 au 2<sup>e</sup>, 30 au 3<sup>e</sup>. Indice poste −10, indice nationalité −25, faute d'orthographe −10. Un joueur trouvé rapporte au moins 10 points.</li>
-        <li><b>Jeu libre :</b> 5 minutes pour marquer le plus de points. Un joueur moyen compte ×1,5, un difficile ×2. Classement général sur le meilleur score, conservé d'un jour à l'autre.</li>
-        <li><b>Contre-la-montre :</b> 2 minutes, une seule proposition et 20 secondes par fiche. On compte les joueurs trouvés.</li>
-        <li><b>Défi entre amis :</b> 2 essais, sans indice. Le plus rapide gagne.</li>
-      </ul>
-      <button id="rulesToggle" style="margin-top:6px">Règles détaillées</button>
-      <div id="rulesMore" class="hide small rules-more">
-        <h3>Le défi du jour</h3>
-        <p>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile), une seule fois par jour. Le classement se fait d'abord au nombre de joueurs trouvés, puis aux points (500 au maximum), puis au temps total le plus court : le chrono tourne du premier au dernier joueur, pauses comprises. Le bouton « Partager mon score à des amis » envoie le résultat sans dévoiler les réponses.</p>
-        <h3>Contre-la-montre</h3>
-        <p>Deux minutes pour trouver le plus de joueurs possible. Chaque fiche reste 20 secondes ; une seule proposition par fiche, juste ou fausse, et la fiche suivante arrive. Les fiches sont les mêmes pour tout le monde dans la journée ; seule la première partie du jour compte pour le classement, classé par nombre de joueurs trouvés puis par temps moyen de réponse. Une partie quittée en cours compte comme jouée.</p>
-        <h3>Défi entre amis</h3>
-        <p>Choisis un joueur et envoie le lien. Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer ». Pas de limite de temps : chacun joue quand il veut. Le classement range ceux qui ont trouvé, du plus rapide au plus lent ; le temps compte de « Commencer » à la bonne réponse. Le créateur du défi n'est pas classé.</p>
-        <h3>Jeu libre</h3>
-        <p>Une partie dure 5 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis. Trois propositions au maximum par joueur ; « Passer » donne la réponse et 0 point et fait gagner du temps. Les points d'un joueur moyen sont multipliés par 1,5, ceux d'un difficile par 2 (indices et fautes compris) : un difficile trouvé du premier coup rapporte 200 points. Le classement général retient le meilleur score de chaque joueur depuis le lancement ; il n'est pas remis à zéro chaque jour et on peut rejouer autant de fois qu'on veut. Une partie quittée avant la fin n'est pas classée.</p>
-        <h3>Saisie et statistiques</h3>
-        <p>Accents et majuscules sont ignorés. Une faute est tolérée à partir de 5 lettres, deux à partir de 10 ; une réponse acceptée avec une faute coûte 10 points. Les statistiques correspondent aux matchs et buts en championnat ; une saison avec un prêt ou un transfert apparaît sur deux lignes. Le niveau d'un joueur est facile, moyen ou difficile ; son époque correspond à la décennie où il a disputé le plus de matchs.</p>
-      </div>
-    </div>
+    <button class="rulesBtn" id="rulesBtn">Règles du jeu</button>
     <div class="card hide" id="installBox">
       <button class="installMain" id="installBtn">📲 Installe le jeu sur ton téléphone</button>
       <div class="installSteps hide" id="installSteps"></div>
@@ -299,6 +282,49 @@ body:not(.home-bg) .playcount{display:none}
       </div>
     </div>
     <div class="card rank hide" id="introRank" style="margin-top:16px"></div>
+  </section>
+
+  <!-- RÈGLES -->
+  <section id="rulesView" class="hide">
+    <div class="card rulespage">
+      <h2>Règles</h2>
+      <h3>Pour tous les jeux</h3>
+      <p>La carrière en club du joueur s'affiche saison par saison, avec ses matchs et ses buts en championnat. À toi de retrouver qui c'est.</p>
+      <ul>
+        <li>Le nom de famille suffit. Les accents et les majuscules sont ignorés.</li>
+        <li>Une faute de frappe est tolérée à partir de 5 lettres, deux à partir de 10.</li>
+        <li>Chaque joueur a un niveau (facile, moyen ou difficile) et une époque : la décennie où il a disputé le plus de matchs (les années 1980 sont rattachées aux années 1990).</li>
+        <li>Une saison avec un prêt ou un transfert apparaît sur deux lignes. Quand les statistiques saison par saison ne sont pas disponibles, une ligne peut regrouper plusieurs saisons (ex. : 1988-90).</li>
+      </ul>
+      <h3>Le défi du jour</h3>
+      <ul>
+        <li>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile), une seule fois par jour.</li>
+        <li>Trois propositions par joueur : 100 points au 1<sup>er</sup> essai, 60 au 2<sup>e</sup>, 30 au 3<sup>e</sup>.</li>
+        <li>Indice poste −10, indice nationalité −25, réponse acceptée avec une faute −10. Un joueur trouvé rapporte au moins 10 points.</li>
+        <li>« Passer » donne la réponse et 0 point.</li>
+        <li>Classement du jour : d'abord le nombre de joueurs trouvés, puis les points (500 au maximum), puis le temps total, compté du premier au dernier joueur, pauses comprises.</li>
+        <li>Le partage du score ne dévoile pas les réponses.</li>
+      </ul>
+      <h3>Contre-la-montre</h3>
+      <ul>
+        <li>2 minutes pour trouver le plus de joueurs possible. Une nouvelle fiche arrive toutes les 20 secondes.</li>
+        <li>Une seule proposition par fiche, sans indice : juste ou fausse, la fiche suivante arrive.</li>
+        <li>Les fiches sont les mêmes pour tout le monde dans la journée. Seule la première partie du jour est classée, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement.</li>
+      </ul>
+      <h3>Défi entre amis</h3>
+      <ul>
+        <li>Choisis un joueur et envoie le lien à tes amis.</li>
+        <li>Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse ; pas de limite de temps pour jouer.</li>
+        <li>Le classement range ceux qui ont trouvé, du plus rapide au plus lent. Le créateur du défi n'est pas classé.</li>
+      </ul>
+      <h3>Jeu libre</h3>
+      <ul>
+        <li>Une partie dure 5 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis.</li>
+        <li>Mêmes points que le défi du jour (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
+        <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
+      </ul>
+    </div>
+    <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
   </section>
 
   <!-- CLASSEMENT DU DÉFI DU JOUR -->
@@ -1065,7 +1091,7 @@ const PLAYERS = [
 const $ = id => document.getElementById(id);
 const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’'`\-\.]/g," ").replace(/\s+/g," ").trim();
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
+function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView","rulesView"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
 document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
 
 function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
@@ -1951,7 +1977,7 @@ $("btnDaily").onclick = () => {
 
 rankBtns();
 
-$("rulesToggle").onclick = () => { const m = $("rulesMore"); const open = m.classList.toggle("hide") === false; $("rulesToggle").textContent = open ? "Masquer les règles détaillées" : "Règles détaillées"; };
+$("rulesBtn").onclick = () => show("rulesView");
 
 
 /* ---------- partage du score en image ---------- */
