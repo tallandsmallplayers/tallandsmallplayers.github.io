@@ -95,6 +95,9 @@
   .muted{color:var(--muted)}
   .rank{margin-bottom:12px}
   .rank h3{margin:0 0 6px;font-size:17px}
+  .dailyWrap{display:flex;flex-direction:column;gap:6px}
+  .dailyWrap .big{flex:1 1 auto}
+  .rankBtn{width:100%;font-weight:600;color:var(--accent);border-color:var(--accent)}
   .rank .me-line{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:600;color:var(--accent);margin-bottom:8px}
   .rank table{width:100%;border-collapse:collapse;font-size:14px;table-layout:auto}
   .rank td{padding:4px 4px;border-bottom:1px solid var(--line);width:auto}
@@ -208,11 +211,10 @@ body:not(.home-bg) .playcount{display:none}
   <!-- ACCUEIL -->
   <section id="home">
     <div class="grid">
-      <button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button>
-      <button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 20 secondes</small></button>
+      <div class="dailyWrap"><button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Voir le classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 20 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Voir le classement</button></div>
       <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
     </div>
-    <div class="card rank hide" id="homeRank" style="margin-top:16px"></div>
     <div class="soloBlock">
       <button class="big" id="btnSolo"><strong>Jeu libre</strong><small>5 minutes pour marquer le plus de points</small></button>
     <div class="card compact soloSettings">
@@ -233,6 +235,7 @@ body:not(.home-bg) .playcount{display:none}
       </div>
       <div class="lbl" id="levelCount" style="margin:6px 0 0"></div>
     </div>
+    <button class="rankBtn hide" id="soloRankBtn" style="margin-top:6px">Voir le classement</button>
     </div>
     <p class="playcount hide" id="playCount"></p>
     <div class="card compact">
@@ -296,6 +299,12 @@ body:not(.home-bg) .playcount{display:none}
       </div>
     </div>
     <div class="card rank hide" id="introRank" style="margin-top:16px"></div>
+  </section>
+
+  <!-- CLASSEMENT DU DÉFI DU JOUR -->
+  <section id="rankView" class="hide">
+    <div class="card rank" id="viewRankBox"></div>
+    <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
   </section>
 
   <!-- PARTIE -->
@@ -824,7 +833,7 @@ const PLAYERS = [
 const $ = id => document.getElementById(id);
 const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’'`\-\.]/g," ").replace(/\s+/g," ").trim();
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-function show(id){ ["home","intro","game","create"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") loadPlayCount(); }
+function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
 document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
 
 function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
@@ -1118,11 +1127,11 @@ function soloEnd(){
   if (!best || SESSION.total > best.points) lsSet("ts_solo_best", { key: SESSION.key, points: SESSION.total });
   showSoloRank($("rankBox"));
 }
-async function showSoloRank(el){
-  const H3 = "<h3>Classement du jeu libre</h3>";
+async function showSoloRank(el, quiet, view){
+  const H3 = "<h3>Classement du Jeu libre</h3>";
   el.classList.remove("hide");
   const ps = lsGet("ts_pseudo", "");
-  if (!SESSION.sent) {
+  if (!view && !SESSION.sent) {
     if (!ps) {
       el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement.</div>
         <div class="row"><input id="soloPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
@@ -1138,22 +1147,22 @@ async function showSoloRank(el){
       if (r.status !== 201) throw new Error("envoi " + r.status);
       SESSION.sent = true;
     } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div><div class="row"><button id="soloRetry">Réessayer</button></div>`; $("soloRetry").onclick = () => showSoloRank(el); return; }
-  } else el.innerHTML = H3 + `<div class="small muted">Chargement du classement…</div>`;
+  } else if (!quiet) el.innerHTML = H3 + `<div class="small muted">Chargement du classement…</div>`;
   let rows;
   try {
     const r = await fetch(SB_URL + "/solo_ranking_all?select=pseudo,points,found,played&order=points.desc,found.desc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
-  } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
-  const best = lsGet("ts_solo_best", { points: SESSION.total });
+  } catch(e) { if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  const best = lsGet("ts_solo_best", null) || { points: SESSION ? SESSION.total : -1 };
   const mi = rows.findIndex(r => r.pseudo === ps && r.points === best.points);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.points} pts</td><td class="n">${r.found}/${r.played}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = H3 + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur depuis le lancement, sur 5 minutes. Le classement est conservé d'un jour à l'autre.</div>
+    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur depuis le lancement, sur 5 minutes. Le classement est conservé d'un jour à l'autre.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     <div class="row"><button id="${el.id}SoloRefresh">Actualiser</button></div>`;
-  $(el.id + "SoloRefresh").onclick = () => showSoloRank(el);
+  $(el.id + "SoloRefresh").onclick = () => showSoloRank(el, false, view);
 }
 function renderSession(){
   const el = $("sessionTotal");
@@ -1507,42 +1516,42 @@ function clmEnd(quit){
   $("resHome").classList.remove("hide");
   showClmRank($("rankBox"));
 }
-async function showClmRank(el){
+async function showClmRank(el, quiet){
   const s = clmSaved();
   if (!s || !s.done) { el.classList.add("hide"); return; }
   el.classList.remove("hide");
   if (!s.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
-      el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
+      el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
         <div class="row"><input id="clmPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="clmSend">Publier mon score</button></div><div class="msg bad small" id="clmMsg"></div>`;
       $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el); };
       return;
     }
-    el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Envoi de ton score…</div>`;
+    el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/clm_scores", { method: "POST",
         headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
         body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen }) });
       if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
       s.sent = { pseudo: ps, found: s.found, avg: s.avg }; lsSet("ts_clm", s);
-    } catch(e) { el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du contre-la-montre.</div>`; return; }
-  } else el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Chargement du classement…</div>`;
+    } catch(e) { el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du contre-la-montre.</div>`; return; }
+  } else if (!quiet) el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Chargement du classement…</div>`;
   let rows;
   try {
     const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&select=pseudo,found,avg_ms&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
-  } catch(e) { el.innerHTML = `<h3>Classement du contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  } catch(e) { if (!quiet) el.innerHTML = `<h3>Classement du Contre-la-montre</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
   const me = s.sent;
   const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.avg_ms === me.avg);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">${r.found ? fmtTime(r.avg_ms) : "–"}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
-  el.innerHTML = `<h3>Classement du contre-la-montre</h3>
+  el.innerHTML = `<h3>Classement du Contre-la-montre</h3>
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches pour tout le monde aujourd'hui.</div>
+    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches pour tout le monde aujourd'hui.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     <div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`;
   $(el.id + "ClmRefresh").onclick = () => showClmRank(el);
 }
@@ -1628,14 +1637,14 @@ async function sbRanking(key){
 }
 const mmss = ms => { const t = Math.round(ms/1000); return Math.floor(t/60) + ":" + String(t%60).padStart(2,"0"); };
 const rangTxt = n => n === 1 ? "1er" : n + "e";
-async function showRank(el){
+async function showRank(el, quiet){
   const saved = lsGet("ts_daily", null);
   if (!saved || saved.key !== todayKey() || (saved.res||[]).length < 5) { el.classList.add("hide"); return; }
   el.classList.remove("hide");
   if (!saved.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
-      el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
+      el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
         <div class="row"><input id="rkPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="rkSend">Publier mon score</button></div><div class="msg bad small" id="rkMsg"></div>`;
       $("rkSend").onclick = () => {
@@ -1645,27 +1654,49 @@ async function showRank(el){
       };
       return;
     }
-    el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Envoi de ton score…</div>`;
+    el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Envoi de ton score…</div>`;
     try { await sbSend(saved, ps); }
-    catch(e){ el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du défi du jour.</div>`; return; }
-  } else {
-    el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Chargement du classement…</div>`;
+    catch(e){ el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du défi du jour.</div>`; return; }
+  } else if (!quiet) {
+    el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Chargement du classement…</div>`;
   }
   let rows;
   try { rows = await sbRanking(saved.key); }
-  catch(e){ el.innerHTML = `<h3>Classement du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  catch(e){ if (!quiet) el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
   const me = saved.sent;
   const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.points === me.points && r.ms === me.ms);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found}/5</td><td class="n">${r.points} pts</td><td class="n">${mmss(r.ms)}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
-  el.innerHTML = `<h3>Classement du jour</h3>
+  el.innerHTML = `<h3>Classement du Défi du jour</h3>
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée.</div>
+    <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée${el.id === "viewRankBox" ? " et se met à jour toutes les 30 secondes" : ""}.</div>
     <div class="row"><button id="rkRefresh">Actualiser</button></div>`;
   $("rkRefresh").onclick = () => showRank(el);
 }
+function dailyDoneSub(saved){
+  saved = saved || lsGet("ts_daily", null);
+  const n = 5, done = saved && saved.key === todayKey() && (saved.res||[]).length >= n;
+  $("dailyRankBtn").classList.toggle("hide", !done);
+  if (!done) { $("dailySub").textContent = "Les mêmes 5 joueurs pour tout le monde aujourd'hui"; return; }
+  const t = saved.res.reduce((s,r)=>s+r.pts,0), ms = (saved.end || 0) - (saved.start || 0), f = saved.res.filter(r=>r.won).length;
+  $("dailySub").textContent = `Déjà joué aujourd'hui : ${f}/${n} trouvés · ${t} pts · ${fmtDur(ms)} ${saved.res.map(SYMB).join("")} · Nouvelle série demain.`;
+}
+function openRank(render){
+  show("rankView");
+  const box = $("viewRankBox");
+  render(box, false);
+  window._rankLive = setInterval(() => { if (!box.querySelector("input")) render(box, true); }, 30000);
+}
+function rankBtns(){
+  dailyDoneSub();
+  const c = clmSaved(); $("clmRankBtn").classList.toggle("hide", !(c && c.done));
+  $("soloRankBtn").classList.toggle("hide", !lsGet("ts_solo_best", null));
+}
+$("dailyRankBtn").onclick = () => openRank((el, q) => showRank(el, q));
+$("clmRankBtn").onclick = () => openRank((el, q) => showClmRank(el, q));
+$("soloRankBtn").onclick = () => openRank((el, q) => showSoloRank(el, q, true));
 $("btnDaily").onclick = () => {
   const key = todayKey();
   DAILY = { list: dailyPick(key), idx: 0, res: [], key, start: Date.now(), end: 0 };
@@ -1675,9 +1706,8 @@ $("btnDaily").onclick = () => {
       const t = saved.res.reduce((s,r)=>s+r.pts,0);
       const ms = (saved.end || 0) - (saved.start || 0);
       const f = saved.res.filter(r=>r.won).length;
-      $("dailySub").textContent = `Déjà joué aujourd'hui : ${f}/${DAILY.list.length} trouvés · ${t} pts · ${fmtDur(ms)} ${saved.res.map(SYMB).join("")} · Nouvelle série demain.`;
+      dailyDoneSub(saved);
       G = { mode: "daily", shareText: dailyShareText(key, saved.res, ms) + "\n" + baseUrl() };
-      showRank($("homeRank"));
       return;
     }
     DAILY.res = saved.res || []; DAILY.idx = saved.res.length; DAILY.start = saved.start || Date.now();   // reprise : le chrono continue depuis le début de la série
@@ -1686,6 +1716,8 @@ $("btnDaily").onclick = () => {
   if (!DAILY.res.length) lsSet("ts_daily", { key, res: [], start: DAILY.start, end: 0 });
   dailyStart();
 };
+
+rankBtns();
 
 $("rulesToggle").onclick = () => { const m = $("rulesMore"); const open = m.classList.toggle("hide") === false; $("rulesToggle").textContent = open ? "Masquer les règles détaillées" : "Règles détaillées"; };
 
