@@ -229,7 +229,7 @@ body:not(.home-bg) .playcount{display:none}
       <div class="dailyWrap"><button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Voir le classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 20 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Voir le classement</button></div>
       <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
-      <div class="dailyWrap"><button class="big" id="btnTrio"><strong>Qui suis-je ?</strong><small>3 clubs, un joueur à trouver : 3 minutes pour en enchaîner le plus possible</small></button><button class="rankBtn hide" id="trioRankBtn">Voir le classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnTrio"><strong>Qui a joué dans ces 3 clubs ?</strong><small>Un joueur à trouver par trio de clubs : 3 minutes pour en enchaîner le plus possible</small></button><button class="rankBtn hide" id="trioRankBtn">Voir le classement</button></div>
     </div>
     <div class="soloBlock">
       <button class="big" id="btnSolo"><strong>Jeu libre</strong><small>5 minutes pour marquer le plus de points</small></button>
@@ -295,11 +295,11 @@ body:not(.home-bg) .playcount{display:none}
     <div class="card rank hide" id="introRank" style="margin-top:16px"></div>
   </section>
 
-  <!-- QUI SUIS-JE ? -->
+  <!-- QUI A JOUÉ DANS CES 3 CLUBS ? -->
   <section id="trio" class="hide">
     <button class="back" data-home>← Accueil</button>
     <div class="card hide" id="trioPick">
-      <h2>Qui suis-je ?</h2>
+      <h2>Qui a joué dans ces 3 clubs ?</h2>
       <p class="small muted" style="margin:0 0 10px">Choisis un niveau. Les points d'un trio moyen sont multipliés par 1,5, ceux d'un difficile par 2.</p>
       <div class="levels" id="trioLevels">
         <button data-tl="tous">Tous</button>
@@ -367,12 +367,12 @@ body:not(.home-bg) .playcount{display:none}
         <li>Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse ; pas de limite de temps pour jouer.</li>
         <li>Le classement range ceux qui ont trouvé, du plus rapide au plus lent. Le créateur du défi n'est pas classé.</li>
       </ul>
-      <h3>Qui suis-je ?</h3>
+      <h3>Qui a joué dans ces 3 clubs ?</h3>
       <ul>
         <li>Trois clubs s'affichent : trouve un joueur de notre base qui a joué dans les trois (les prêts comptent, les équipes réserves non). Une partie dure 3 minutes.</li>
         <li>S'il y a plusieurs réponses, le nombre de joueurs possibles est indiqué ; un seul suffit pour passer au trio suivant.</li>
         <li>Avant de jouer, choisis un niveau ou « Tous ». Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles.</li>
-        <li>Mêmes points que le défi du jour : 100, 60 ou 30 points selon l'essai, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
+        <li>Mêmes points que le défi du jour : 100, 60 ou 30 points selon l'essai, indice poste −10, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
         <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <h3>Jeu libre</h3>
@@ -2006,7 +2006,7 @@ function openRank(render){
   window._rankLive = setInterval(() => { if (!box.querySelector("input")) render(box, true); }, 30000);
 }
 
-/* ---------- Qui suis-je ? (3 clubs) ---------- */
+/* ---------- Qui a joué dans ces 3 clubs ? ---------- */
 const TRIO_TOTAL = 3 * 60 * 1000, TRIO_MIN_CLUB = 8;
 const isReserve = c => /( B| C| II| III| rés\.| U\d\d|Castilla|Mestalla|Bilbao Athletic|Séville Atlético|Sevilla Atlético|Basconia)$/.test(c);
 const clubBase = c => c.replace(/ \(prêt\)$/, "");
@@ -2040,7 +2040,7 @@ function trioPick(){
 const trioLeft = () => TRIO_TOTAL - (Date.now() - TRIO.start);
 function trioScore(){
   const t = TRIO.cur;
-  const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hint ? HINT_COST.c : 0) - (t.approx ? TYPO_COST : 0));
+  const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hintP ? HINT_COST.p : 0) - (t.hint ? HINT_COST.c : 0) - (t.approx ? TYPO_COST : 0));
   return Math.round(raw * (LEVEL_COEF[t.level] || 1));
 }
 function trioRenderTime(){
@@ -2055,17 +2055,20 @@ function trioRender(){
   $("trioCount").innerHTML = `<span class="badge ${t.level}">${t.level}</span> ` + (n > 1 ? `${n} joueurs possibles dans notre base : un seul suffit` : "1 joueur possible dans notre base");
   $("trioTries").textContent = t.tries.length ? "Propositions : " + t.tries.join(", ") : "";
   const box = $("trioHints"); box.innerHTML = "";
-  if (t.hint) {
-    const nat = [...new Set(t.sol.map(i => PLAYERS[i].c).filter(Boolean))];
-    const sp = document.createElement("span"); sp.className = "hint-val"; sp.textContent = "Nationalité : " + (nat.join(" ou ") || "inconnue"); box.appendChild(sp);
-  } else {
-    const b = document.createElement("button"); b.textContent = `Nationalité (−${Math.round(HINT_COST.c * (LEVEL_COEF[t.level] || 1))})`;
-    b.onclick = () => { t.hint = true; trioRender(); $("trioInput").focus(); }; box.appendChild(b);
-  }
+  const coef = LEVEL_COEF[t.level] || 1;
+  [["hintP", "Poste", "p", i => PLAYERS[i].p], ["hint", "Nationalité", "c", i => PLAYERS[i].c]].forEach(([key, label, k, get]) => {
+    if (t[key]) {
+      const vals = [...new Set(t.sol.map(get).filter(Boolean))];
+      const sp = document.createElement("span"); sp.className = "hint-val"; sp.textContent = `${label} : ` + (vals.join(" ou ") || "inconnu"); box.appendChild(sp);
+    } else {
+      const b = document.createElement("button"); b.textContent = `${label} (−${Math.round(HINT_COST[k] * coef)})`;
+      b.onclick = () => { t[key] = true; trioRender(); $("trioInput").focus(); }; box.appendChild(b);
+    }
+  });
   trioRenderTime();
 }
 function trioNext(flash){
-  TRIO.cur = Object.assign(trioPick(), { tries: [], hint: false, approx: null });
+  TRIO.cur = Object.assign(trioPick(), { tries: [], hint: false, hintP: false, approx: null });
   $("trioInput").value = "";
   $("trioMsg").textContent = flash || ""; $("trioMsg").className = "msg" + (flash ? " flash" : "");
   trioRender(); $("trioInput").focus();
@@ -2133,7 +2136,7 @@ $("trioAgain").onclick = trioChoose;
 $("trioShare").onclick = () => { G = { mode: "trio" }; $("shareImg").onclick(); };
 $("trioRankBtn").onclick = () => openRank((el, q) => showTrioRank(el, q, true));
 async function showTrioRank(el, quiet, view){
-  const H3 = "<h3>Classement de Qui suis-je ?</h3>";
+  const H3 = "<h3>Classement : Qui a joué dans ces 3 clubs ?</h3>";
   el.classList.remove("hide");
   const ps = lsGet("ts_pseudo", "");
   if (!view && !TRIO.sent) {
@@ -2218,7 +2221,7 @@ function scoreCardData(){
       line: won ? `Trouvé au ${G.tries.length === 0 ? "1er" : "2e"} essai` : "Deux essais manqués", res: [{ won, tries: G.tries.length }] };
   }
   if (G.mode === "trio") { const f = TRIO.found, n = TRIO.played;
-    return { title: "Qui suis-je ?", big: `${TRIO.total}`, unit: "pts", line: `${f} trio${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}`, time: TRIO_TOTAL, res: TRIO.res.slice(-20) }; }
+    return { title: "Qui a joué dans ces 3 clubs ?", big: `${TRIO.total}`, unit: "pts", line: `${f} trio${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}`, time: TRIO_TOTAL, res: TRIO.res.slice(-20) }; }
   const f = SESSION.found, n = SESSION.played;
   return { title: "Jeu libre", big: `${SESSION.total}`, unit: "pts", line: `${f} joueur${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}`, time: (SESSION.end || Date.now()) - SESSION.start, res: SESSION.res.slice(-20) };
 }
