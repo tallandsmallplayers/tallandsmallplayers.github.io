@@ -124,6 +124,8 @@
   .trioClubs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
   .trioClubs div{border:1px solid var(--line);border-radius:10px;padding:12px 6px;text-align:center;font-weight:700;font-size:15px;line-height:1.2;background:rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:70px}
   .trioClubs .flag{font-size:20px}
+  #trioLevels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  #trioLevels button{padding:12px 4px;font-weight:600}
   .trioCount{text-align:center;color:var(--accent);font-weight:600;font-size:14px;margin-bottom:10px}
   #trioPass{font-size:14.5px;font-weight:700;padding:7px 12px;color:#f2c94c;border:1.5px solid #f2c94c;background:rgba(242,201,76,.12)}
   #trioMsg.flash{color:var(--muted)}
@@ -296,6 +298,16 @@ body:not(.home-bg) .playcount{display:none}
   <!-- QUI SUIS-JE ? -->
   <section id="trio" class="hide">
     <button class="back" data-home>← Accueil</button>
+    <div class="card hide" id="trioPick">
+      <h2>Qui suis-je ?</h2>
+      <p class="small muted" style="margin:0 0 10px">Choisis un niveau. Les points d'un trio moyen sont multipliés par 1,5, ceux d'un difficile par 2.</p>
+      <div class="levels" id="trioLevels">
+        <button data-tl="tous">Tous</button>
+        <button data-tl="facile">Facile</button>
+        <button data-tl="moyen">Moyen</button>
+        <button data-tl="difficile">Difficile</button>
+      </div>
+    </div>
     <div class="card" id="trioPlay">
       <div id="trioTime"></div>
       <div class="trioClubs" id="trioClubs"></div>
@@ -359,7 +371,8 @@ body:not(.home-bg) .playcount{display:none}
       <ul>
         <li>Trois clubs s'affichent : trouve un joueur de notre base qui a joué dans les trois (les prêts comptent, les équipes réserves non). Une partie dure 3 minutes.</li>
         <li>S'il y a plusieurs réponses, le nombre de joueurs possibles est indiqué ; un seul suffit pour passer au trio suivant.</li>
-        <li>Mêmes points que le défi du jour : 100, 60 ou 30 points selon l'essai, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
+        <li>Avant de jouer, choisis un niveau ou « Tous ». Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles.</li>
+        <li>Mêmes points que le défi du jour : 100, 60 ou 30 points selon l'essai, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
         <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <h3>Jeu libre</h3>
@@ -2011,20 +2024,24 @@ let TRIO = null;
 function trioPick(){
   const D = trioData();
   for (let k = 0; k < 50; k++){
-    const [, cs] = D.eligible[Math.floor(Math.random() * D.eligible.length)];
+    const pool = TRIO.level === "tous" ? D.eligible : D.eligible.filter(([i]) => PLAYERS[i].d === TRIO.level);
+    const [, cs] = pool[Math.floor(Math.random() * pool.length)];
     const pick = shuffle(cs.slice()).slice(0,3).sort((a,b) => a.localeCompare(b));
     const key = pick.join("|");
     if (TRIO.seen.has(key) && k < 49) continue;
     TRIO.seen.add(key);
     const sol = []; D.sets.forEach((s,i) => { if (pick.every(c => s.has(c))) sol.push(i); });
-    return { clubs: pick, sol };
+    const order = ["facile","moyen","difficile"];
+    const level = order[Math.min(...sol.map(i => order.indexOf(PLAYERS[i].d)).filter(x => x >= 0))] || "moyen";   // niveau du trio : celui du joueur le plus facile à trouver
+    if (TRIO.level !== "tous" && level !== TRIO.level && k < 49) continue;
+    return { clubs: pick, sol, level };
   }
 }
 const trioLeft = () => TRIO_TOTAL - (Date.now() - TRIO.start);
 function trioScore(){
   const t = TRIO.cur;
   const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hint ? HINT_COST.c : 0) - (t.approx ? TYPO_COST : 0));
-  return raw;
+  return Math.round(raw * (LEVEL_COEF[t.level] || 1));
 }
 function trioRenderTime(){
   const left = Math.max(0, trioLeft());
@@ -2035,14 +2052,14 @@ function trioRender(){
   const t = TRIO.cur, D = trioData();
   $("trioClubs").innerHTML = t.clubs.map(c => { const f = clubFlag(c, D.div[c] || ""); return `<div>${f ? `<span class="flag">${f}</span>` : ""}<span>${esc(c)}</span></div>`; }).join("");
   const n = t.sol.length;
-  $("trioCount").textContent = n > 1 ? `${n} joueurs possibles dans notre base : un seul suffit` : "1 joueur possible dans notre base";
+  $("trioCount").innerHTML = `<span class="badge ${t.level}">${t.level}</span> ` + (n > 1 ? `${n} joueurs possibles dans notre base : un seul suffit` : "1 joueur possible dans notre base");
   $("trioTries").textContent = t.tries.length ? "Propositions : " + t.tries.join(", ") : "";
   const box = $("trioHints"); box.innerHTML = "";
   if (t.hint) {
     const nat = [...new Set(t.sol.map(i => PLAYERS[i].c).filter(Boolean))];
     const sp = document.createElement("span"); sp.className = "hint-val"; sp.textContent = "Nationalité : " + (nat.join(" ou ") || "inconnue"); box.appendChild(sp);
   } else {
-    const b = document.createElement("button"); b.textContent = `Nationalité (−${HINT_COST.c})`;
+    const b = document.createElement("button"); b.textContent = `Nationalité (−${Math.round(HINT_COST.c * (LEVEL_COEF[t.level] || 1))})`;
     b.onclick = () => { t.hint = true; trioRender(); $("trioInput").focus(); }; box.appendChild(b);
   }
   trioRenderTime();
@@ -2071,14 +2088,23 @@ function trioEnd(){
   TRIO.live = false; TRIO.over = true; clearInterval(window._trioTick);
   $("trioPlay").classList.add("hide"); $("trioEnd").classList.remove("hide");
   const f = TRIO.found, n = TRIO.played;
-  $("trioEndText").textContent = `${TRIO.total} point${TRIO.total>1?"s":""} en 3 minutes : ${f} trio${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}.`;
+  const lv = { tous: "tous niveaux", facile: "niveau facile", moyen: "niveau moyen", difficile: "niveau difficile" }[TRIO.level];
+  $("trioEndText").textContent = `${TRIO.total} point${TRIO.total>1?"s":""} en 3 minutes (${lv}) : ${f} trio${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}.`;
   TRIO.key = todayKey();
   const best = lsGet("ts_trio_best", null);
   if (!best || TRIO.total > best.points) lsSet("ts_trio_best", { key: TRIO.key, points: TRIO.total });
   showTrioRank($("trioRankBox"));
 }
-function trioStart(){
-  TRIO = { total: 0, played: 0, found: 0, res: [], seen: new Set(), start: Date.now(), live: true, over: false, sent: false };
+function trioChoose(){
+  if (TRIO && TRIO.live) TRIO.live = false;
+  clearInterval(window._trioTick);
+  $("trioPick").classList.remove("hide"); $("trioPlay").classList.add("hide"); $("trioEnd").classList.add("hide");
+  show("trio");
+}
+document.querySelectorAll("#trioLevels button").forEach(b => b.onclick = () => trioStart(b.dataset.tl));
+function trioStart(level){
+  $("trioPick").classList.add("hide");
+  TRIO = { level: level || "tous", total: 0, played: 0, found: 0, res: [], seen: new Set(), start: Date.now(), live: true, over: false, sent: false };
   $("trioPlay").classList.remove("hide"); $("trioEnd").classList.add("hide"); $("trioRankBox").classList.add("hide");
   show("trio");
   logPlay("trio");
@@ -2102,8 +2128,8 @@ $("trioForm").onsubmit = e => {
   $("trioMsg").className = "msg bad"; $("trioInput").value = ""; trioRender();
 };
 $("trioPass").onclick = () => { if (TRIO && TRIO.live) trioClose(false); };
-$("btnTrio").onclick = trioStart;
-$("trioAgain").onclick = trioStart;
+$("btnTrio").onclick = trioChoose;
+$("trioAgain").onclick = trioChoose;
 $("trioShare").onclick = () => { G = { mode: "trio" }; $("shareImg").onclick(); };
 $("trioRankBtn").onclick = () => openRank((el, q) => showTrioRank(el, q, true));
 async function showTrioRank(el, quiet, view){
