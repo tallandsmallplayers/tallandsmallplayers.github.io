@@ -2057,7 +2057,9 @@ function trioClose(won){
   const t = TRIO.cur, pts = won ? trioScore() : 0;
   TRIO.total += pts; TRIO.played++; if (won) TRIO.found++;
   TRIO.res.push({ won, tries: t.tries.length });
-  trioNext(won ? `Trio précédent : +${pts} points.` : "Trio précédent : 0 point.");
+  const names = t.sol.map(i => PLAYERS[i].n);
+  const ans = names.length === 1 ? `Il fallait trouver ${names[0]}.` : `Il fallait trouver l'un de ces joueurs : ${names.slice(0,-1).join(", ")} ou ${names[names.length-1]}.`;
+  trioNext(won ? `Trio précédent : +${pts} points.` : `Trio précédent : 0 point. ${ans}`);
 }
 function trioTick(){
   if (!TRIO || !TRIO.live) { clearInterval(window._trioTick); return; }
