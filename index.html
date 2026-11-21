@@ -137,7 +137,22 @@
   .clmSel select{flex:1;min-width:0;padding:5px 6px;border-radius:8px;background:rgba(255,255,255,.08);color:var(--text);border:1px solid var(--line);font:inherit;font-size:13px}
   .trioCount{text-align:center;color:var(--accent);font-weight:600;font-size:14px;margin-bottom:10px}
   #trioPass{font-size:14.5px;font-weight:700;padding:7px 12px;color:#f2c94c;border:1.5px solid #f2c94c;background:rgba(242,201,76,.12)}
+#trioPlay .gcTools{display:block}
+#trioHints{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#trioHints button,#trioHints .hint-val{font-size:12.5px;padding:6px 3px;text-align:center;white-space:nowrap;margin:0}
+#trioHints .hint-val{white-space:normal;line-height:1.2;display:flex;align-items:center;justify-content:center}
+#trioPlay .gcTools .row{justify-content:center;margin:10px 0 0}
   #trioMsg.flash{color:var(--muted)}
+#trioLast{border-radius:9px;padding:6px 10px;margin:0 0 8px;text-align:center;line-height:1.25;animation:trioPop .35s ease-out}
+#trioLast.ok{background:rgba(46,204,113,.16);border:1.5px solid #2ecc71}
+#trioLast.ko{background:rgba(235,87,87,.14);border:1.5px solid #eb5757}
+#trioLast .tl1{font-size:14px;font-weight:700}
+#trioLast.ok .tl1 em{color:#2ecc71;font-style:normal}
+#trioLast.ko .tl1 em{color:#eb5757;font-style:normal}
+#trioMsg:empty{display:none !important}
+#trioLast .nw{white-space:nowrap}
+#trioLast .tl2{font-size:11.5px;color:var(--muted);margin-top:2px}
+@keyframes trioPop{0%{transform:scale(.92);opacity:0}70%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
   .rulespage h3{font-family:"Barlow Condensed",sans-serif;font-size:18px;margin:14px 0 4px;color:var(--accent)}
   .rulespage p{margin:0 0 6px;color:var(--muted);font-size:14px}
   .rulespage ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.4}
@@ -238,7 +253,7 @@ body:not(.home-bg) .playcount{display:none}
   <section id="home">
     <div class="grid">
       <button class="big" id="btnCreate"><strong>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
-      <div class="dailyWrap"><button class="big" id="btnDaily"><strong>Le défi du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnDaily"><strong>Les 5 fiches du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnClm"><strong>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 30 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnTrio"><strong>Qui a joué dans ces 3 clubs ?</strong><small>3 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
     </div>
@@ -320,6 +335,7 @@ body:not(.home-bg) .playcount{display:none}
     </div>
     <div class="card" id="trioPlay">
       <div id="trioTime"></div>
+      <div id="trioLast" class="hide"></div>
       <div class="trioClubs" id="trioClubs"></div>
       <div class="trioCount" id="trioCount"></div>
       <form id="trioForm" class="row">
@@ -349,7 +365,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2>Contre-la-montre</h2>
-      <p class="small muted" style="margin:0 0 10px">2 minutes, une nouvelle fiche toutes les 30 secondes. Chaque combinaison de niveau et d'époque a ses propres fiches du jour et son propre classement.</p>
+      <p class="small muted" style="margin:0 0 10px">2 minutes, une nouvelle fiche toutes les 30 secondes. Seule la combinaison « Tous » et « Toutes » est classée : les autres servent d'entraînement.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="clmLv">
         <button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button>
@@ -375,7 +391,7 @@ body:not(.home-bg) .playcount{display:none}
         <li>Chaque joueur a un niveau (facile, moyen ou difficile) et une époque : la décennie où il a disputé le plus de matchs (les années 1980 sont rattachées aux années 1990).</li>
         <li>Une saison avec un prêt ou un transfert apparaît sur deux lignes. Quand les statistiques saison par saison ne sont pas disponibles, une ligne peut regrouper plusieurs saisons (ex. : 1988-90).</li>
       </ul>
-      <h3>Le défi du jour</h3>
+      <h3>Les 5 fiches du jour</h3>
       <ul>
         <li>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile), une seule fois par jour.</li>
         <li>Trois propositions par joueur : 100 points au 1<sup>er</sup> essai, 60 au 2<sup>e</sup>, 30 au 3<sup>e</sup>.</li>
@@ -388,7 +404,7 @@ body:not(.home-bg) .playcount{display:none}
       <ul>
         <li>2 minutes pour trouver le plus de joueurs possible. Une nouvelle fiche arrive toutes les 30 secondes. Avant de jouer, choisis un niveau et une époque (ou « Tous » et « Toutes »).</li>
         <li>Une seule proposition par fiche, sans indice : juste ou fausse, la fiche suivante arrive.</li>
-        <li>Pour une même combinaison de niveau et d'époque, les fiches sont les mêmes pour tout le monde dans la journée, avec un classement propre à cette combinaison. Seule la première partie du jour de chaque combinaison est classée, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement.</li>
+        <li>Seul le mode « Tous » niveaux et « Toutes » époques est classé : les fiches y sont les mêmes pour tout le monde dans la journée, et seule la première partie du jour compte, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement. Les autres combinaisons servent d'entraînement.</li>
       </ul>
       <h3>Défi entre amis</h3>
       <ul>
@@ -400,21 +416,22 @@ body:not(.home-bg) .playcount{display:none}
       <ul>
         <li>Trois clubs s'affichent : trouve un joueur de notre base qui a joué dans les trois (les prêts comptent, les équipes réserves non). Une partie dure 3 minutes.</li>
         <li>S'il y a plusieurs réponses, le nombre de joueurs possibles est indiqué ; un seul suffit pour passer au trio suivant.</li>
+        <li>L'indice « Époque » donne la décennie où le joueur a disputé le plus de matchs.</li>
         <li>Avant de jouer, choisis un niveau ou « Tous ». Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles.</li>
-        <li>Mêmes points que le défi du jour : 100, 60 ou 30 points selon l'essai, indice poste −10, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
+        <li>Mêmes points que « Les 5 fiches du jour » : 100, 60 ou 30 points selon l'essai, indice poste −10, indice époque −15, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
         <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <h3>Jeu libre</h3>
       <ul>
         <li>Une partie dure 5 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis.</li>
-        <li>Mêmes points que le défi du jour (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
+        <li>Mêmes points que « Les 5 fiches du jour » (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
         <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
     </div>
     <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
   </section>
 
-  <!-- CLASSEMENT DU DÉFI DU JOUR -->
+  <!-- CLASSEMENT DES 5 FICHES DU JOUR -->
   <section id="rankView" class="hide">
     <div class="card rank" id="viewRankBox"></div>
     <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
@@ -1247,7 +1264,7 @@ let order = [], orderIdx = 0;
 function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
 /* Barème : 100 points de base ; 100 % au 1er essai, 60 % au 2e, 30 % au 3e ; chaque indice retire 25 points */
-const BASE = 100, TRY_FACTOR = [1, 0.6, 0.3], HINT_COST = { p: 10, c: 25 }, TYPO_COST = 10, MIN_FOUND = 10;
+const BASE = 100, TRY_FACTOR = [1, 0.6, 0.3], HINT_COST = { p: 10, c: 25, e: 15 }, TYPO_COST = 10, MIN_FOUND = 10;
 const LEVEL_COEF = { facile: 1, moyen: 1.5, difficile: 2 };   // pondération du jeu libre
 const coefOf = () => (G && G.mode === "solo") ? (LEVEL_COEF[G.p.d] || 1) : 1;
 function computeScore(){
@@ -1265,7 +1282,7 @@ function startGame(player, mode){
   if (mode === "chrono") { G.start = performance.now(); G.defi = DEFI; clearInterval(window._tick); window._tick = setInterval(renderScore, 100); }
   const badge = player.d ? `<span class="badge ${player.d}">${player.d}</span>` : "";
   $("gameLabel").innerHTML = mode === "solo" ? `Joueur ${orderIdx} sur ${order.length}` + badge
-    : mode === "daily" ? `Défi du jour · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` + badge
+    : mode === "daily" ? `Les 5 fiches du jour · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` + badge
     : mode === "chrono" ? "Défi entre amis · 2 essais" : "Défi d'un ami";
   $("guessInput").value = ""; $("msg").textContent = ""; $("msg").className = "msg";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
@@ -1794,9 +1811,10 @@ function clmPickRender(){
   document.querySelectorAll("#clmLv button").forEach(b => b.classList.toggle("on", b.dataset.v === CLM_SEL.lv));
   document.querySelectorAll("#clmEra button").forEach(b => b.classList.toggle("on", b.dataset.v === CLM_SEL.era));
   const n = clmPool(CLM_SEL).length, g = clmGame(clmCombo(CLM_SEL));
-  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (g && g.done ? "Déjà jouée aujourd'hui : partie hors classement." : "Partie classée : tes fiches du jour sont les mêmes que celles des autres joueurs qui choisissent cette combinaison.");
+  const main = clmCombo(CLM_SEL) === "tous-toutes";
+  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (!main ? "Entraînement : cette combinaison n'est pas classée." : g && g.done ? "Déjà jouée aujourd'hui : partie hors classement." : "Partie classée : mêmes fiches du jour pour tout le monde.");
   $("clmGo").disabled = n < 4;
-  $("clmGo").textContent = n < 4 ? "Pas assez de joueurs" : (g && g.done ? "Rejouer (hors classement)" : "Commencer");
+  $("clmGo").textContent = n < 4 ? "Pas assez de joueurs" : (!main ? "Commencer (entraînement)" : g && g.done ? "Rejouer (hors classement)" : "Commencer");
 }
 function clmPick(){
   const d = clmDay(); let ch = false;
@@ -1810,7 +1828,7 @@ function clmStart(){
   const sel = Object.assign({}, CLM_SEL), combo = clmCombo(sel);
   logPlay("clm");
   const g = clmGame(combo);
-  const ranked = !g || !g.done;
+  const ranked = combo === "tous-toutes" && (!g || !g.done);
   CLM = { ranked, combo, sel, key: todayKey(), list: clmList(ranked, sel), idx: -1, found: 0, ms: [], res: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
   if (ranked) { const d = clmDay(); d.games[combo] = { found: 0, avg: 0, seen: 0, done: false }; d.last = combo; lsSet("ts_clm", d); }
   clearInterval(window._clmTick);
@@ -1830,7 +1848,7 @@ function clmNext(){
   G = { p, mode: "clm", score: 0, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   $("rankBox").classList.add("hide");
   const badge = p.d ? `<span class="badge ${p.d}">${p.d}</span>` : "";
-  $("gameLabel").innerHTML = `Contre-la-montre · ${clmLabel(CLM.combo)}${CLM.ranked ? "" : " · hors classement"} · fiche ${CLM.seen}` + badge;
+  $("gameLabel").innerHTML = `Contre-la-montre · ${clmLabel(CLM.combo)}${CLM.ranked ? "" : CLM.combo === "tous-toutes" ? " · hors classement" : " · entraînement"} · fiche ${CLM.seen}` + badge;
   $("guessInput").value = "";
   $("msg").textContent = ""; $("msg").className = "msg";
   $("clmLive").classList.remove("hide");
@@ -1883,7 +1901,7 @@ function clmEnd(quit){
   $("resultTitle").textContent = "Temps écoulé !";
   $("resultText").textContent = `${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} sur ${CLM.seen} fiche${CLM.seen>1?"s":""}`
     + (CLM.found ? `, en ${fmtTime(avg)} en moyenne.` : ".") + ` La dernière fiche était ${G.p.n}.`
-    + ` (${clmLabel(CLM.combo)})` + (CLM.ranked ? "" : " Partie hors classement.");
+    + ` (${clmLabel(CLM.combo)})` + (CLM.ranked ? "" : CLM.combo === "tous-toutes" ? " Partie hors classement." : " Partie d'entraînement, hors classement.");
   G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} (${clmLabel(CLM.combo)}) : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
@@ -1894,12 +1912,12 @@ function clmEnd(quit){
 }
 async function showClmRank(el, quiet, combo){
   const d = clmDay();
-  combo = combo || (el.dataset.combo) || d.last || clmCombo(CLM_SEL);
+  combo = "tous-toutes";   // seul le mode Tous niveaux · toutes époques est classé
   el.dataset.combo = combo;
   const s = Object.assign({ key: d.key, combo }, d.games[combo] || {});
   el.classList.remove("hide");
   const H3 = `<h3>Classement du Contre-la-montre</h3>`;
-  const sel = () => { const [lv, era] = combo.split("-");
+  const sel = () => ""; const selOld = () => { const [lv, era] = combo.split("-");
     return `<div class="clmSel"><select id="${el.id}ClmLv">${Object.entries(CLM_LV).map(([k,v]) => `<option value="${k}" ${k===lv?"selected":""}>${v}</option>`).join("")}</select>`
       + `<select id="${el.id}ClmEra">${CLM_ERA_ORDER.map(k => [k, CLM_ERA[k]]).map(([k,v]) => `<option value="${k}" ${k===era?"selected":""}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join("")}</select></div>`; };
   const bindSel = () => { const f = () => showClmRank(el, false, $(el.id+"ClmLv").value + "-" + $(el.id+"ClmEra").value); if ($(el.id+"ClmLv")) { $(el.id+"ClmLv").onchange = f; $(el.id+"ClmEra").onchange = f; } };
@@ -1935,7 +1953,7 @@ async function showClmRank(el, quiet, combo){
   el.innerHTML = H3 + sel() + `
     <div class="me-line">${!rows.length ? "Personne n'a encore joué cette combinaison aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mêmes fiches aujourd'hui pour tous ceux qui choisissent ${clmLabel(combo).toLowerCase()}.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
+    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mode « Tous niveaux · toutes époques » : mêmes fiches pour tout le monde aujourd'hui.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     <div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`;
   bindSel();
   $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
@@ -1965,7 +1983,7 @@ function fmtDate(key){ const [y,m,d] = key.split("-"); return `${Number(d)} ${MO
 function dailyShareText(key, res, ms){
   const t = res.reduce((s,r)=>s+r.pts,0);
   const f = res.filter(r=>r.won).length;
-  return `TALL&small players – Défi du ${fmtDate(key)} : ${f}/${res.length} trouvés · ${t} pts · ${fmtDur(ms)}\n${res.map(SYMB).join("")}`;
+  return `TALL&small players – Les 5 fiches du ${fmtDate(key)} : ${f}/${res.length} trouvés · ${t} pts · ${fmtDur(ms)}\n${res.map(SYMB).join("")}`;
 }
 function dailyStart(){
   startGame(JSON.parse(JSON.stringify(PLAYERS[DAILY.list[DAILY.idx]])), "daily");
@@ -1979,16 +1997,16 @@ function dailyEnd(won){
   renderSession();
   const t = DAILY.res.reduce((s,r)=>s+r.pts,0);
   if (DAILY.res.length < DAILY.list.length) {
-    $("resultText").textContent += ` Défi du jour : ${t} points après ${DAILY.res.length} joueur${DAILY.res.length>1?"s":""}.`;
+    $("resultText").textContent += ` Les 5 fiches du jour : ${t} points après ${DAILY.res.length} joueur${DAILY.res.length>1?"s":""}.`;
   } else {
     const f = DAILY.res.filter(r=>r.won).length;
-    $("resultText").textContent += ` Défi du jour terminé : ${f}/${DAILY.list.length} trouvés, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}. ${DAILY.res.map(SYMB).join("")}`;
+    $("resultText").textContent += ` Les 5 fiches du jour terminées : ${f}/${DAILY.list.length} trouvés, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}. ${DAILY.res.map(SYMB).join("")}`;
     G.shareText = dailyShareText(DAILY.key, DAILY.res, DAILY.end - DAILY.start) + "\n" + baseUrl();
     showRank($("rankBox"));
   }
 }
 
-/* ---------- classement commun du défi du jour (Supabase) ---------- */
+/* ---------- classement commun des 5 fiches du jour (Supabase) ---------- */
 const SB_URL = "https://vfsrjwmawfmnyfnqztou.supabase.co/rest/v1";
 const SB_KEY = "sb_publishable_g2kUCH_YC_R2S0J6uryGQw_i4dbj0l8";
 function deviceId(){
@@ -2026,7 +2044,7 @@ async function showRank(el, quiet){
   if (!saved.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
-      el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
+      el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
         <div class="row"><input id="rkPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
         <button class="primary" id="rkSend">Publier mon score</button></div><div class="msg bad small" id="rkMsg"></div>`;
       $("rkSend").onclick = () => {
@@ -2036,21 +2054,21 @@ async function showRank(el, quiet){
       };
       return;
     }
-    el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Envoi de ton score…</div>`;
+    el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Envoi de ton score…</div>`;
     try { await sbSend(saved, ps); }
-    catch(e){ el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du défi du jour.</div>`; return; }
+    catch(e){ el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture des 5 fiches du jour.</div>`; return; }
   } else if (!quiet) {
-    el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Chargement du classement…</div>`;
+    el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Chargement du classement…</div>`;
   }
   let rows;
   try { rows = await sbRanking(saved.key); }
-  catch(e){ if (!quiet) el.innerHTML = `<h3>Classement du Défi du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  catch(e){ if (!quiet) el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
   const me = saved.sent;
   const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.points === me.points && r.ms === me.ms);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found}/5</td><td class="n">${r.points} pts</td><td class="n">${mmss(r.ms)}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
-  el.innerHTML = `<h3>Classement du Défi du jour</h3>
+  el.innerHTML = `<h3>Classement des 5 fiches du jour</h3>
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée${el.id === "viewRankBox" ? " et se met à jour toutes les 30 secondes" : ""}.</div>
@@ -2106,7 +2124,7 @@ function trioPick(){
 const trioLeft = () => TRIO_TOTAL - (Date.now() - TRIO.start);
 function trioScore(){
   const t = TRIO.cur;
-  const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hintP ? HINT_COST.p : 0) - (t.hint ? HINT_COST.c : 0) - (t.approx ? TYPO_COST : 0));
+  const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hintP ? HINT_COST.p : 0) - (t.hint ? HINT_COST.c : 0) - (t.hintE ? HINT_COST.e : 0) - (t.approx ? TYPO_COST : 0));
   return Math.round(raw * (LEVEL_COEF[t.level] || 1));
 }
 function trioRenderTime(){
@@ -2122,7 +2140,7 @@ function trioRender(){
   $("trioTries").textContent = t.tries.length ? "Propositions : " + t.tries.join(", ") : "";
   const box = $("trioHints"); box.innerHTML = "";
   const coef = LEVEL_COEF[t.level] || 1;
-  [["hintP", "Poste", "p", i => PLAYERS[i].p], ["hint", "Nationalité", "c", i => PLAYERS[i].c]].forEach(([key, label, k, get]) => {
+  [["hintP", "Poste", "p", i => PLAYERS[i].p], ["hint", "Nationalité", "c", i => PLAYERS[i].c], ["hintE", "Époque", "e", i => "années " + ({"90":"1990","00":"2000","10":"2010","20":"2020"}[PLAYERS[i].e] || "")]].forEach(([key, label, k, get]) => {
     if (t[key]) {
       const vals = [...new Set(t.sol.map(get).filter(Boolean))];
       const sp = document.createElement("span"); sp.className = "hint-val"; sp.textContent = `${label} : ` + (vals.join(" ou ") || "inconnu"); box.appendChild(sp);
@@ -2133,19 +2151,24 @@ function trioRender(){
   });
   trioRenderTime();
 }
-function trioNext(flash){
-  TRIO.cur = Object.assign(trioPick(), { tries: [], hint: false, hintP: false, approx: null });
+function trioNext(last){
+  TRIO.cur = Object.assign(trioPick(), { tries: [], hint: false, hintP: false, hintE: false, approx: null });
   $("trioInput").value = "";
-  $("trioMsg").textContent = flash || ""; $("trioMsg").className = "msg" + (flash ? " flash" : "");
+  $("trioMsg").textContent = ""; $("trioMsg").className = "msg";
+  const L = $("trioLast");
+  if (last) { L.className = last.cls; L.innerHTML = last.html; void L.offsetWidth; L.style.animation = "none"; void L.offsetWidth; L.style.animation = ""; }
+  else { L.className = "hide"; L.innerHTML = ""; }
   trioRender(); $("trioInput").focus();
 }
 function trioClose(won){
   const t = TRIO.cur, pts = won ? trioScore() : 0;
   TRIO.total += pts; TRIO.played++; if (won) TRIO.found++;
   TRIO.res.push({ won, tries: t.tries.length });
-  const names = t.sol.map(i => PLAYERS[i].n);
-  const ans = names.length === 1 ? `Il fallait trouver ${names[0]}.` : `Il fallait trouver l'un de ces joueurs : ${names.slice(0,-1).join(", ")} ou ${names[names.length-1]}.`;
-  trioNext(won ? `Trio précédent : +${pts} points.` : `Trio précédent : 0 point. ${ans}`);
+  const names = (won && t.hit != null ? [t.hit] : t.sol).map(i => esc(PLAYERS[i].n));
+  const who = names.length === 1 ? names[0] : names.slice(0,-1).join(", ") + " ou " + names[names.length-1];
+  const clubs = `<div class="tl2">${t.clubs.map(esc).join(" · ")}</div>`;
+  trioNext(won ? { cls: "ok", html: `<div class="tl1"><em>✓ Bien joué !</em> ${who} <span class="nw">· +${pts} pts</span></div>${clubs}` }
+               : { cls: "ko", html: `<div class="tl1"><em>✗ C'était</em> ${who} <span class="nw">· 0 pt</span></div>${clubs}` });
 }
 function trioTick(){
   if (!TRIO || !TRIO.live) { clearInterval(window._trioTick); return; }
@@ -2186,7 +2209,7 @@ $("trioForm").onsubmit = e => {
   const v = $("trioInput").value.trim(); if (!v) return;
   const t = TRIO.cur;
   let res = false;
-  for (const i of t.sol) { const r = checkGuess(v, PLAYERS[i]); if (r === "exact") { res = r; break; } if (r) res = r; }
+  for (const i of t.sol) { const r = checkGuess(v, PLAYERS[i]); if (r === "exact") { res = r; t.hit = i; break; } if (r && !res) { res = r; t.hit = i; } }
   if (res) { t.approx = res === "approx" ? v : null; trioClose(true); return; }
   const known = PLAYERS.some(p => checkGuess(v, p));
   if (!known) { $("trioMsg").textContent = "Ce joueur n'est pas dans notre base : essaie un autre nom."; $("trioMsg").className = "msg"; $("trioInput").value = ""; return; }
@@ -2278,7 +2301,7 @@ function scoreCardData(){
   if (G.mode === "daily") {
     const res = DAILY.res, t = res.reduce((s,r)=>s+r.pts,0), found = res.filter(r=>r.won).length;
     const done = res.length >= DAILY.list.length;
-    return { title: `Défi du jour · ${fmtDate(DAILY.key)}`, big: `${found}/${DAILY.list.length}`, unit: `trouvé${found>1?"s":""}`,
+    return { title: `Les 5 fiches du jour · ${fmtDate(DAILY.key)}`, big: `${found}/${DAILY.list.length}`, unit: `trouvé${found>1?"s":""}`,
       line: `${t} points`, time: (done && DAILY.end ? DAILY.end : Date.now()) - DAILY.start, res };
   }
   if (G.mode === "chrono") {
