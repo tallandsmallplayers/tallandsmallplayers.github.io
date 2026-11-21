@@ -2310,11 +2310,11 @@ function logPlay(mode){
 async function loadPlayCount(){
   const el = $("playCount"); if (!el) return;
   try {
-    const r = await fetch(SB_URL + "/play_stats?select=total,today", { headers: { apikey: SB_KEY } });
+    const r = await fetch(SB_URL + "/play_stats?select=total,today,players", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw 0;
     const [s] = await r.json(); if (!s) throw 0;
     const f = n => String(Math.round(Number(n))).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
-    el.textContent = `⚽ ${f(s.total)} partie${s.total>1?"s":""} jouée${s.total>1?"s":""} · ${f(s.today)} aujourd'hui`;
+    el.textContent = `⚽ ${f(s.total)} partie${s.total>1?"s":""} jouée${s.total>1?"s":""}` + (s.players ? ` par ${f(s.players)} joueur${s.players>1?"s":""}` : "") + ` · ${f(s.today)} aujourd'hui`;
     el.classList.remove("hide");
   } catch(e){ el.classList.add("hide"); }
 }
