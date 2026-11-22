@@ -205,8 +205,8 @@ body.typing #guessInput,body.typing #guessForm button{padding-top:7px;padding-bo
 body.typing #clmTime{font-size:13px}
 body.typing #clmLive{margin:-2px 0 6px}
 body.typing #guessCard{padding:8px 10px}
-body.typing #careerCard{overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:0}
-body.typing #guessCard{position:relative;border-radius:10px;margin-bottom:8px}
+body.typing #careerCard{margin-bottom:0}
+body.typing #guessCard{position:sticky;top:0;border-radius:10px;margin-bottom:8px}
 body.typing div.wrap{padding-top:8px}
 #guessCard .gcTools{gap:5px}#guessCard .hints{gap:5px}
 #guessCard .msg{font-size:14px;margin-top:6px;line-height:1.25}
@@ -2550,22 +2550,16 @@ async function loadPlayCount(){
 }
 loadPlayCount();
 
-// Mode saisie (téléphone) : clavier ouvert -> en-tête réduit, carrière sous la réponse, hauteur ajustée au clavier
+// Mode saisie (téléphone) : clavier ouvert -> en-tête réduit, réponse en haut (fixe au défilement), carrière complète dessous
 (() => {
   if (!window.matchMedia || !matchMedia("(pointer:coarse)").matches) return;
-  const inp = $("guessInput"), car = $("careerCard"), vv = window.visualViewport;
-  const fit = () => {
-    if (!document.body.classList.contains("typing")) return;
-    const h = vv ? vv.height : innerHeight;
-    car.style.maxHeight = Math.max(110, h - $("guessCard").offsetHeight - document.querySelector("#game>.back").offsetHeight - 30) + "px";
-    window.scrollTo(0, 0);
-  };
-  inp.addEventListener("focus", () => { document.body.classList.add("typing"); fit(); setTimeout(fit, 350); });
+  const inp = $("guessInput");
+  const top = () => { if (document.body.classList.contains("typing")) window.scrollTo(0, 0); };
+  inp.addEventListener("focus", () => { const was = document.body.classList.contains("typing"); document.body.classList.add("typing"); if (!was) { top(); setTimeout(top, 350); } });
   inp.addEventListener("blur", () => setTimeout(() => {
     if (document.activeElement === inp) return;
-    document.body.classList.remove("typing"); car.style.maxHeight = "";
+    document.body.classList.remove("typing");
   }, 250));
-  if (vv) vv.addEventListener("resize", fit);
 })();
 </script>
 </body>
