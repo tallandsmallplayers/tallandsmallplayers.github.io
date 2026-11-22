@@ -432,8 +432,9 @@ body:not(.home-bg) .playcount{display:none}
       <h3>Défi entre amis</h3>
       <ul>
         <li>Choisis un joueur et envoie le lien à tes amis.</li>
-        <li>Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse ; pas de limite de temps pour jouer.</li>
-        <li>Le classement range ceux qui ont trouvé, du plus rapide au plus lent. Le créateur du défi n'est pas classé.</li>
+        <li>Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse.</li>
+        <li>Le créateur choisit la durée de validité du lien : 5 min, 15 min, 1 h ou 24 h. Après l'heure de fin, on peut encore jouer, mais hors délai et sans être classé pour la victoire ; le créateur peut alors partager le résultat en image.</li>
+        <li>Le classement range d'abord ceux qui ont trouvé au 1er essai, puis ceux qui ont trouvé au 2e ; à essai égal, le plus rapide passe devant. Le créateur du défi n'est pas classé.</li>
       </ul>
       <h3>Qui a joué dans ces 3 clubs ?</h3>
       <ul>
@@ -537,6 +538,8 @@ body:not(.home-bg) .playcount{display:none}
       <label for="cRows">Carrière : une saison par ligne, au format « saison ; club ; matchs ; buts »</label>
       <textarea id="cRows" placeholder="1992-93 ; Bordeaux ; 35 ; 10&#10;1993-94 ; Bordeaux ; 34 ; 6"></textarea>
       </div>
+      <label>Lien valable</label>
+      <div class="levels" id="defiDuree"><button type="button" data-v="300">5 min</button><button type="button" data-v="900">15 min</button><button type="button" data-v="3600" class="on">1 h</button><button type="button" data-v="86400">24 h</button></div>
       <div class="msg bad" id="createMsg"></div>
       <div class="row" style="margin-top:8px">
         <button class="primary" id="genCode" style="flex:0 0 auto">Créer le lien du défi</button>
@@ -1255,7 +1258,12 @@ function decode(code){ return JSON.parse(decodeURIComponent(escape(atob(code.rep
 
 /* ---------- liens de défi ---------- */
 const PUBLIC_URL = "https://tallandsmallplayers.github.io/";            // adresse publique du jeu, à renseigner une fois hébergé
-const DEFI_DELAI = 0;             // 0 = pas de délai officiel : tout le monde est classé
+const DEFI_DELAI = 0;             // défis créés avant le 22/11 : pas de délai officiel, tout le monde est classé
+const defiDelai = d => (d && d.l) || DEFI_DELAI;   // délai choisi par le créateur (5 min, 15 min, 1 h, 24 h) ; anciens défis : aucun
+const finTxt = sec => { const d = new Date(sec*1000), n = new Date(), dm = new Date(); dm.setDate(n.getDate()+1);
+  if (d.toDateString() === n.toDateString()) return hhmm(sec);
+  if (d.toDateString() === dm.toDateString()) return "demain " + hhmm(sec);
+  return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + " à " + hhmm(sec); };
 const KEY = "TALL&small players";
 function xorBytes(bytes){ const k = new TextEncoder().encode(KEY); return bytes.map((b,i) => b ^ k[i % k.length] ^ (i*31 & 255)); }
 function packToken(obj){
@@ -1315,7 +1323,7 @@ function readDefi(s){
     if (!p) throw 0;
     const player = JSON.parse(JSON.stringify(p));
     if (Array.isArray(o.e) && o.e.length) player.a = [...new Set([...(player.a || []), ...o.e])];
-    return { player, t: o.t || 0, tok };
+    return { player, t: o.t || 0, l: o.l || 0, tok };
   } catch(e){
     const ch = decode(tok);               // ancien format de code
     if (!ch || !ch.n || !Array.isArray(ch.r)) throw 0;
@@ -1685,6 +1693,8 @@ function readChallenge(){
   const pv = $("preset").value, baseA = pv !== "" ? (PLAYERS[pv].a || []) : [];
   return { n: name, extra, a: [...new Set([...baseA, ...extra])], p: $("cPoste").value.trim(), c: $("cNat").value.trim(), r: rows };
 }
+document.querySelectorAll("#defiDuree button").forEach(b => b.onclick = () => { document.querySelectorAll("#defiDuree button").forEach(x => x.classList.toggle("on", x === b)); lsSet("ts_defi_duree", b.dataset.v); });
+{ const v = lsGet("ts_defi_duree", null); if (v) document.querySelectorAll("#defiDuree button").forEach(x => x.classList.toggle("on", x.dataset.v === v)); }
 $("genCode").onclick = async () => {
   $("createMsg").textContent = "";
   try {
@@ -1700,7 +1710,8 @@ $("genCode").onclick = async () => {
     const base = v !== "" ? PLAYERS[v] : null;
     const same = base && base.n === ch.n && JSON.stringify(base.r.map(r=>[r[0],r[1],String(r[3]),String(r[4])])) === JSON.stringify(ch.r.map(r=>[r[0],r[1],String(r[3]),String(r[4])]));
     const extra = ch.extra; delete ch.extra;
-    const tok = packToken(same ? (extra.length ? { k: playerKey(base), t, e: extra } : { k: playerKey(base), t }) : { x: ch, t });
+    const l = Number(($("defiDuree").querySelector("button.on") || {}).dataset?.v || 3600);
+    const tok = packToken(same ? (extra.length ? { k: playerKey(base), t, l, e: extra } : { k: playerKey(base), t, l }) : { x: ch, t, l });
     const mine = lsGet("ts_crees", []); mine.push(tok); lsSet("ts_crees", mine.slice(-100));
     $("genCode").disabled = true; $("createMsg").textContent = "Création du lien…";
     const link = await makeShortLink(tok);
@@ -1743,10 +1754,10 @@ async function showDefiRank(el, d, mine){
     else el.classList.add("hide");
     return;
   }
-  const fin = d.t && DEFI_DELAI ? (d.t + DEFI_DELAI) * 1000 : 0;
+  const fin = d.t && defiDelai(d) ? (d.t + defiDelai(d)) * 1000 : 0;
   rows.forEach(r => { r.off = !r.createur && (!fin || Date.parse(r.created_at) <= fin); });
   const cls = r => r.won && r.off ? 0 : r.won ? 1 : 2;
-  rows.sort((a,b) => cls(a) - cls(b) || (cls(a) < 2 ? a.ms - b.ms : 0));
+  rows.sort((a,b) => cls(a) - cls(b) || (cls(a) < 2 ? (a.essai || 1) - (b.essai || 1) || a.ms - b.ms : 0));   // 1er essai devant 2e essai, puis le plus rapide
   if (!rows.length && !mine) { el.classList.add("hide"); return; }
   el.classList.remove("hide");
   const winners = rows.filter(r => cls(r) === 0);
@@ -1754,7 +1765,7 @@ async function showDefiRank(el, d, mine){
   let head;
   const dl = fin ? " dans le délai" : "";
   if (mi >= 0 && cls(rows[mi]) === 0) head = mi === 0 ? `Tu es en tête (${winners.length} joueur${winners.length>1?"s ont":" a"} trouvé${dl})` : `Tu es ${rangTxt(mi+1)} sur ${winners.length}${dl}`;
-  else if (winners.length) head = `En tête : ${esc(winners[0].pseudo)} (${fmtTime(winners[0].ms)})`;
+  else if (winners.length) head = `${fin && Date.now() > fin ? "Vainqueur" : "En tête"} : ${esc(winners[0].pseudo)} (${fmtTime(winners[0].ms)})`;
   else head = rows.length ? "Personne n'a encore trouvé" + (fin ? " dans le délai" : "") : "Aucun résultat pour l'instant";
   const etat = r => r.createur ? "créateur" : !r.won ? "pas trouvé" : r.off ? fmtTime(r.ms) : fmtTime(r.ms) + " (hors délai)";
   const voitRates = mine || lsGet("ts_defi_joues", []).includes(d.tok) || lsGet("ts_crees", []).includes(d.tok);
@@ -1765,14 +1776,21 @@ async function showDefiRank(el, d, mine){
     return `<tr class="${i === mi ? "me" : ""}"><td>${rang}</td><td class="p">${esc(r.pseudo)}${rate(r)}</td><td class="n">${r.won ? (r.essai === 1 ? "1er essai" : "2e essai") : ""}</td><td class="n">${etat(r)}</td></tr>`;
   }).join("");
   const live = fin ? Date.now() < fin + 60000 : true;
-  const note = !fin ? "Classement du plus rapide au plus lent, de « Commencer » à la bonne réponse. Il se met à jour automatiquement." : Date.now() < fin
-    ? `Défi officiel jusqu'à ${hhmm(fin/1000)}. Le classement se met à jour automatiquement.`
-    : `Délai officiel terminé à ${hhmm(fin/1000)}.`;
+  const note = !fin ? "Classement : 1er essai devant 2e essai, puis du plus rapide au plus lent (de « Commencer » à la bonne réponse). Il se met à jour automatiquement." : Date.now() < fin
+    ? `Défi officiel jusqu'à ${finTxt(fin/1000)}. Le classement se met à jour automatiquement.`
+    : `Délai officiel terminé ${/^\d/.test(finTxt(fin/1000)) ? "à " : ""}${finTxt(fin/1000)}.`;
+  let waRes = "";
+  if (fin && Date.now() > fin && lsGet("ts_crees", []).includes(d.tok)) {
+    DEFI_RES = { name: d.player.n, top: winners.slice(0, 5).map(r => ({ p: r.pseudo, ms: r.ms, rates: r.rates || "" })),
+      ko: rows.filter(r => !r.won && !r.createur && r.off).map(r => ({ p: r.pseudo, rates: r.rates || "" })) };
+    waRes = `<div class="row" style="margin-top:10px"><button class="primary" id="${el.id}ResImg">📸 Partager le résultat</button></div>`;
+  }
   el.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="me-line">${head}</div>
     ${rows.length ? `<table>${body}</table>` : ""}
-    <div class="small muted" style="margin-top:6px">${note}</div>
+    <div class="small muted" style="margin-top:6px">${note}</div>${waRes}
     <div class="row"><button id="${el.id}Refresh">Actualiser</button></div>`;
   $(el.id + "Refresh").onclick = () => showDefiRank(el, d, mine);
+  if ($(el.id + "ResImg")) $(el.id + "ResImg").onclick = () => shareCanvas(drawDefiResult(DEFI_RES), "tallsmall-defi.png", "Résultat du défi TALL&small players");
   if (live) DEFI_TIMER = setTimeout(() => { if (el.offsetParent !== null) showDefiRank(el, d, mine); }, 15000);
 }
 /* ---------- défi chronométré ---------- */
@@ -1780,10 +1798,10 @@ let DEFI = null;
 function openDefi(d){
   DEFI = d;
   const now = Math.floor(Date.now()/1000);
-  const fin = d.t && DEFI_DELAI ? d.t + DEFI_DELAI : 0;
+  const fin = d.t && defiDelai(d) ? d.t + defiDelai(d) : 0;
   $("introDeadline").textContent = !fin ? "" : now < fin
-    ? `Défi officiel jusqu'à ${hhmm(fin)} : le plus rapide parmi ceux qui trouvent avant cette heure gagne.`
-    : `Le délai officiel s'est terminé à ${hhmm(fin)}. Tu peux jouer, mais ton résultat sera hors délai.`;
+    ? `Défi officiel jusqu'à ${finTxt(fin)} : seuls ceux qui trouvent avant cette heure sont classés (1er essai devant 2e essai, puis le plus rapide).`
+    : `Le délai officiel s'est terminé ${/^\d/.test(finTxt(fin)) ? "à " : ""}${finTxt(fin)}. Tu peux jouer, mais ton résultat sera hors délai.`;
   const mine = lsGet("ts_crees", []);
   $("introCreator").textContent = mine.includes(d.tok) ? "Tu as créé ce défi : tu connais la réponse, ton résultat ne comptera pas." : "";
   const knownPs = lsGet("ts_pseudo", "");
@@ -1806,7 +1824,7 @@ $("startDefi").onclick = () => {
 };
 function endDefi(won){
   const ms = G.end - G.start;
-  const fin = DEFI.t && DEFI_DELAI ? DEFI.t + DEFI_DELAI : 0;
+  const fin = DEFI.t && defiDelai(DEFI) ? DEFI.t + defiDelai(DEFI) : 0;
   const now = Math.floor(Date.now()/1000);
   const horsDelai = fin && now > fin;
   const createur = lsGet("ts_crees", []).includes(DEFI.tok);
@@ -2470,16 +2488,69 @@ function drawScoreCard(){
   return c;
 }
 function roundRect(x, a, b, w, h, r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
-let shareFile = null;
+let shareFile = null, shareTxt = null, DEFI_RES = null;
+/* Image du résultat d'un défi (créateur, après la fin du délai) */
+function drawDefiResult(r){
+  const yTop = 620 + (r.top.length ? r.top.reduce((s, t) => s + (t.rates ? 104 : 76) + 6, 0) : 90);
+  const nKo = Math.min(r.ko.length, 12);
+  const W = 1080, H = Math.max(1350, yTop + (nKo ? 70 + nKo * 46 : 0) + 230), c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
+  for (let i = 0; i < 10; i++) { x.fillStyle = i % 2 ? "#1b5727" : "#22682f"; x.fillRect(0, i*H/10, W, H/10); }
+  x.strokeStyle = "rgba(255,255,255,.18)"; x.lineWidth = 6;
+  x.strokeRect(50, 50, W-100, H-100); x.beginPath(); x.moveTo(50, H/2); x.lineTo(W-50, H/2); x.stroke();
+  x.beginPath(); x.arc(W/2, H/2, 150, 0, Math.PI*2); x.stroke();
+  x.fillStyle = "rgba(5,24,11,.86)"; roundRect(x, 90, 110, W-180, H-220, 36); x.fill();
+  const logo = document.querySelector("h1.brand img");
+  if (logo && logo.naturalWidth) { const lw = 460, lh = lw * logo.naturalHeight / logo.naturalWidth; x.drawImage(logo, (W-lw)/2, 150, lw, lh); }
+  x.textAlign = "center"; x.fillStyle = "#f2c94c"; x.font = "700 38px 'Barlow Condensed', Arial, sans-serif"; x.fillText("PLAYERS", W/2, 300);
+  x.fillStyle = "#cfdcd2"; x.font = "500 38px Barlow, Arial, sans-serif"; x.fillText("Défi entre amis · terminé", W/2, 370);
+  x.fillStyle = "#cfdcd2"; x.font = "500 40px Barlow, Arial, sans-serif"; x.fillText("C'était", W/2, 440);
+  let fs = 92; x.font = `700 ${fs}px 'Barlow Condensed', Arial, sans-serif`;
+  while (x.measureText(r.name).width > W - 260 && fs > 50) { fs -= 4; x.font = `700 ${fs}px 'Barlow Condensed', Arial, sans-serif`; }
+  x.fillStyle = "#ffffff"; x.fillText(r.name, W/2, 530);
+  const fit = (t, w) => { if (x.measureText(t).width <= w) return t; while (t.length > 1 && x.measureText(t + "…").width > w) t = t.slice(0, -1); return t + "…"; };
+  let y = 620;
+  const medal = ["#f2c94c", "#d7dde3", "#d9945b", "#9fb3a5", "#9fb3a5"];
+  if (!r.top.length) { x.fillStyle = "#cfdcd2"; x.font = "500 44px Barlow, Arial, sans-serif"; x.fillText("Personne n'a trouvé dans le délai", W/2, y + 30); y += 90; }
+  r.top.forEach((t, i) => {
+    const h = t.rates ? 104 : 76;
+    x.fillStyle = i === 0 ? "rgba(242,201,76,.16)" : "rgba(255,255,255,.06)"; roundRect(x, 140, y - 50, W - 280, h - 8, 18); x.fill();
+    x.textAlign = "left"; x.fillStyle = medal[i]; x.font = "700 46px 'Barlow Condensed', Arial, sans-serif"; x.fillText(i === 0 ? "1er" : (i+1) + "e", 170, y);
+    x.fillStyle = "#ffffff"; x.font = "600 44px Barlow, Arial, sans-serif"; x.fillText(fit(t.p, 520), 260, y);
+    x.textAlign = "right"; x.fillStyle = "#ffffff"; x.font = "600 44px 'Barlow Condensed', Arial, sans-serif"; x.fillText(fmtTime(t.ms), W - 170, y);
+    if (t.rates) { x.textAlign = "left"; x.fillStyle = "#ff8a8a"; x.font = "italic 400 32px Barlow, Arial, sans-serif"; x.fillText(fit("raté : " + t.rates, W - 450), 260, y + 40); }
+    y += h + 6;
+  });
+  if (r.ko.length) {
+    y += 20; x.textAlign = "center"; x.fillStyle = "#cfdcd2"; x.font = "600 36px Barlow, Arial, sans-serif"; x.fillText("Pas trouvé", W/2, y); y += 52;
+    const lines = r.ko.map(k => k.p + (k.rates ? " (" + k.rates + ")" : ""));
+    const max = 12;
+    x.fillStyle = "#ff8a8a"; x.font = "italic 400 34px Barlow, Arial, sans-serif";
+    lines.slice(0, lines.length > max ? max - 1 : max).forEach(l => { x.fillText(fit(l, W - 300), W/2, y); y += 46; });
+    if (lines.length > max) { x.fillText(`et ${lines.length - max + 1} autre${lines.length - max + 1 > 1 ? "s" : ""}`, W/2, y); }
+  }
+  x.textAlign = "center"; x.fillStyle = "#f2c94c"; x.font = "600 34px Barlow, Arial, sans-serif"; x.fillText("tallandsmallplayers.github.io", W/2, H - 150);
+  return c;
+}
+function shareCanvas(c, name, txt){
+  shareTxt = txt || null;
+  c.toBlob(async blob => {
+    shareFile = new File([blob], name, { type: "image/png" });
+    $("shareImgOut").src = URL.createObjectURL(blob);
+    $("shareImgMsg").textContent = "";
+    $("shareOverlay").classList.remove("hide");
+    await trySharePng();
+  }, "image/png");
+}
 async function trySharePng(){
   try {
-    const text = (G.mode === "daily" && G.shareText) ? G.shareText : "Mon score sur TALL&small players" + (PUBLIC_URL ? " : " + PUBLIC_URL : "");
+    const text = shareTxt ? shareTxt : (G && G.mode === "daily" && G.shareText) ? G.shareText : "Mon score sur TALL&small players" + (PUBLIC_URL ? " : " + PUBLIC_URL : "");
     if (navigator.canShare && navigator.canShare({ files: [shareFile] })) { await navigator.share({ files: [shareFile], text }); $("shareImgMsg").textContent = ""; return true; }
   } catch(e){ if (e && e.name === "AbortError") return true; }
   $("shareImgMsg").textContent = "Le partage direct n'est pas disponible ici. Fais un appui long sur l'image pour l'enregistrer ou la partager (WhatsApp, Messages, TikTok…).";
   return false;
 }
 $("shareImg").onclick = () => {
+  shareTxt = null;
   const c = drawScoreCard();
   c.toBlob(async blob => {
     shareFile = new File([blob], "tallsmall-score.png", { type: "image/png" });
