@@ -196,7 +196,6 @@ body.typing #game{display:flex;flex-direction:column;position:relative}
 body.typing #game>.back{order:-3;margin:0 0 6px;font-size:14px;align-self:flex-start}
 body.typing #game .topbar{position:absolute;top:0;right:0;margin:0}
 body.typing #score{font-family:inherit;font-size:14px;font-weight:600;color:var(--accent)}
-body.typing #score::before{content:"pour ";font-weight:500;color:var(--muted)}
 body.typing #score small{font-size:14px;font-weight:500}
 body.typing #careerCard td{font-size:13px}
 body.typing #careerCard th{font-size:12px}
@@ -278,7 +277,7 @@ body:not(.home-bg) .playcount{display:none}
     <div class="soloBlock">
       <div class="dailyWrap"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
     </div>
-    <p class="playcount hide" id="playCount" style="margin-top:56px"></p>
+    <p class="playcount hide" id="playCount" style="margin-top:62px"></p>
     <div class="card compact">
       <h2>Consulter une des <span id="nbFiches">560</span> fiches</h2>
       <form id="viewForm" class="row">
@@ -450,6 +449,7 @@ body:not(.home-bg) .playcount{display:none}
         <li>Mêmes points que « Les 5 fiches du jour » (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
         <li>Le classement général retient le meilleur score de chaque joueur ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
+      <p class="small muted" style="margin:14px 0 0">Sources des statistiques : Wikipédia et sites spécialisés.</p>
     </div>
     <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
   </section>
@@ -464,7 +464,7 @@ body:not(.home-bg) .playcount{display:none}
   <section id="game" class="hide">
     <button class="back" data-home>← Accueil</button>
     <div class="topbar">
-      <div class="score" id="score">100 <small>points</small></div>
+      <div class="score" id="score"><small class="pour">pour</small> 100 <small>points</small></div>
       <div class="total" id="sessionTotal"></div>
       <div class="muted small" id="gameLabel" style="width:100%"></div>
     </div>
@@ -554,7 +554,7 @@ body:not(.home-bg) .playcount{display:none}
     </div>
   </section>
 
-  <footer class="mentions">Statistiques : Wikipédia · © 2026 TALL&amp;small players</footer>
+  <footer class="mentions">© 2026 TALL&amp;small players</footer>
 </div>
 
 <div id="shareOverlay" class="hide" style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px">
@@ -1437,7 +1437,7 @@ function renderScore(){
     const ms = (G.over ? G.end : performance.now()) - G.start;
     $("score").innerHTML = `${fmtTime(ms)} <small>chrono</small>`; return;
   }
-  $("score").innerHTML = `${G.score} <small>points</small>`;
+  $("score").innerHTML = `<small class="pour">pour</small> ${G.score} <small>points</small>`;   // valeur de la fiche en cours
 }
 function renderTries(){ $("tries").textContent = G.tries.length ? "Propositions : " + G.tries.join(", ") : ""; }
 
@@ -1631,7 +1631,7 @@ function renderSession(){
   const el = $("sessionTotal");
   if (G && G.mode === "daily") { const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length; el.innerHTML = `${f}/${DAILY.list.length} trouvés <small>· ${t} pts · ⏱ ${fmtDur((DAILY.end || Date.now()) - DAILY.start)}</small>`; return; }
   if (!G || G.mode !== "solo" || SESSION.over) { el.textContent = ""; return; }   // fin du Jeu libre : ligne du haut retirée
-  el.innerHTML = `Total : ${SESSION.total} pts <small>· ${SESSION.found}/${SESSION.played} trouvé${SESSION.found>1?"s":""} · ⏱ ${fmtClock(SESSION.live ? soloLeft() : 0)}</small>`;
+  el.textContent = "";   // Jeu libre : chrono, points et trouvés affichés dans le bandeau de la zone de réponse
 }
 function nextSolo(){
   if (orderIdx >= order.length) { order = shuffle(pool()); orderIdx = 0; }
@@ -2002,8 +2002,7 @@ function clmRender(){
   const card = Math.max(0, CLM_CARD - (now - CLM.cardStart));
   const s = Math.ceil(left / 1000);
   $("score").innerHTML = `${CLM.found} <small>trouvé${CLM.found>1?"s":""}</small>`;
-  $("sessionTotal").innerHTML = `⏱ ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")} · fiche : ${Math.ceil(card/1000)} s`
-    + `<div class="clmbar"><div style="width:${(card / CLM_CARD * 100).toFixed(1)}%"></div></div>`;
+  $("sessionTotal").textContent = "";   // chrono affiché seulement dans le bandeau de la zone de réponse
   $("clmTime").innerHTML = `<span>⏱ ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</span><span>fiche : ${Math.ceil(card/1000)} s</span><span>${CLM.found} trouvé${CLM.found>1?"s":""}</span>`
     + `<div class="clmbar"><div style="width:${(card / CLM_CARD * 100).toFixed(1)}%"></div></div>`;
 }
