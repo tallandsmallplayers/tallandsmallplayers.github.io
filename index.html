@@ -2152,7 +2152,7 @@ function dailyDoneSub(saved){
   $("dailyRankBtn").classList.toggle("hide", !done); $("dailyRankBtn").parentElement.classList.toggle("hasRank", !!done);
   if (!done) { $("dailySub").textContent = "Les mêmes 5 joueurs pour tout le monde aujourd'hui"; return; }
   const t = saved.res.reduce((s,r)=>s+r.pts,0), ms = (saved.end || 0) - (saved.start || 0), f = saved.res.filter(r=>r.won).length;
-  $("dailySub").innerHTML = `Déjà joué aujourd'hui : ${f}/${n} trouvés · ${t} pts · ${fmtDur(ms)}<span class="sq">${saved.res.map(SYMB).join("")}</span>`;
+  $("dailySub").innerHTML = `Déjà joué aujourd'hui : ${f}/${n} trouvé${f>1?"s":""}<span class="sq">${saved.res.map(SYMB).join("")}</span>`;
 }
 function openRank(render){
   show("rankView");
