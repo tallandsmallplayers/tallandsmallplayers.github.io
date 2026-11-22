@@ -62,14 +62,11 @@
   th.n{font-size:11.5px;padding-left:0;padding-right:4px;letter-spacing:-.2px}
   td.club .flag{margin-left:2px}
   th:first-child{width:56px}
-  body:not(.home-bg) h1.brand img{height:30px}
-  body:not(.home-bg) h1.brand span{font-size:16px}
-  body:not(.home-bg) h1.brand{flex-direction:row;justify-content:center;margin-bottom:6px}
   body:not(.home-bg) .sub{display:none}
   h1.brand + .sub{text-align:center}
-  body:is(:has(#clmPick:not(.hide)),:has(#soloPick:not(.hide)),:has(#trio:not(.hide) #trioPick:not(.hide))) h1.brand{flex-direction:column;align-items:center;gap:6px;margin:6px 0 10px}
-  body:is(:has(#clmPick:not(.hide)),:has(#soloPick:not(.hide)),:has(#trio:not(.hide) #trioPick:not(.hide))) h1.brand img{height:38px}
-  body:is(:has(#clmPick:not(.hide)),:has(#soloPick:not(.hide)),:has(#trio:not(.hide) #trioPick:not(.hide))) h1.brand span{font-size:19px}
+  body:not(.home-bg) h1.brand{flex-direction:column;align-items:center;gap:6px;margin:1px 0 10px}
+  body:not(.home-bg) h1.brand img{height:38px}
+  body:not(.home-bg) h1.brand span{font-size:19px}
   td{padding:1px 5px;border-bottom:1px solid rgba(255,255,255,.06);font-variant-numeric:tabular-nums;font-size:14px;line-height:1.15}
   table{table-layout:fixed}
   td.season{color:#cfdcd2;white-space:nowrap;width:56px;font-size:12.5px}
@@ -192,6 +189,23 @@
 #guessCard .gcTools .hints{margin:0}
 #guessCard .gcTools .row{margin:0 0 0 auto}
 #guessCard .hints button,#guessCard .hints .hint-val,#guessCard #giveUp{font-size:12px;padding:4px 7px}
+body.typing h1.brand,body.typing #sessionTotal,body.typing #gameLabel{display:none}
+body.typing #game{display:flex;flex-direction:column;position:relative}
+body.typing #game>.back{order:-3;margin:0 0 6px;font-size:14px;align-self:flex-start}
+body.typing #game .topbar{position:absolute;top:0;right:0;margin:0}
+body.typing #score{font-family:inherit;font-size:14px;font-weight:600;color:var(--accent)}
+body.typing #score::before{content:"pour ";font-weight:500;color:var(--muted)}
+body.typing #score small{font-size:14px;font-weight:500}
+body.typing #careerCard td{font-size:13px}
+body.typing #careerCard th{font-size:12px}
+body.typing #careerCard{padding:6px 8px!important}
+body.typing #guessInput,body.typing #guessForm button{padding-top:7px;padding-bottom:7px}
+body.typing #clmTime{font-size:13px}
+body.typing #clmLive{margin:-2px 0 6px}
+body.typing #guessCard{padding:8px 10px}
+body.typing #careerCard{overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:0}
+body.typing #guessCard{position:relative;border-radius:10px;margin-bottom:8px}
+body.typing div.wrap{padding-top:8px}
 #guessCard .gcTools{gap:5px}#guessCard .hints{gap:5px}
 #guessCard .msg{font-size:14px;margin-top:6px;line-height:1.25}
 #guessCard .msg:empty{display:none}
@@ -288,6 +302,7 @@ body:not(.home-bg) .playcount{display:none}
 
   <!-- INTRO DÉFI -->
   <section id="intro" class="hide">
+    <button class="back" data-home>← Accueil</button>
     <div class="card">
       <h2>Défi entre amis</h2>
       <p style="margin:0 0 10px">Retrouve le footballeur à partir de sa carrière en club. Tu as <strong>2 essais</strong>. Le chrono démarre quand tu appuies sur « Commencer ».</p>
@@ -298,7 +313,6 @@ body:not(.home-bg) .playcount{display:none}
       <div class="msg bad" id="introMsg"></div>
       <div class="row" style="margin-top:8px">
         <button class="primary" id="startDefi" style="flex:0 0 auto">Commencer</button>
-        <button data-home style="flex:0 0 auto">Accueil</button>
       </div>
     </div>
     <div class="card rank hide" id="introRank" style="margin-top:16px"></div>
@@ -388,6 +402,7 @@ body:not(.home-bg) .playcount{display:none}
 
   <!-- RÈGLES -->
   <section id="rulesView" class="hide">
+    <button class="back" data-home>← Accueil</button>
     <div class="card rulespage">
       <h2>Règles</h2>
       <h3>Pour tous les jeux</h3>
@@ -440,8 +455,8 @@ body:not(.home-bg) .playcount{display:none}
 
   <!-- CLASSEMENT DES 5 FICHES DU JOUR -->
   <section id="rankView" class="hide">
+    <button class="back" data-home>← Accueil</button>
     <div class="card rank" id="viewRankBox"></div>
-    <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
   </section>
 
   <!-- PARTIE -->
@@ -483,7 +498,7 @@ body:not(.home-bg) .playcount{display:none}
         <button data-home class="mini" id="resHome">Accueil</button>
       </div>
     </div>
-    <div class="card" style="padding:8px 10px">
+    <div class="card" id="careerCard" style="padding:8px 10px">
       <table>
         <thead><tr><th>Saison</th><th>Club</th><th class="n">Matchs</th><th class="n">Buts</th></tr></thead>
         <tbody id="careerBody"></tbody>
@@ -2490,6 +2505,24 @@ async function loadPlayCount(){
   } catch(e){ el.classList.add("hide"); }
 }
 loadPlayCount();
+
+// Mode saisie (téléphone) : clavier ouvert -> en-tête réduit, carrière sous la réponse, hauteur ajustée au clavier
+(() => {
+  if (!window.matchMedia || !matchMedia("(pointer:coarse)").matches) return;
+  const inp = $("guessInput"), car = $("careerCard"), vv = window.visualViewport;
+  const fit = () => {
+    if (!document.body.classList.contains("typing")) return;
+    const h = vv ? vv.height : innerHeight;
+    car.style.maxHeight = Math.max(110, h - $("guessCard").offsetHeight - document.querySelector("#game>.back").offsetHeight - 30) + "px";
+    window.scrollTo(0, 0);
+  };
+  inp.addEventListener("focus", () => { document.body.classList.add("typing"); fit(); setTimeout(fit, 350); });
+  inp.addEventListener("blur", () => setTimeout(() => {
+    if (document.activeElement === inp) return;
+    document.body.classList.remove("typing"); car.style.maxHeight = "";
+  }, 250));
+  if (vv) vv.addEventListener("resize", fit);
+})();
 </script>
 </body>
 </html>
