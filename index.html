@@ -307,7 +307,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card">
       <h2>Défi entre amis</h2>
-      <p style="margin:0 0 10px">Retrouve le footballeur à partir de sa carrière en club. Tu as <strong>2 essais</strong>. Le chrono démarre quand tu appuies sur «&nbsp;Commencer&nbsp;».</p>
+      <p style="margin:0 0 10px">Retrouve le footballeur à partir de sa carrière en club et donne son <strong>nom de famille</strong>, sans faute. Tu as <strong>2 essais</strong>. Le chrono démarre quand tu appuies sur «&nbsp;Commencer&nbsp;».</p>
       <p class="small" id="introDeadline" style="margin:0 0 6px"></p>
       <p class="small muted" id="introCreator" style="margin:0 0 6px"></p>
       <p id="pseudoKnown" class="hide" style="margin:0 0 4px">Tu joues sous le pseudo <strong id="pseudoName"></strong> · <button type="button" id="pseudoChange" class="linkbtn">changer</button></p>
@@ -432,7 +432,7 @@ body:not(.home-bg) .playcount{display:none}
       <h3>Défi entre amis</h3>
       <ul>
         <li>Choisis un joueur et envoie le lien à tes amis.</li>
-        <li>Chacun a 2 essais, sans indice. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse.</li>
+        <li>Chacun a 2 essais, sans indice. La réponse attendue est le nom de famille du joueur, écrit sans faute (les accents et les majuscules ne comptent pas) ; les surnoms ne sont pas acceptés. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse.</li>
         <li>Le créateur choisit la durée de validité du lien : 5 min, 15 min, 1 h ou 24 h. Après l'heure de fin, on peut encore jouer, mais hors délai et sans être classé pour la victoire ; le créateur peut alors partager le résultat en image.</li>
         <li>Le classement range d'abord ceux qui ont trouvé au 1er essai, puis ceux qui ont trouvé au 2e ; à essai égal, le plus rapide passe devant. Le créateur du défi n'est pas classé.</li>
       </ul>
@@ -526,8 +526,6 @@ body:not(.home-bg) .playcount{display:none}
         </table>
       </div>
 
-      <label for="cAlias">Autre réponse acceptée (facultatif)</label>
-      <input id="cAlias" maxlength="40" placeholder="Ex. : Zizou" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <div class="hide" id="cFields">
       <label for="cName">Réponse (nom du joueur)</label>
       <input id="cName" placeholder="Ex. : Zinédine Zidane">
@@ -1468,13 +1466,21 @@ function checkGuess(guess, p){
   for (const a of accepted) if (distance(g, a) <= tolerance(a)) return "approx";
   return false;
 }
+/* Défi entre amis : nom de famille exact (accents et majuscules ignorés), sans surnom ni faute tolérée ; le nom complet est aussi accepté */
+function checkGuessDefi(guess, p){
+  const g = norm(guess); if (!g) return false;
+  const parts = norm(p.n).split(" ");
+  const accepted = new Set([parts.join(" ")]);
+  for (let i = 1; i < parts.length; i++) accepted.add(parts.slice(i).join(" "));
+  return accepted.has(g) || accepted.has(g.replace(/ /g, "")) || [...accepted].some(a => a.replace(/ /g, "") === g.replace(/ /g, "")) ? "exact" : false;
+}
 
 $("guessForm").onsubmit = e => {
   e.preventDefault();
   if (!G || G.over) return;
   const v = $("guessInput").value.trim(); if (!v) return;
   if (G.mode === "clm") { clmAnswer(v); return; }
-  const res = checkGuess(v, G.p);
+  const res = G.mode === "chrono" ? checkGuessDefi(v, G.p) : checkGuess(v, G.p);
   if (res) { G.approx = (res === "approx") ? v : null; G.score = computeScore(); endGame(true); return; }
   G.tries.push(v); G.score = computeScore();
   const maxTries = G.mode === "chrono" ? 2 : 3;
@@ -1667,7 +1673,6 @@ $("presetSearch").oninput = () => {
     box.querySelectorAll(".pick").forEach(a => a.onclick = e => { e.preventDefault(); $("presetSearch").value = PLAYERS[a.dataset.i].n; $("presetSearch").oninput(); });
   } else if (hits.length > 8) box.innerHTML = '<span class="muted">Trop de joueurs correspondent : précise le nom.</span>';
 };
-$("cAlias").oninput = () => $("codeBox").classList.add("hide");
 $("preset").onchange = () => {
   $("codeBox").classList.add("hide"); $("createMsg").textContent = "";
   const v = $("preset").value;
@@ -1689,7 +1694,7 @@ function readChallenge(){
     if (f.length < 5) throw `Ligne ${idx+1} incomplète : il faut saison ; club ; matchs ; buts.`;
     return [f[0], f[1], f[2], f[3], f[4]];
   });
-  const extra = $("cAlias").value.trim() ? [$("cAlias").value.trim()] : [];
+  const extra = [];   // champ « Autre réponse acceptée » retiré le 22/11 (les anciens défis gardent leurs réponses ajoutées)
   const pv = $("preset").value, baseA = pv !== "" ? (PLAYERS[pv].a || []) : [];
   return { n: name, extra, a: [...new Set([...baseA, ...extra])], p: $("cPoste").value.trim(), c: $("cNat").value.trim(), r: rows };
 }
