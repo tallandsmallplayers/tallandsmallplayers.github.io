@@ -100,8 +100,8 @@
   #home .big strong,#home .big small{text-align:center;width:100%}
   #home .big small .sq{display:block;text-align:center;margin-top:3px;letter-spacing:1px}
   .dailyWrap .big{flex:1 1 auto;width:100%}
-  .dailyWrap.hasRank .big{padding-bottom:36px !important}
-  .rankBtn{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;color:var(--accent);border:1px solid var(--accent);background:rgba(242,201,76,.10);line-height:1.4;z-index:1}
+  .dailyWrap.hasRank .big{padding-bottom:34px !important}
+  .rankBtn{position:absolute;right:10px;bottom:7px;font-size:11.5px;font-weight:500;padding:2px 10px;border-radius:999px;color:var(--text);border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);line-height:1.4;z-index:1}
   .rank .me-line{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:600;color:var(--accent);margin-bottom:8px}
   .rank table{width:100%;border-collapse:collapse;font-size:14px;table-layout:auto}
   .rank td{padding:4px 4px;border-bottom:1px solid var(--line);width:auto}
@@ -241,7 +241,7 @@ body:not(.home-bg) .playcount{display:none}
   #home .rulescard .rules-more{font-size:12px;line-height:1.35;margin-top:6px}
   #home .rulescard .rules-more h3{font-size:14px;margin:8px 0 1px}
 
-#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}</style>
+#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}#home .big .icoj{width:42px;height:19px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}</style>
 </head>
 <body class="home-bg">
 <div class="wrap">
@@ -255,7 +255,7 @@ body:not(.home-bg) .playcount{display:none}
       <button class="big" id="btnCreate"><strong><svg class="ico ico3" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8.5" r="2.5"/><path d="M1.5 18.5c0-2.6 1.8-4.6 4-4.6 1 0 1.9.3 2.6.9"/><circle cx="22.5" cy="8.5" r="2.5"/><path d="M26.5 18.5c0-2.6-1.8-4.6-4-4.6-1 0-1.9.3-2.6.9"/><circle cx="14" cy="7.5" r="3.1"/><path d="M8.3 20.5c0-3.3 2.6-6 5.7-6s5.7 2.7 5.7 6"/></svg>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
       <div class="dailyWrap"><button class="big" id="btnDaily"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnClm"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 30 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
-      <div class="dailyWrap"><button class="big" id="btnTrio"><strong><svg class="ico ico3" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M0 -4.6 L3.6 -3.3 V0.6 C3.6 3 2 4.6 0 5.4 C-2 4.6 -3.6 3 -3.6 0.6 V-3.3 Z" transform="translate(4.5 12)"/><path d="M0 -4.6 L3.6 -3.3 V0.6 C3.6 3 2 4.6 0 5.4 C-2 4.6 -3.6 3 -3.6 0.6 V-3.3 Z" transform="translate(14 12)"/><path d="M0 -4.6 L3.6 -3.3 V0.6 C3.6 3 2 4.6 0 5.4 C-2 4.6 -3.6 3 -3.6 0.6 V-3.3 Z" transform="translate(23.5 12)"/></svg>Qui a joué dans ces 3 clubs ?</strong><small>3 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnTrio"><strong><svg class="ico ico3 icoj" viewBox="0 4.5 36 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M-2,-5 L-4.6,-4 L-5.6,-0.8 L-3.4,0 L-3.2,-1.4 V5.2 H3.2 V-1.4 L3.4,0 L5.6,-0.8 L4.6,-4 L2,-5 Q0,-3.4 -2,-5 Z" transform="translate(6 12.5)"/><path d="M-2,-5 L-4.6,-4 L-5.6,-0.8 L-3.4,0 L-3.2,-1.4 V5.2 H3.2 V-1.4 L3.4,0 L5.6,-0.8 L4.6,-4 L2,-5 Q0,-3.4 -2,-5 Z" transform="translate(18 12.5)"/><path d="M-2,-5 L-4.6,-4 L-5.6,-0.8 L-3.4,0 L-3.2,-1.4 V5.2 H3.2 V-1.4 L3.4,0 L5.6,-0.8 L4.6,-4 L2,-5 Q0,-3.4 -2,-5 Z" transform="translate(30 12.5)"/></svg>Qui a joué dans ces 3 clubs ?</strong><small>3 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
     </div>
     <div class="soloBlock">
       <div class="dailyWrap"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small>5 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
@@ -1674,7 +1674,7 @@ async function showDefiRank(el, d, mine){
   let rows;
   try { rows = await sbDefiRows(d.tok); }
   catch(e){
-    if (mine) { el.classList.remove("hide"); el.innerHTML = `<h3>Classement du défi</h3><div class="small muted">Classement indisponible pour le moment.</div>`; }
+    if (mine) { el.classList.remove("hide"); el.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="small muted">Classement indisponible pour le moment.</div>`; }
     else el.classList.add("hide");
     return;
   }
@@ -1703,7 +1703,7 @@ async function showDefiRank(el, d, mine){
   const note = !fin ? "Classement du plus rapide au plus lent, de « Commencer » à la bonne réponse. Il se met à jour automatiquement." : Date.now() < fin
     ? `Défi officiel jusqu'à ${hhmm(fin/1000)}. Le classement se met à jour automatiquement.`
     : `Délai officiel terminé à ${hhmm(fin/1000)}.`;
-  el.innerHTML = `<h3>Classement du défi</h3><div class="me-line">${head}</div>
+  el.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="me-line">${head}</div>
     ${rows.length ? `<table>${body}</table>` : ""}
     <div class="small muted" style="margin-top:6px">${note}</div>
     <div class="row"><button id="${el.id}Refresh">Actualiser</button></div>`;
@@ -1755,7 +1755,7 @@ function endDefi(won){
   const mine = { pseudo: ps, ms: Math.round(ms), won };
   const joues = lsGet("ts_defi_joues", []); if (!joues.includes(DEFI.tok)) { joues.push(DEFI.tok); lsSet("ts_defi_joues", joues.slice(-200)); }
   const box = $("rankBox"); box.classList.remove("hide");
-  box.innerHTML = `<h3>Classement du défi</h3><div class="small muted">Envoi de ton résultat…</div>`;
+  box.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="small muted">Envoi de ton résultat…</div>`;
   sbDefiSend({ defi: DEFI.tok, device: deviceId(), pseudo: ps, won, essai: won ? essai : 0, ms: mine.ms, createur: !!createur, rates: G.tries.length ? G.tries.map(t => t.slice(0, 40)).join(", ").slice(0, 120) : null })
     .catch(() => {}).finally(() => showDefiRank(box, DEFI, mine));
 }
@@ -2257,7 +2257,7 @@ $("trioAgain").onclick = trioChoose;
 $("trioShare").onclick = () => { G = { mode: "trio" }; $("shareImg").onclick(); };
 $("trioRankBtn").onclick = () => openRank((el, q) => showTrioRank(el, q, true));
 async function showTrioRank(el, quiet, view){
-  const H3 = "<h3>Classement : Qui a joué dans ces 3 clubs ?</h3>";
+  const H3 = "<h3>Classement de « Qui a joué dans ces 3 clubs ? »</h3>";
   el.classList.remove("hide");
   const ps = lsGet("ts_pseudo", "");
   if (!view && !TRIO.sent) {
