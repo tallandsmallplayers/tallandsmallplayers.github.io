@@ -241,7 +241,7 @@ body:not(.home-bg) .playcount{display:none}
   #home .rulescard .rules-more{font-size:12px;line-height:1.35;margin-top:6px}
   #home .rulescard .rules-more h3{font-size:14px;margin:8px 0 1px}
 
-#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}</style>
+#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}#presetHits .pick{color:#7bd88f;text-decoration:underline}</style>
 </head>
 <body class="home-bg">
 <div class="wrap">
@@ -492,8 +492,7 @@ body:not(.home-bg) .playcount{display:none}
       <label for="presetSearch" id="presetLabel">Choisir un joueur de la base</label>
       <input id="presetSearch" placeholder="Ex. : Zidane" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <div id="presetHits"></div>
-      <div class="small muted" style="margin:8px 0 4px">ou fais défiler la liste</div>
-      <select id="preset"><option value="">— Choisis un joueur —</option></select>
+      <select id="preset" hidden style="display:none"><option value="">— Choisis un joueur —</option></select>
       <div id="cPrevOut" class="hide" style="margin-top:12px">
         <div class="small muted" style="margin-bottom:4px">Aperçu de la fiche à faire deviner :</div>
         <div id="cPrevHead"></div>
@@ -1595,6 +1594,10 @@ $("presetSearch").oninput = () => {
   const v = hits.length === 1 ? String(PLAYERS.indexOf(hits[0])) : "";
   if ($("preset").value !== v) { $("preset").value = v; $("preset").onchange(); }
   box.textContent = hits.length === 1 ? "✓ " + hits[0].n : "";
+  if (hits.length > 1 && hits.length <= 8) {
+    box.innerHTML = '<span class="muted">Plusieurs joueurs : </span>' + hits.map(p => `<a href="#" class="pick" data-i="${PLAYERS.indexOf(p)}">${esc(p.n)}</a>`).join(" · ");
+    box.querySelectorAll(".pick").forEach(a => a.onclick = e => { e.preventDefault(); $("presetSearch").value = PLAYERS[a.dataset.i].n; $("presetSearch").oninput(); });
+  } else if (hits.length > 8) box.innerHTML = '<span class="muted">Trop de joueurs correspondent : précise le nom.</span>';
 };
 $("cAlias").oninput = () => $("codeBox").classList.add("hide");
 $("preset").onchange = () => {
