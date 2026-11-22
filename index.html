@@ -96,7 +96,7 @@
   .result.lost{border-left-color:var(--bad)}
   .muted{color:var(--muted)}
   .rank{margin-bottom:12px}
-  .rank h3{margin:0 0 6px;font-size:17px}
+  .rank h3{margin:0 0 6px;font-size:17px;text-align:center;color:var(--accent)}
   .dailyWrap{display:flex;flex-direction:column;position:relative}
   #home .big{text-align:center;align-items:center}
   #home .big strong,#home .big small{text-align:center;width:100%}
@@ -278,9 +278,9 @@ body:not(.home-bg) .playcount{display:none}
     <div class="soloBlock">
       <div class="dailyWrap"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
     </div>
-    <p class="playcount hide" id="playCount"></p>
+    <p class="playcount hide" id="playCount" style="margin-top:44px"></p>
     <div class="card compact">
-      <h2>Consulter une fiche</h2>
+      <h2>Consulter une des <span id="nbFiches">560</span> fiches</h2>
       <form id="viewForm" class="row">
         <input id="viewInput" name="fiche-footballeur" placeholder="Nom d'un joueur de la base" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" style="flex:1 1 160px">
         <button class="primary" type="submit" style="flex:0 0 auto">Afficher</button>
@@ -307,7 +307,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card">
       <h2>Défi entre amis</h2>
-      <p style="margin:0 0 10px">Retrouve le footballeur à partir de sa carrière en club et donne son <strong>nom de famille</strong>, sans faute. Tu as <strong>2 essais</strong>. Le chrono démarre quand tu appuies sur «&nbsp;Commencer&nbsp;».</p>
+      <p style="margin:0 0 10px">Trouve le <strong>nom de famille</strong> du joueur… sans faute&nbsp;!</p>
       <p class="small" id="introDeadline" style="margin:0 0 6px"></p>
       <p class="small muted" id="introCreator" style="margin:0 0 6px"></p>
       <p id="pseudoKnown" class="hide" style="margin:0 0 4px">Tu joues sous le pseudo <strong id="pseudoName"></strong> · <button type="button" id="pseudoChange" class="linkbtn">changer</button></p>
@@ -358,7 +358,6 @@ body:not(.home-bg) .playcount{display:none}
       <div class="rank hide" id="trioRankBox"></div>
       <div class="row resFoot">
         <button id="trioShare" class="mini">📸 Partager mon score à des amis</button>
-        <button data-home class="mini">Accueil</button>
       </div>
     </div>
   </section>
@@ -433,7 +432,7 @@ body:not(.home-bg) .playcount{display:none}
       <ul>
         <li>Choisis un joueur et envoie le lien à tes amis.</li>
         <li>Chacun a 2 essais, sans indice. La réponse attendue est le nom de famille du joueur, écrit sans faute (les accents et les majuscules ne comptent pas) ; les surnoms ne sont pas acceptés. Le chrono démarre à « Commencer » et s'arrête à la bonne réponse.</li>
-        <li>Le créateur choisit la durée de validité du lien : 5 min, 15 min, 1 h ou 24 h. Après l'heure de fin, on peut encore jouer, mais hors délai et sans être classé pour la victoire ; le créateur peut alors partager le résultat en image.</li>
+        <li>Le créateur choisit la durée de validité du lien : 5 min, 15 min, 1 h ou 3 h. Après l'heure de fin, on peut encore jouer, mais hors délai et sans être classé pour la victoire ; chacun peut alors partager le résultat en image.</li>
         <li>Le classement range d'abord ceux qui ont trouvé au 1er essai, puis ceux qui ont trouvé au 2e ; à essai égal, le plus rapide passe devant. Le créateur du défi n'est pas classé.</li>
       </ul>
       <h3>Qui a joué dans ces 3 clubs ?</h3>
@@ -443,13 +442,13 @@ body:not(.home-bg) .playcount{display:none}
         <li>L'indice « Époque » donne la décennie où le joueur a disputé le plus de matchs.</li>
         <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles. Seules les parties « Toutes » époques sont classées : les autres servent d'entraînement.</li>
         <li>Mêmes points que « Les 5 fiches du jour » : 100, 60 ou 30 points selon l'essai, indice poste −10, indice époque −15, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
-        <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement. Une partie quittée avant la fin n'est pas classée.</li>
+        <li>Le classement général retient le meilleur score de chaque joueur. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <h3>Jeu libre</h3>
       <ul>
         <li>Une partie dure 4 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis ; on peut cocher plusieurs niveaux et plusieurs époques (ex. : facile et moyen, années 2000, 2010 et 2020). Le téléphone retient le dernier choix.</li>
         <li>Mêmes points que « Les 5 fiches du jour » (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
-        <li>Le classement général retient le meilleur score de chaque joueur depuis le lancement ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
+        <li>Le classement général retient le meilleur score de chaque joueur ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
     </div>
     <div class="row" style="margin-top:12px"><button data-home style="flex:0 0 auto">Retour à l'accueil</button></div>
@@ -537,7 +536,7 @@ body:not(.home-bg) .playcount{display:none}
       <textarea id="cRows" placeholder="1992-93 ; Bordeaux ; 35 ; 10&#10;1993-94 ; Bordeaux ; 34 ; 6"></textarea>
       </div>
       <label>Lien valable</label>
-      <div class="levels" id="defiDuree"><button type="button" data-v="300">5 min</button><button type="button" data-v="900">15 min</button><button type="button" data-v="3600" class="on">1 h</button><button type="button" data-v="86400">24 h</button></div>
+      <div class="levels" id="defiDuree"><button type="button" data-v="300">5 min</button><button type="button" data-v="900">15 min</button><button type="button" data-v="3600" class="on">1 h</button><button type="button" data-v="10800">3 h</button></div>
       <div class="msg bad" id="createMsg"></div>
       <div class="row" style="margin-top:8px">
         <button class="primary" id="genCode" style="flex:0 0 auto">Créer le lien du défi</button>
@@ -1257,7 +1256,7 @@ function decode(code){ return JSON.parse(decodeURIComponent(escape(atob(code.rep
 /* ---------- liens de défi ---------- */
 const PUBLIC_URL = "https://tallandsmallplayers.github.io/";            // adresse publique du jeu, à renseigner une fois hébergé
 const DEFI_DELAI = 0;             // défis créés avant le 22/11 : pas de délai officiel, tout le monde est classé
-const defiDelai = d => (d && d.l) || DEFI_DELAI;   // délai choisi par le créateur (5 min, 15 min, 1 h, 24 h) ; anciens défis : aucun
+const defiDelai = d => (d && d.l) || DEFI_DELAI;   // délai choisi par le créateur (5 min, 15 min, 1 h, 3 h ; 24 h pour les défis créés le 22/11 avant 21 h 30) ; anciens défis : aucun
 const finTxt = sec => { const d = new Date(sec*1000), n = new Date(), dm = new Date(); dm.setDate(n.getDate()+1);
   if (d.toDateString() === n.toDateString()) return hhmm(sec);
   if (d.toDateString() === dm.toDateString()) return "demain " + hhmm(sec);
@@ -1475,6 +1474,7 @@ function checkGuessDefi(guess, p){
   return accepted.has(g) || accepted.has(g.replace(/ /g, "")) || [...accepted].some(a => a.replace(/ /g, "") === g.replace(/ /g, "")) ? "exact" : false;
 }
 
+$("nbFiches").textContent = PLAYERS.length;   // nombre de fiches de la base, mis à jour automatiquement
 $("guessForm").onsubmit = e => {
   e.preventDefault();
   if (!G || G.over) return;
@@ -1577,12 +1577,12 @@ function soloEnd(){
   const rc = $("resultCard"); rc.classList.remove("hide"); rc.classList.remove("lost");
   $("resultTitle").textContent = "Temps écoulé !";
   const f = SESSION.found, n = SESSION.played;
-  $("resultText").textContent = `${SESSION.total} point${SESSION.total>1?"s":""} en 4 minutes : ${f} joueur${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}.` + (cur ? ` La dernière fiche était ${cur}.` : "");
+  $("resultText").textContent = `${f} joueur${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}.` + (cur ? ` La dernière fiche était ${cur}.` : "");
   $("score").innerHTML = `${SESSION.total} <small>points</small>`;
   renderSession();
   $("shareImg").classList.remove("hide");
   $("nextBtn").textContent = "Rejouer";
-  $("resHome").classList.remove("hide");
+  $("resHome").classList.add("hide");   // Jeu libre : « ← Accueil » en haut suffit
   SESSION.key = todayKey();
   lsSet("ts_solo_last", { key: SESSION.key, found: f, played: n });
   const best = lsGet("ts_solo_best4", null);
@@ -1622,14 +1622,14 @@ async function showSoloRank(el, quiet, view){
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = H3 + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 4 minutes (parties depuis le 22/11/2026). Le classement est conservé d'un jour à l'autre.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
-    <div class="row"><button id="${el.id}SoloRefresh">Actualiser</button></div>`;
-  $(el.id + "SoloRefresh").onclick = () => showSoloRank(el, false, view);
+    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 4 minutes. Le classement est conservé d'un jour à l'autre.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
+    ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}SoloRefresh">Actualiser</button></div>`}`;
+  if ($(el.id + "SoloRefresh")) $(el.id + "SoloRefresh").onclick = () => showSoloRank(el, false, view);
 }
 function renderSession(){
   const el = $("sessionTotal");
   if (G && G.mode === "daily") { const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length; el.innerHTML = `${f}/${DAILY.list.length} trouvés <small>· ${t} pts · ⏱ ${fmtDur((DAILY.end || Date.now()) - DAILY.start)}</small>`; return; }
-  if (!G || G.mode !== "solo") { el.textContent = ""; return; }
+  if (!G || G.mode !== "solo" || SESSION.over) { el.textContent = ""; return; }   // fin du Jeu libre : ligne du haut retirée
   el.innerHTML = `Total : ${SESSION.total} pts <small>· ${SESSION.found}/${SESSION.played} trouvé${SESSION.found>1?"s":""} · ⏱ ${fmtClock(SESSION.live ? soloLeft() : 0)}</small>`;
 }
 function nextSolo(){
@@ -1699,7 +1699,7 @@ function readChallenge(){
   return { n: name, extra, a: [...new Set([...baseA, ...extra])], p: $("cPoste").value.trim(), c: $("cNat").value.trim(), r: rows };
 }
 document.querySelectorAll("#defiDuree button").forEach(b => b.onclick = () => { document.querySelectorAll("#defiDuree button").forEach(x => x.classList.toggle("on", x === b)); lsSet("ts_defi_duree", b.dataset.v); });
-{ const v = lsGet("ts_defi_duree", null); if (v) document.querySelectorAll("#defiDuree button").forEach(x => x.classList.toggle("on", x.dataset.v === v)); }
+{ const v = lsGet("ts_defi_duree", null); if (v && document.querySelector(`#defiDuree button[data-v="${v}"]`)) document.querySelectorAll("#defiDuree button").forEach(x => x.classList.toggle("on", x.dataset.v === v)); }
 $("genCode").onclick = async () => {
   $("createMsg").textContent = "";
   try {
@@ -1722,7 +1722,7 @@ $("genCode").onclick = async () => {
     const link = await makeShortLink(tok);
     $("genCode").disabled = false; $("createMsg").textContent = "";
     $("codeOut").textContent = link;
-    $("sendWa").href = "https://wa.me/?text=" + encodeURIComponent("Essaye de retrouver ce footballeur !\n" + link);
+    $("sendWa").href = "https://wa.me/?text=" + encodeURIComponent("Essaye de trouver ce footballeur !\n" + link);
     $("codeBox").classList.remove("hide"); $("copyMsg").textContent = "";
   }
   catch(err){ $("createMsg").textContent = err; }
@@ -1785,7 +1785,7 @@ async function showDefiRank(el, d, mine){
     ? `Défi officiel jusqu'à ${finTxt(fin/1000)}. Le classement se met à jour automatiquement.`
     : `Délai officiel terminé ${/^\d/.test(finTxt(fin/1000)) ? "à " : ""}${finTxt(fin/1000)}.`;
   let waRes = "";
-  if (fin && Date.now() > fin && lsGet("ts_crees", []).includes(d.tok)) {
+  if (fin && Date.now() > fin) {   // après la fin du délai : bouton visible par tous (la mémoire du créateur n'est pas partagée entre Safari et l'icône de l'écran d'accueil)
     DEFI_RES = { name: d.player.n, top: winners.slice(0, 5).map(r => ({ p: r.pseudo, ms: r.ms, rates: r.rates || "" })),
       ko: rows.filter(r => !r.won && !r.createur && r.off).map(r => ({ p: r.pseudo, rates: r.rates || "" })) };
     waRes = `<div class="row" style="margin-top:10px"><button class="primary" id="${el.id}ResImg">📸 Partager le résultat</button></div>`;
@@ -2030,7 +2030,7 @@ function clmEnd(quit){
   G.over = true; renderCareer();
   const avg = CLM.ms.length ? CLM.ms.reduce((a,b)=>a+b,0) / CLM.ms.length : 0;
   $("score").innerHTML = `${CLM.found} <small>trouvé${CLM.found>1?"s":""}</small>`;
-  $("sessionTotal").textContent = "⏱ 0:00";
+  $("sessionTotal").textContent = "";   // fin de partie : ligne du haut retirée
   $("guessCard").classList.add("hide");
   const rc = $("resultCard"); rc.classList.remove("hide"); rc.classList.remove("lost");
   $("resultTitle").textContent = "Temps écoulé !";
@@ -2042,7 +2042,7 @@ function clmEnd(quit){
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
   $("shareImg").classList.add("hide");
   $("nextBtn").textContent = "Rejouer (hors classement)";
-  $("resHome").classList.remove("hide");
+  $("resHome").classList.add("hide");   // « ← Accueil » en haut suffit
   showClmRank($("rankBox"), false, CLM.combo);
 }
 async function showClmRank(el, quiet, combo){
@@ -2089,9 +2089,9 @@ async function showClmRank(el, quiet, combo){
     <div class="me-line">${!rows.length ? "Personne n'a encore joué cette combinaison aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mode « Tous niveaux · toutes époques » : mêmes fiches pour tout le monde aujourd'hui.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
-    <div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`;
+    ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`}`;
   bindSel();
-  $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
+  if ($(el.id + "ClmRefresh")) $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
 }
 $("btnClm").onclick = clmPick;
 $("clmGo").onclick = clmStart;
@@ -2405,9 +2405,9 @@ async function showTrioRank(el, quiet, view){
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = H3 + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur depuis le lancement, sur 3 minutes.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
-    <div class="row"><button id="${el.id}TrioRefresh">Actualiser</button></div>`;
-  $(el.id + "TrioRefresh").onclick = () => showTrioRank(el, false, view);
+    <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 3 minutes.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
+    ${el.id === "trioRankBox" ? "" : `<div class="row"><button id="${el.id}TrioRefresh">Actualiser</button></div>`}`;
+  if ($(el.id + "TrioRefresh")) $(el.id + "TrioRefresh").onclick = () => showTrioRank(el, false, view);
 }
 function rankBtns(){
   setTimeout(() => document.querySelectorAll(".rankBtn").forEach(b => b.parentElement.classList.toggle("hasRank", !b.classList.contains("hide"))), 0);
