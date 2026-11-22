@@ -278,7 +278,7 @@ body:not(.home-bg) .playcount{display:none}
     <div class="soloBlock">
       <div class="dailyWrap"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
     </div>
-    <p class="playcount hide" id="playCount" style="margin-top:44px"></p>
+    <p class="playcount hide" id="playCount" style="margin-top:56px"></p>
     <div class="card compact">
       <h2>Consulter une des <span id="nbFiches">560</span> fiches</h2>
       <form id="viewForm" class="row">
@@ -1376,7 +1376,8 @@ function startGame(player, mode){
   $("guessInput").value = ""; $("msg").textContent = ""; $("msg").className = "msg";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
   $("nextBtn").textContent = mode === "solo" ? "Joueur suivant" : mode === "daily" ? (DAILY.idx + 1 < DAILY.list.length ? "Joueur suivant" : "Retour à l'accueil") : "Retour à l'accueil";
-  $("resHome").classList.toggle("hide", $("nextBtn").textContent === "Retour à l'accueil");
+  $("resHome").classList.add("hide");   // « ← Accueil » en haut suffit
+  $("nextBtn").classList.toggle("hide", $("nextBtn").textContent === "Retour à l'accueil");
   $("shareRow").classList.add("hide"); $("shareMsg").textContent = "";
   $("shareWa").textContent = "Envoyer mon résultat sur WhatsApp";
   $("giveUp").parentElement.classList.toggle("hide", false);
@@ -1581,7 +1582,7 @@ function soloEnd(){
   $("score").innerHTML = `${SESSION.total} <small>points</small>`;
   renderSession();
   $("shareImg").classList.remove("hide");
-  $("nextBtn").textContent = "Rejouer";
+  $("nextBtn").textContent = "Rejouer"; $("nextBtn").classList.remove("hide");
   $("resHome").classList.add("hide");   // Jeu libre : « ← Accueil » en haut suffit
   SESSION.key = todayKey();
   lsSet("ts_solo_last", { key: SESSION.key, found: f, played: n });
@@ -1793,8 +1794,8 @@ async function showDefiRank(el, d, mine){
   el.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="me-line">${head}</div>
     ${rows.length ? `<table>${body}</table>` : ""}
     <div class="small muted" style="margin-top:6px">${note}</div>${waRes}
-    <div class="row"><button id="${el.id}Refresh">Actualiser</button></div>`;
-  $(el.id + "Refresh").onclick = () => showDefiRank(el, d, mine);
+    ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}Refresh">Actualiser</button></div>`}`;
+  if ($(el.id + "Refresh")) $(el.id + "Refresh").onclick = () => showDefiRank(el, d, mine);
   if ($(el.id + "ResImg")) $(el.id + "ResImg").onclick = () => shareCanvas(drawDefiResult(DEFI_RES), "tallsmall-defi.png", "Résultat du défi TALL&small players");
   if (live) DEFI_TIMER = setTimeout(() => { if (el.offsetParent !== null) showDefiRank(el, d, mine); }, 15000);
 }
@@ -2041,7 +2042,7 @@ function clmEnd(quit){
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
   $("shareImg").classList.add("hide");
-  $("nextBtn").textContent = "Rejouer (hors classement)";
+  $("nextBtn").textContent = "Rejouer (hors classement)"; $("nextBtn").classList.remove("hide");
   $("resHome").classList.add("hide");   // « ← Accueil » en haut suffit
   showClmRank($("rankBox"), false, CLM.combo);
 }
@@ -2207,8 +2208,8 @@ async function showRank(el, quiet){
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée${el.id === "viewRankBox" ? " et se met à jour toutes les 30 secondes" : ""}.</div>
-    <div class="row"><button id="rkRefresh">Actualiser</button></div>`;
-  $("rkRefresh").onclick = () => showRank(el);
+    ${el.id === "rankBox" ? "" : `<div class="row"><button id="rkRefresh">Actualiser</button></div>`}`;
+  if ($("rkRefresh")) $("rkRefresh").onclick = () => showRank(el);
 }
 function dailyDoneSub(saved){
   saved = saved || lsGet("ts_daily", null);
@@ -2526,12 +2527,13 @@ function drawDefiResult(r){
     y += h + 6;
   });
   if (r.ko.length) {
-    y += 20; x.textAlign = "center"; x.fillStyle = "#cfdcd2"; x.font = "600 36px Barlow, Arial, sans-serif"; x.fillText("Pas trouvé", W/2, y); y += 52;
-    const lines = r.ko.map(k => k.p + (k.rates ? " (" + k.rates + ")" : ""));
+    y += 20; x.textAlign = "left"; x.fillStyle = "#cfdcd2"; x.font = "600 36px Barlow, Arial, sans-serif"; x.fillText("Pas trouvé", 170, y); y += 52;
+    const two = s => { const a = (s || "").split(",").map(t => t.trim()).filter(Boolean); while (a.length < 2) a.push("–"); return a.slice(0, 2).join(", "); };
+    const lines = r.ko.map(k => k.p + " (" + two(k.rates) + ")");
     const max = 12;
     x.fillStyle = "#ff8a8a"; x.font = "italic 400 34px Barlow, Arial, sans-serif";
-    lines.slice(0, lines.length > max ? max - 1 : max).forEach(l => { x.fillText(fit(l, W - 300), W/2, y); y += 46; });
-    if (lines.length > max) { x.fillText(`et ${lines.length - max + 1} autre${lines.length - max + 1 > 1 ? "s" : ""}`, W/2, y); }
+    lines.slice(0, lines.length > max ? max - 1 : max).forEach(l => { x.fillText(fit(l, W - 340), 170, y); y += 46; });
+    if (lines.length > max) { x.fillText(`et ${lines.length - max + 1} autre${lines.length - max + 1 > 1 ? "s" : ""}`, 170, y); }
   }
   x.textAlign = "center"; x.fillStyle = "#f2c94c"; x.font = "600 34px Barlow, Arial, sans-serif"; x.fillText("tallandsmallplayers.github.io", W/2, H - 150);
   return c;
