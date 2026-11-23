@@ -323,7 +323,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card hide" id="trioPick">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M9 3.5 L4.5 5.3 L2.6 10.6 L6 11.9 L6.4 10.1 V20.5 H17.6 V10.1 L18 11.9 L21.4 10.6 L19.5 5.3 L15 3.5 Q12 6 9 3.5 Z"/></svg>Qui a joué dans ces 3 clubs&nbsp;?</h2>
-      <p class="small muted pickDesc" style="margin:0 0 10px">3 minutes pour trouver le plus de joueurs (×1,5 pour un trio moyen, ×2 pour un difficile). Plusieurs niveaux et époques peuvent être cochés&nbsp;; seule l'époque «&nbsp;Toutes&nbsp;» est classée.</p>
+      <p class="small muted pickDesc" style="margin:0 0 10px">3 minutes pour trouver le plus de joueurs. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seul le niveau «&nbsp;Tous&nbsp;» est classé.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="trioLv">
         <button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button>
@@ -387,7 +387,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</h2>
-      <p class="small muted" style="margin:0 0 10px">Chaque jour, les mêmes 5 joueurs pour tout le monde : 2 faciles, 2 moyens et 1 difficile. 100, 60 ou 30 points selon l'essai ; à points égaux, le plus rapide passe devant. Une seule partie classée par jour.</p>
+      <p class="small muted" style="margin:0 0 10px">Les mêmes 5&nbsp;joueurs pour tout le monde&nbsp;: 2&nbsp;faciles, 2&nbsp;moyens et 1&nbsp;difficile. Une seule partie classée par jour.</p>
       <div id="dpDay"></div>
     </div>
     <button id="dpInvite" style="width:100%;margin-top:12px">📲 Envoyer à des amis</button>
@@ -409,7 +409,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</h2>
-      <p class="small muted pickDesc" style="margin:0 0 10px">4 minutes pour marquer le plus de points (×1,5 pour un joueur moyen, ×2 pour un difficile). Plusieurs niveaux et époques peuvent être cochés&nbsp;; ton téléphone retient ton dernier choix.</p>
+      <p class="small muted pickDesc" style="margin:0 0 10px">4 minutes pour marquer le plus de points. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seul le niveau «&nbsp;Tous&nbsp;» est classé.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="levels">
         <button data-level="tous">Tous</button><button data-level="facile">Facile</button><button data-level="moyen">Moyen</button><button data-level="difficile">Difficile</button>
@@ -465,7 +465,7 @@ body:not(.home-bg) .playcount{display:none}
         <li>Trois clubs s'affichent : trouve un joueur de notre base qui a joué dans les trois (les prêts comptent, les équipes réserves non). Une partie dure 3 minutes.</li>
         <li>S'il y a plusieurs réponses, le nombre de joueurs possibles est indiqué ; un seul suffit pour passer au trio suivant.</li>
         <li>L'indice « Époque » donne la décennie où le joueur a disputé le plus de matchs.</li>
-        <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles. Seules les parties « Toutes » époques sont classées : les autres servent d'entraînement.</li>
+        <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles. Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : les autres servent d'entraînement.</li>
         <li>Mêmes points que « Les 5 fiches du jour » : 100, 60 ou 30 points selon l'essai, indice poste −10, indice époque −15, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
         <li>Le classement général retient le meilleur score de chaque joueur. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
@@ -473,7 +473,7 @@ body:not(.home-bg) .playcount{display:none}
       <ul>
         <li>Une partie dure 4 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis ; on peut cocher plusieurs niveaux et plusieurs époques (ex. : facile et moyen, années 2000, 2010 et 2020). Le téléphone retient le dernier choix.</li>
         <li>Mêmes points que « Les 5 fiches du jour » (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
-        <li>Le classement général retient le meilleur score de chaque joueur ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
+        <li>Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées. Le classement général retient le meilleur score de chaque joueur ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <p class="small muted" style="margin:14px 0 0">Sources des statistiques : Wikipédia et sites spécialisés.</p>
     </div>
@@ -1453,7 +1453,7 @@ function renderHints(){
       const s = document.createElement("span"); s.className = "hint-val"; s.textContent = `${label} : ${G.p[k]}`; box.appendChild(s);
     } else {
       const btn = document.createElement("button"); btn.textContent = `${label} (−${Math.round(HINT_COST[k] * coefOf())})`;
-      btn.onclick = () => { G.hintsUsed[k] = true; G.score = computeScore(); renderHints(); renderScore(); };
+      btn.onclick = () => { G.hintsUsed[k] = true; G.score = computeScore(); renderHints(); renderScore(); dailySaveCur(); };
       box.appendChild(btn);
     }
   });
@@ -1514,7 +1514,7 @@ $("guessForm").onsubmit = e => {
   if (G.tries.length >= maxTries) { G.score = 0; endGame(false); return; }
   const left = maxTries - G.tries.length;
   $("msg").textContent = left === 1 ? "Ce n'est pas lui. Dernier essai." : `Ce n'est pas lui. Encore ${left} essais.`; $("msg").className = "msg bad";
-  $("guessInput").value = ""; renderScore(); renderTries();
+  $("guessInput").value = ""; renderScore(); renderTries(); dailySaveCur(); if (G.mode === "chrono") defiSaveCur();
 };
 $("giveUp").onclick = () => {
   if (G && G.mode === "clm") {   // Contre-la-montre : passer à la fiche suivante (comptée comme non trouvée)
@@ -1565,7 +1565,7 @@ function mainEra(p){
 }
 PLAYERS.forEach(p => { if (!p.e) p.e = mainEra(p); });
 const pool = () => PLAYERS.map((p,i)=>[p,i]).filter(([p]) => (!levels.size || levels.has(p.d)) && (!eras.size || eras.has(p.e))).map(([,i])=>i);
-function renderLevelCount(){ const n = pool().length; $("levelCount").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. Partie classée (classement général).`; $("soloGo").disabled = !n; $("soloGo").textContent = n ? "Commencer" : "Aucun joueur pour ce choix"; }
+function renderLevelCount(){ const n = pool().length, main = !levels.size; $("levelCount").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (main ? "Partie classée : classement général." : "Entraînement : cette combinaison n'est pas classée."); $("soloGo").disabled = !n; $("soloGo").textContent = !n ? "Aucun joueur pour ce choix" : main ? "Commencer" : "Commencer (entraînement)"; }
 /* Choix multiples : « Tous » / « Toutes » annule la sélection ; tout cocher revient à « Tous » */
 function multiSelect(boxId, attr, allVal, set){
   const btns = [...document.querySelectorAll(`#${boxId} button`)];
@@ -1618,8 +1618,9 @@ function soloEnd(){
   $("resHome").classList.add("hide");   // Jeu libre : « ← Accueil » en haut suffit
   SESSION.key = todayKey();
   lsSet("ts_solo_last", { key: SESSION.key, found: f, played: n });
-  const best = lsGet("ts_solo_best4", null);
-  if (!best || SESSION.total > best.points) lsSet("ts_solo_best4", { key: SESSION.key, points: SESSION.total });
+  if (!SESSION.ranked) { $("resultText").textContent += " Entraînement : partie non classée."; SESSION.sent = true; showSoloRank($("rankBox"), false, true); return; }
+  const best = lsGet("ts_solo_best5", null);
+  if (!best || SESSION.total > best.points) lsSet("ts_solo_best5", { key: SESSION.key, points: SESSION.total });
   showSoloRank($("rankBox"));
 }
 async function showSoloRank(el, quiet, view){
@@ -1648,7 +1649,7 @@ async function showSoloRank(el, quiet, view){
     const r = await fetch(SB_URL + "/solo_ranking_all?select=pseudo,points,found,played&order=points.desc,found.desc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
-  const best = lsGet("ts_solo_best4", null) || { points: SESSION ? SESSION.total : -1 };
+  const best = lsGet("ts_solo_best5", null) || { points: SESSION ? SESSION.total : -1 };
   const mi = rows.findIndex(r => r.pseudo === ps && r.points === best.points);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.points} pts</td><td class="n">${r.found}/${r.played}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
@@ -1674,7 +1675,7 @@ function nextSolo(){
 $("btnSolo").onclick = () => { show("soloPick"); renderLevelCount(); };
 $("soloGo").onclick = () => {
   if (!pool().length) return;
-  SESSION = { total: 0, played: 0, found: 0, res: [], start: Date.now(), end: 0, live: true, over: false, sent: false };
+  SESSION = { total: 0, played: 0, found: 0, res: [], start: Date.now(), end: 0, live: true, over: false, sent: false, ranked: !levels.size };
   clearInterval(window._soloTick); window._soloTick = setInterval(soloTick, 250);
   logPlay("solo");
   order = shuffle(pool()); orderIdx = 0; nextSolo();
@@ -1848,6 +1849,13 @@ function openDefi(d){
   $("pseudoKnown").classList.toggle("hide", !knownPs);
   $("pseudoAsk").classList.toggle("hide", !!knownPs);
   $("introMsg").textContent = "";
+  /* Une seule partie par défi et par téléphone : une partie commencée reprend où elle en était (chrono compris), une partie terminée ne se rejoue pas */
+  const createurDefi = mine.includes(d.tok), cur = defiCur(d.tok);
+  const dejaJoue = !createurDefi && !cur && lsGet("ts_defi_joues", []).includes(d.tok);
+  $("startDefi").classList.toggle("hide", dejaJoue);
+  $("startDefi").textContent = cur ? "Reprendre (le chrono a continué)" : "Commencer";
+  if (dejaJoue) $("introCreator").textContent = "Tu as déjà joué ce défi : voici le classement."
+  if (dejaJoue) { $("pseudoKnown").classList.add("hide"); $("pseudoAsk").classList.add("hide"); }
   show("intro");
   $("introRank").classList.add("hide");
   showDefiRank($("introRank"), d, null);
@@ -1857,9 +1865,25 @@ $("startDefi").onclick = () => {
   const ps = $("pseudo").value.trim();
   if (!ps) { $("introMsg").textContent = "Indique un pseudo."; return; }
   lsSet("ts_pseudo", ps);
-  logPlay("defi");
+  const cur = defiCur(DEFI.tok);
+  if (!cur) logPlay("defi");
   startGame(DEFI.player, "chrono");
+  if (cur) {   // reprise : même départ du chrono, mêmes propositions
+    G.start = performance.now() - (Date.now() - cur.start);
+    G.tries = (cur.tries || []).slice();
+    if (G.tries.length) { $("msg").textContent = "Ce n'est pas lui. Dernier essai."; $("msg").className = "msg bad"; }
+    renderTries(); renderScore();
+  } else defiSaveCur(Date.now());
 };
+function defiCur(tok){ return (lsGet("ts_defi_cur", {}) || {})[tok] || null; }
+function defiSaveCur(start){
+  if (!G || G.mode !== "chrono" || !DEFI || G.over) return;
+  const all = lsGet("ts_defi_cur", {}) || {};
+  const prev = all[DEFI.tok];
+  all[DEFI.tok] = { start: start || (prev && prev.start) || Date.now(), tries: G.tries.slice() };
+  lsSet("ts_defi_cur", all);
+}
+function defiClearCur(){ const all = lsGet("ts_defi_cur", {}) || {}; if (DEFI && all[DEFI.tok]) { delete all[DEFI.tok]; lsSet("ts_defi_cur", all); } }
 function endDefi(won){
   const ms = G.end - G.start;
   const fin = DEFI.t && defiDelai(DEFI) ? DEFI.t + defiDelai(DEFI) : 0;
@@ -1880,6 +1904,7 @@ function endDefi(won){
   $("shareRow").classList.remove("hide");
   const mine = { pseudo: ps, ms: Math.round(ms), won };
   const joues = lsGet("ts_defi_joues", []); if (!joues.includes(DEFI.tok)) { joues.push(DEFI.tok); lsSet("ts_defi_joues", joues.slice(-200)); }
+  defiClearCur();
   const box = $("rankBox"); box.classList.remove("hide");
   box.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="small muted">Envoi de ton résultat…</div>`;
   sbDefiSend({ defi: DEFI.tok, device: deviceId(), pseudo: ps, won, essai: won ? essai : 0, ms: mine.ms, createur: !!createur, rates: G.tries.length ? G.tries.map(t => t.slice(0, 40)).join(", ").slice(0, 120) : null })
@@ -2153,8 +2178,26 @@ function dailyShareText(key, res, ms){
   const f = res.filter(r=>r.won).length;
   return `TALL&small players – Les 5 fiches du ${fmtDate(key)} : ${f}/${res.length} trouvés · ${t} pts · ${fmtDur(ms)}\n${res.map(SYMB).join("")}`;
 }
+/* Partie du jour : la fiche en cours (propositions fausses et indices) est mémorisée, pour la retrouver telle quelle après un retour à l'accueil */
+function dailySaveCur(){
+  if (!G || G.mode !== "daily" || !DAILY || DAILY.train || G.over) return;
+  const s = lsGet("ts_daily", null); if (!s || s.key !== DAILY.key) return;
+  s.cur = { idx: DAILY.idx, tries: G.tries.slice(), hints: Object.keys(G.hintsUsed) };
+  lsSet("ts_daily", s);
+}
+function dailyRestoreCur(){
+  if (DAILY.train) return;
+  const s = lsGet("ts_daily", null);
+  if (!s || s.key !== DAILY.key || !s.cur || s.cur.idx !== DAILY.idx) return;
+  G.tries = (s.cur.tries || []).slice(); (s.cur.hints || []).forEach(k => G.hintsUsed[k] = true);
+  G.score = computeScore();
+  const left = 3 - G.tries.length;
+  if (G.tries.length) { $("msg").textContent = left === 1 ? "Ce n'est pas lui. Dernier essai." : `Ce n'est pas lui. Encore ${left} essais.`; $("msg").className = "msg bad"; }
+  renderHints(); renderScore(); renderTries();
+}
 function dailyStart(){
   startGame(JSON.parse(JSON.stringify(PLAYERS[DAILY.list[DAILY.idx]])), "daily");
+  dailyRestoreCur();
   clearInterval(window._dtick); window._dtick = setInterval(renderSession, 1000);
 }
 function dailyEnd(won){
@@ -2356,12 +2399,12 @@ function trioEnd(){
   $("trioPlay").classList.add("hide"); $("trioEnd").classList.remove("hide");
   const f = TRIO.found, n = TRIO.played;
   const lbl = selLabel(TRIO);
-  $("trioEndText").textContent = `${TRIO.total} point${TRIO.total>1?"s":""} en 3 minutes (${lbl.charAt(0).toLowerCase() + lbl.slice(1)}) : ${f} trio${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}.` + (!TRIO.era.length ? "" : " Entraînement : partie non classée.");
+  $("trioEndText").textContent = `${TRIO.total} point${TRIO.total>1?"s":""} en 3 minutes (${lbl.charAt(0).toLowerCase() + lbl.slice(1)}) : ${f} trio${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}.` + (!TRIO.lv.length ? "" : " Entraînement : partie non classée.");
   TRIO.key = todayKey();
   lsSet("ts_trio_last", { key: TRIO.key, found: f, played: n });
-  if (TRIO.era.length) { TRIO.sent = true; showTrioRank($("trioRankBox"), false, true); return; }
-  const best = lsGet("ts_trio_best", null);
-  if (!best || TRIO.total > best.points) lsSet("ts_trio_best", { key: TRIO.key, points: TRIO.total });
+  if (TRIO.lv.length) { TRIO.sent = true; showTrioRank($("trioRankBox"), false, true); return; }
+  const best = lsGet("ts_trio_best2", null);
+  if (!best || TRIO.total > best.points) lsSet("ts_trio_best2", { key: TRIO.key, points: TRIO.total });
   showTrioRank($("trioRankBox"));
 }
 function trioChoose(){
@@ -2374,8 +2417,8 @@ let TRIO_SEL = normSel(lsGet("ts_trio_sel", null));
 function trioPool(sel){ return trioData().eligible.filter(([i]) => (!sel.lv.length || sel.lv.includes(PLAYERS[i].d)) && (!sel.era.length || sel.era.includes(PLAYERS[i].e))); }
 function trioPickRender(){
   paintSel("trioLv", TRIO_SEL.lv, "tous"); paintSel("trioEra", TRIO_SEL.era, "toutes");
-  const n = trioPool(TRIO_SEL).length, main = !TRIO_SEL.era.length;
-  $("trioPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (main ? "Partie classée (classement général)." : "Entraînement : seules les parties « Toutes » époques sont classées.");
+  const n = trioPool(TRIO_SEL).length, main = !TRIO_SEL.lv.length;
+  $("trioPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (main ? "Partie classée : classement général." : "Entraînement : cette combinaison n'est pas classée.");
   $("trioGo").disabled = n < 5;
   $("trioGo").textContent = n < 5 ? "Pas assez de joueurs" : (main ? "Commencer" : "Commencer (entraînement)");
 }
@@ -2438,7 +2481,7 @@ async function showTrioRank(el, quiet, view){
     const r = await fetch(SB_URL + "/trio_ranking_all?select=pseudo,points,found,played&order=points.desc,found.desc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
-  const best = lsGet("ts_trio_best", null) || { points: -1 };
+  const best = lsGet("ts_trio_best2", null) || { points: -1 };
   const mi = rows.findIndex(r => r.pseudo === ps && r.points === best.points);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.points} pts</td><td class="n">${r.found}/${r.played}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
@@ -2453,8 +2496,8 @@ function rankBtns(){
   setTimeout(() => document.querySelectorAll(".rankBtn").forEach(b => b.parentElement.classList.toggle("hasRank", !b.classList.contains("hide"))), 0);
   dailyDoneSub();
   const c = clmSaved(); $("clmRankBtn").classList.toggle("hide", !(c && c.done));
-  $("soloRankBtn").classList.toggle("hide", !lsGet("ts_solo_best4", null));
-  $("trioRankBtn").classList.toggle("hide", !lsGet("ts_trio_best", null));
+  $("soloRankBtn").classList.toggle("hide", !lsGet("ts_solo_best5", null));
+  $("trioRankBtn").classList.toggle("hide", !lsGet("ts_trio_best2", null));
   lastSub("trioSub", "ts_trio_last", "3 minutes pour trouver le maximum de joueurs");
   lastSub("soloSub", "ts_solo_last", "4 minutes pour marquer le plus de points");
 }
@@ -2541,7 +2584,7 @@ function dailyGo(){
     DAILY.res = saved.res || []; DAILY.idx = saved.res.length; DAILY.start = saved.start || Date.now();   // reprise : le chrono continue depuis le début de la série
   }
   if (!(saved && saved.key === key && saved.start)) logPlay("daily");
-  if (!DAILY.res.length) lsSet("ts_daily", { key, res: [], start: DAILY.start, end: 0 });
+  if (!(saved && saved.key === key && saved.start)) lsSet("ts_daily", { key, res: [], start: DAILY.start, end: 0 });
   dailyStart();
 };
 
