@@ -102,7 +102,7 @@
   #home .big strong,#home .big small{text-align:center;width:100%}
   #home .big small .sq{display:none}
   .dailyWrap .big{flex:1 1 auto;width:100%}
-  .dailyWrap.hasRank .big{padding-bottom:34px !important}
+  #home .rankBtn{display:none !important}   /* classements : boutons dans la page de chaque jeu */
   .rankBtn{position:absolute;right:10px;bottom:7px;font-size:11.5px;font-weight:500;padding:2px 10px;border-radius:999px;color:var(--text);border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);line-height:1.4;z-index:1}
   .rank .me-line{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:600;color:var(--accent);margin-bottom:8px}
   .rank table{width:100%;border-collapse:collapse;font-size:14px;table-layout:auto}
@@ -131,9 +131,9 @@
   .trioClubs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
   .trioClubs div{border:1px solid var(--line);border-radius:10px;padding:12px 6px;text-align:center;font-weight:700;font-size:15px;line-height:1.2;background:rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:70px}
   .trioClubs .flag{font-size:20px}
-  #clmLv,#clmEra,#trioLv,#trioEra,#soloPick #levels,#soloPick #eras{display:grid;gap:6px}
-  #clmLv,#trioLv,#soloPick #levels{grid-template-columns:repeat(4,1fr)} #clmEra,#trioEra,#soloPick #eras{grid-template-columns:repeat(5,1fr)}
-  #clmLv button,#clmEra button,#trioLv button,#trioEra button,#soloPick #levels button,#soloPick #eras button{padding:8px 2px;font-size:14px;min-width:0;line-height:normal}
+  #clmLv,#clmEra,#trioLv,#trioEra,#dtLv,#dtEra,#soloPick #levels,#soloPick #eras{display:grid;gap:6px}
+  #clmLv,#trioLv,#dtLv,#soloPick #levels{grid-template-columns:repeat(4,1fr)} #clmEra,#trioEra,#dtEra,#soloPick #eras{grid-template-columns:repeat(5,1fr)}
+  #clmLv button,#clmEra button,#trioLv button,#trioEra button,#dtLv button,#dtEra button,#soloPick #levels button,#soloPick #eras button{padding:8px 2px;font-size:14px;min-width:0;line-height:normal}
   .clmSel{display:flex;gap:6px;margin:4px 0 8px}
   .clmSel select{flex:1;min-width:0;padding:5px 6px;border-radius:8px;background:rgba(255,255,255,.08);color:var(--text);border:1px solid var(--line);font:inherit;font-size:13px}
   .trioCount{text-align:center;color:var(--accent);font-weight:600;font-size:14px;margin-bottom:10px}
@@ -334,6 +334,7 @@ body:not(.home-bg) .playcount{display:none}
       </div>
       <div class="small muted" id="trioPickInfo" style="margin:10px 0"></div>
       <button class="primary" id="trioGo" style="width:100%">Commencer</button>
+      <button id="trioPickRank" style="width:100%;margin-top:10px">Voir le classement</button>
     </div>
     <div class="card" id="trioPlay">
       <div id="trioTime"></div>
@@ -377,10 +378,33 @@ body:not(.home-bg) .playcount{display:none}
       </div>
       <div class="small muted" id="clmPickInfo" style="margin:10px 0"></div>
       <button class="primary" id="clmGo" style="width:100%">Commencer</button>
+      <button id="clmPickRank" style="width:100%;margin-top:10px">Voir le classement</button>
     </div>
   </section>
 
   <!-- JEU LIBRE : choix -->
+  <section id="dailyPage" class="hide">
+    <button class="back" data-home>← Accueil</button>
+    <div class="card clmPickCard">
+      <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</h2>
+      <p class="small muted" style="margin:0 0 10px">Chaque jour, les mêmes 5 joueurs pour tout le monde : 2 faciles, 2 moyens et 1 difficile. 100, 60 ou 30 points selon l'essai ; à points égaux, le plus rapide passe devant. Une seule partie classée par jour.</p>
+      <div id="dpDay"></div>
+    </div>
+    <button id="dpInvite" style="width:100%;margin-top:12px">📲 Envoyer à des amis</button>
+    <div class="card clmPickCard" id="dpTrain" style="margin-top:12px">
+      <h3 style="margin:0 0 6px;text-align:center">Entraînement</h3>
+      <p class="small muted" style="margin:0 0 10px">5 fiches tirées au hasard selon le niveau et l'époque choisis, autant de fois que tu veux. Ces parties ne comptent pas pour le classement.</p>
+      <div id="dtBox">
+        <div class="lbl">Niveau</div>
+        <div class="levels" id="dtLv"><button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button></div>
+        <div class="lbl" style="margin-top:8px">Époque</div>
+        <div class="levels" id="dtEra"><button data-v="toutes">Toutes</button><button data-v="90">1990</button><button data-v="00">2000</button><button data-v="10">2010</button><button data-v="20">2020</button></div>
+        <div class="small muted" id="dtCount" style="margin:10px 0"></div>
+        <button class="primary" id="dtGo" style="width:100%">Commencer l'entraînement</button>
+      </div>
+      <div class="small muted" id="dtLock" style="text-align:center">Disponible après la partie du jour.</div>
+    </div>
+  </section>
   <section id="soloPick" class="hide">
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
@@ -396,6 +420,7 @@ body:not(.home-bg) .playcount{display:none}
       </div>
       <div class="small muted" id="levelCount" style="margin:10px 0"></div>
       <button class="primary" id="soloGo" style="width:100%">Commencer</button>
+      <button id="soloPickRank" style="width:100%;margin-top:10px">Voir le classement</button>
     </div>
   </section>
 
@@ -414,12 +439,13 @@ body:not(.home-bg) .playcount{display:none}
       </ul>
       <h3>Les 5 fiches du jour</h3>
       <ul>
-        <li>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile), une seule fois par jour.</li>
+        <li>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile) ; une seule partie classée par jour.</li>
         <li>Trois propositions par joueur : 100 points au 1<sup>er</sup> essai, 60 au 2<sup>e</sup>, 30 au 3<sup>e</sup>.</li>
         <li>Indice poste −10, indice nationalité −25, réponse acceptée avec une faute −10. Un joueur trouvé rapporte au moins 10 points.</li>
         <li>« Passer » donne la réponse et 0 point.</li>
         <li>Classement du jour : d'abord le nombre de joueurs trouvés, puis les points (500 au maximum), puis le temps total, compté du premier au dernier joueur, pauses comprises.</li>
         <li>Le partage du score ne dévoile pas les réponses.</li>
+        <li>Une fois la partie du jour jouée, on peut s'entraîner autant qu'on veut sur 5 autres fiches, en choisissant le niveau et l'époque. Ces parties ne comptent pas pour le classement.</li>
       </ul>
       <h3>Contre-la-montre</h3>
       <ul>
@@ -1247,7 +1273,7 @@ const PLAYERS = [
 const $ = id => document.getElementById(id);
 const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’'`\-\.]/g," ").replace(/\s+/g," ").trim();
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView","rulesView","trio","clmPick","soloPick"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); { const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = "#0f2213"; } window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
+function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView","rulesView","trio","clmPick","soloPick","dailyPage"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); { const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = "#0f2213"; } window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
 document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
 
 function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
@@ -1371,11 +1397,11 @@ function startGame(player, mode){
   if (mode === "chrono") { G.start = performance.now(); G.defi = DEFI; clearInterval(window._tick); window._tick = setInterval(renderScore, 100); }
   const badge = player.d ? `<span class="badge ${player.d}">${player.d}</span>` : "";
   $("gameLabel").innerHTML = mode === "solo" ? `Joueur ${orderIdx} sur ${order.length}` + badge
-    : mode === "daily" ? `Les 5 fiches du jour · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` + badge
+    : mode === "daily" ? `${DAILY.train ? "Entraînement" : "Les 5 fiches du jour"} · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` + badge
     : mode === "chrono" ? "Défi entre amis · 2 essais" : "Défi d'un ami";
   $("guessInput").value = ""; $("msg").textContent = ""; $("msg").className = "msg";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
-  $("nextBtn").textContent = mode === "solo" ? "Joueur suivant" : mode === "daily" ? (DAILY.idx + 1 < DAILY.list.length ? "Joueur suivant" : "Retour à l'accueil") : "Retour à l'accueil";
+  $("nextBtn").textContent = mode === "solo" ? "Joueur suivant" : mode === "daily" ? (DAILY.idx + 1 < DAILY.list.length ? "Joueur suivant" : DAILY.train ? "Rejouer l'entraînement" : "Retour à l'accueil") : "Retour à l'accueil";
   $("resHome").classList.add("hide");   // « ← Accueil » en haut suffit
   $("nextBtn").classList.toggle("hide", $("nextBtn").textContent === "Retour à l'accueil");
   $("shareRow").classList.add("hide"); $("shareMsg").textContent = "";
@@ -1491,6 +1517,11 @@ $("guessForm").onsubmit = e => {
   $("guessInput").value = ""; renderScore(); renderTries();
 };
 $("giveUp").onclick = () => {
+  if (G && G.mode === "clm") {   // Contre-la-montre : passer à la fiche suivante (comptée comme non trouvée)
+    if (!CLM || CLM.over) return;
+    CLM.res.push(0); CLM.flash = `Passé : c'était ${G.p.n}.`; CLM.flashOk = false;
+    clmPersist(false); clmNext(); return;
+  }
   if (G && !G.over) { G.score = 0; endGame(false); }
 };
 
@@ -1520,6 +1551,7 @@ $("nextBtn").onclick = () => {
   if (G.mode === "clm") { clmPick(); return; }
   if (G.mode === "solo") { if (SESSION.over) $("btnSolo").onclick(); else nextSolo(); }
   else if (G.mode === "daily" && DAILY.idx + 1 < DAILY.list.length) { DAILY.idx++; dailyStart(); }
+  else if (G.mode === "daily" && DAILY.train) dtStart();
   else show("home");
 };
 
@@ -1990,7 +2022,8 @@ function clmNext(){
   $("clmLive").classList.remove("hide");
   $("clmFlash").textContent = CLM.flash; $("clmFlash").className = CLM.flash ? (CLM.flashOk ? "good" : "bad") : "";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
-  $("giveUp").parentElement.classList.add("hide");
+  $("giveUp").textContent = "Passer (0 pt)";
+  $("giveUp").parentElement.classList.remove("hide");
   $("hints").innerHTML = ""; $("tries").textContent = "";
   renderCareer(); clmRender();
   if ($("game").classList.contains("hide")) show("game");
@@ -2128,6 +2161,13 @@ function dailyEnd(won){
   DAILY.res.push({ won, tries: G.tries.length, hints: Object.keys(G.hintsUsed).length, pts: won ? G.score : 0 });
   const last = DAILY.res.length >= DAILY.list.length;
   if (last) { DAILY.end = Date.now(); clearInterval(window._dtick); }
+  if (DAILY.train) {   // entraînement : ni enregistrement, ni classement, ni partage
+    renderSession(); $("shareImg").classList.add("hide");
+    const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length;
+    $("resultText").textContent += last ? ` Entraînement terminé : ${f}/${DAILY.list.length} trouvé${f>1?"s":""}, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}.`
+      : ` Entraînement : ${t} points après ${DAILY.res.length} joueur${DAILY.res.length>1?"s":""}.`;
+    return;
+  }
   lsSet("ts_daily", { key: DAILY.key, res: DAILY.res, start: DAILY.start, end: DAILY.end });
   renderSession();
   const t = DAILY.res.reduce((s,r)=>s+r.pts,0);
@@ -2136,7 +2176,7 @@ function dailyEnd(won){
   } else {
     const f = DAILY.res.filter(r=>r.won).length;
     $("resultText").textContent += ` Les 5 fiches du jour terminées : ${f}/${DAILY.list.length} trouvés, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}. ${DAILY.res.map(SYMB).join("")}`;
-    G.shareText = dailyShareText(DAILY.key, DAILY.res, DAILY.end - DAILY.start) + "\n" + baseUrl();
+    G.shareText = baseUrl() + "?jour";   // l'image porte le résultat : le message ne contient que le lien
     showRank($("rankBox"));
   }
 }
@@ -2425,7 +2465,67 @@ function lastSub(id, k, def){
 $("dailyRankBtn").onclick = () => openRank((el, q) => showRank(el, q));
 $("clmRankBtn").onclick = () => openRank((el, q) => showClmRank(el, q, q ? undefined : clmDay().last));
 $("soloRankBtn").onclick = () => openRank((el, q) => showSoloRank(el, q, true));
-$("btnDaily").onclick = () => {
+$("clmPickRank").onclick = () => $("clmRankBtn").onclick();
+$("trioPickRank").onclick = () => $("trioRankBtn").onclick();
+$("soloPickRank").onclick = () => $("soloRankBtn").onclick();
+$("btnDaily").onclick = () => { show("dailyPage"); dpRender(); };
+function dpRender(){
+  const saved = lsGet("ts_daily", null), key = todayKey();
+  const cur = saved && saved.key === key && saved.start ? saved : null, n = (cur && cur.res || []).length, done = n >= 5;
+  if (done) {
+    const f = cur.res.filter(r=>r.won).length, t = cur.res.reduce((s,r)=>s+r.pts,0);
+    $("dpDay").innerHTML = `<div class="small" style="text-align:center;margin-bottom:8px">Partie du jour jouée : <strong>${f}/5 trouvé${f>1?"s":""}</strong> · ${t} pts · ${fmtDur((cur.end||0) - (cur.start||0))}</div>
+      <button id="dpRank" style="width:100%">Voir le classement du jour</button>`;
+    $("dpRank").onclick = () => openRank((el, q) => showRank(el, q));
+  } else {
+    $("dpDay").innerHTML = `<button class="primary" id="dpGo" style="width:100%">${n ? `Reprendre la partie du jour (fiche ${n + 1} sur 5)` : "Jouer la partie du jour"}</button>`;
+    $("dpGo").onclick = dailyGo;
+  }
+  $("dtBox").classList.toggle("hide", !done); $("dtLock").classList.toggle("hide", done);
+  if (done) dtRender();
+}
+/* Entraînement des 5 fiches : niveau et époque au choix, sans classement */
+let DT_SEL = normSel(lsGet("ts_dt_sel", null));
+const dtPool = sel => PLAYERS.map((p,i)=>[p,i]).filter(([p]) => (!sel.lv.length || sel.lv.includes(p.d)) && (!sel.era.length || sel.era.includes(p.e))).map(([,i])=>i);
+function dtRender(){
+  paintSel("dtLv", DT_SEL.lv, "tous"); paintSel("dtEra", DT_SEL.era, "toutes");
+  const n = dtPool(DT_SEL).length;
+  $("dtCount").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""} · ${selLabel(DT_SEL)}. Partie non classée.`;
+  $("dtGo").disabled = n < 5; $("dtGo").textContent = n < 5 ? "Pas assez de joueurs pour ce choix" : "Commencer l'entraînement";
+}
+document.querySelectorAll("#dtLv button").forEach(b => b.onclick = () => { DT_SEL.lv = toggleSel(DT_SEL.lv, b.dataset.v, "tous", 3); lsSet("ts_dt_sel", DT_SEL); dtRender(); });
+document.querySelectorAll("#dtEra button").forEach(b => b.onclick = () => { DT_SEL.era = toggleSel(DT_SEL.era, b.dataset.v, "toutes", 4); lsSet("ts_dt_sel", DT_SEL); dtRender(); });
+function dtPick(sel){
+  const all = dtPool(sel), shuf = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  if (!sel.lv.length) {   // tous niveaux : même composition que la partie du jour (2 faciles, 2 moyens, 1 difficile) si possible
+    const by = l => shuf(all.filter(i => PLAYERS[i].d === l));
+    const f = by("facile"), m = by("moyen"), d = by("difficile");
+    if (f.length >= 2 && m.length >= 2 && d.length >= 1) return [f[0], f[1], m[0], m[1], d[0]];
+  }
+  const out = shuf(all).slice(0, 5);
+  const rank = { facile: 0, moyen: 1, difficile: 2 };
+  return out.sort((a, b) => (rank[PLAYERS[a].d] ?? 1) - (rank[PLAYERS[b].d] ?? 1));   // du plus facile au plus difficile
+}
+$("dtGo").onclick = dtStart;
+/* Invitation aux 5 fiches du jour : lien qui ouvre directement la page du jeu ; le score est cité s'il est fait, jamais les réponses */
+$("dpInvite").onclick = async () => {
+  const saved = lsGet("ts_daily", null), done = saved && saved.key === todayKey() && (saved.res || []).length >= 5;
+  const url = baseUrl() + "?jour";
+  if (done) {   // partie jouée : image du résultat + lien seul
+    DAILY = { list: dailyPick(saved.key), idx: saved.res.length, res: saved.res, key: saved.key, start: saved.start, end: saved.end };
+    G = { mode: "daily", shareText: url };
+    $("shareImg").onclick(); return;
+  }
+  const txt = "Les 5 fiches du jour. À toi de jouer\u00a0!";
+  if (navigator.share) { try { await navigator.share({ text: txt + "\n", url }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
+  window.open("https://wa.me/?text=" + encodeURIComponent(txt + "\n" + url), "_blank", "noopener");
+};
+function dtStart(){
+  logPlay("daily");
+  DAILY = { list: dtPick(DT_SEL), idx: 0, res: [], key: todayKey(), start: Date.now(), end: 0, train: true };
+  dailyStart();
+}
+function dailyGo(){
   const key = todayKey();
   DAILY = { list: dailyPick(key), idx: 0, res: [], key, start: Date.now(), end: 0 };
   const saved = lsGet("ts_daily", null);
@@ -2435,7 +2535,7 @@ $("btnDaily").onclick = () => {
       const ms = (saved.end || 0) - (saved.start || 0);
       const f = saved.res.filter(r=>r.won).length;
       dailyDoneSub(saved);
-      G = { mode: "daily", shareText: dailyShareText(key, saved.res, ms) + "\n" + baseUrl() };
+      G = { mode: "daily", shareText: baseUrl() + "?jour" };
       return;
     }
     DAILY.res = saved.res || []; DAILY.idx = saved.res.length; DAILY.start = saved.start || Date.now();   // reprise : le chrono continue depuis le début de la série
@@ -2569,6 +2669,8 @@ $("shareImg").onclick = () => {
 $("shareImgRetry").onclick = trySharePng;
 $("shareImgClose").onclick = () => $("shareOverlay").classList.add("hide");
 
+/* Lien d'invitation aux 5 fiches du jour (?jour) : ouvre directement la page du jeu */
+if (/[?&]jour\b/.test(location.search)) { show("dailyPage"); dpRender(); }
 /* Ouverture directe d'un lien de défi */
 (function(){
   const s = location.search + location.hash;
