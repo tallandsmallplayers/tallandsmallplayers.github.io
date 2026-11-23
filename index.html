@@ -367,7 +367,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>Contre-la-montre</h2>
-      <p class="small muted pickDesc" style="margin:0 0 10px">2 minutes, une nouvelle fiche toutes les 30 secondes. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seule la combinaison «&nbsp;Tous&nbsp;» et «&nbsp;Toutes&nbsp;» est classée.</p>
+      <p class="small muted pickDesc" style="margin:0 0 10px">2 minutes, une nouvelle fiche toutes les 30 secondes. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seul le niveau «&nbsp;Tous&nbsp;» est classé.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="clmLv">
         <button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button>
@@ -389,8 +389,8 @@ body:not(.home-bg) .playcount{display:none}
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</h2>
       <p class="small muted" style="margin:0 0 10px">Les mêmes 5&nbsp;joueurs pour tout le monde&nbsp;: 2&nbsp;faciles, 2&nbsp;moyens et 1&nbsp;difficile. Une seule partie classée par jour.</p>
       <div id="dpDay"></div>
+      <button id="dpInvite" style="width:100%">📲 Envoyer à des amis</button>
     </div>
-    <button id="dpInvite" style="width:100%;margin-top:12px">📲 Envoyer à des amis</button>
     <div class="card clmPickCard" id="dpTrain" style="margin-top:12px">
       <h3 style="margin:0 0 6px;text-align:center">Entraînement</h3>
       <p class="small muted" style="margin:0 0 10px">5 fiches tirées au hasard selon le niveau et l'époque choisis, autant de fois que tu veux. Ces parties ne comptent pas pour le classement.</p>
@@ -451,7 +451,7 @@ body:not(.home-bg) .playcount{display:none}
       <ul>
         <li>2 minutes pour trouver le plus de joueurs possible. Une nouvelle fiche arrive toutes les 30 secondes. Avant de jouer, choisis un ou plusieurs niveaux et une ou plusieurs époques (ou « Tous » et « Toutes ») ; le téléphone retient le dernier choix.</li>
         <li>Une seule proposition par fiche, sans indice : juste ou fausse, la fiche suivante arrive.</li>
-        <li>Seul le mode « Tous » niveaux et « Toutes » époques est classé : les fiches y sont les mêmes pour tout le monde dans la journée, et seule la première partie du jour compte, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement. Les autres combinaisons servent d'entraînement.</li>
+        <li>Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : les fiches y sont les mêmes dans la journée pour tous ceux qui choisissent les mêmes époques, et seule la première partie classée du jour compte, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Une partie quittée en cours compte comme jouée ; les suivantes sont hors classement. Les autres combinaisons servent d'entraînement.</li>
       </ul>
       <h3>Défi entre amis</h3>
       <ul>
@@ -1985,6 +1985,8 @@ function clmDay(){
   return s && s.key === todayKey() ? s : { key: todayKey(), games: {}, last: null };
 }
 function clmGame(combo){ return clmDay().games[combo] || null; }
+/* une seule partie classée par jour (niveau « Tous », quelles que soient les époques) */
+function clmRankedDone(){ return Object.values(clmDay().games).some(g => g.done); }
 function clmSaved(){ const d = clmDay(); return d.last ? Object.assign({ key: d.key, combo: d.last }, d.games[d.last]) : null; }
 function clmSub(){
   const s = clmSaved();
@@ -2003,9 +2005,9 @@ function clmList(ranked, sel){
 }
 function clmPickRender(){
   paintSel("clmLv", CLM_SEL.lv, "tous"); paintSel("clmEra", CLM_SEL.era, "toutes");
-  const n = clmPool(CLM_SEL).length, g = clmGame(clmCombo(CLM_SEL));
-  const main = clmCombo(CLM_SEL) === "tous-toutes";
-  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (!main ? "Entraînement : cette combinaison n'est pas classée." : g && g.done ? "Déjà jouée aujourd'hui : partie hors classement." : "Partie classée : mêmes fiches du jour pour tout le monde.");
+  const n = clmPool(CLM_SEL).length, combo = clmCombo(CLM_SEL), g = clmRankedDone() ? { done: true } : null;
+  const main = combo.startsWith("tous-");
+  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (!main ? "Entraînement : cette combinaison n'est pas classée." : g && g.done ? "Déjà jouée aujourd'hui : partie hors classement." : (combo === "tous-toutes" ? "Partie classée : mêmes fiches du jour pour tout le monde." : "Partie classée : mêmes fiches du jour pour ceux qui choisissent ces époques."));
   $("clmGo").disabled = n < 4;
   $("clmGo").textContent = n < 4 ? "Pas assez de joueurs" : (!main ? "Commencer (entraînement)" : g && g.done ? "Rejouer (hors classement)" : "Commencer");
 }
@@ -2020,8 +2022,7 @@ document.querySelectorAll("#clmEra button").forEach(b => b.onclick = () => { CLM
 function clmStart(){
   const sel = { lv: CLM_SEL.lv.slice(), era: CLM_SEL.era.slice() }, combo = clmCombo(sel);
   logPlay("clm");
-  const g = clmGame(combo);
-  const ranked = combo === "tous-toutes" && (!g || !g.done);
+  const ranked = combo.startsWith("tous-") && !clmRankedDone();
   CLM = { ranked, combo, sel, key: todayKey(), list: clmList(ranked, sel), idx: -1, found: 0, ms: [], res: [], seen: 0, start: Date.now(), cardStart: 0, flash: "", flashOk: false, over: false };
   if (ranked) { const d = clmDay(); d.games[combo] = { found: 0, avg: 0, seen: 0, done: false }; d.last = combo; lsSet("ts_clm", d); }
   clearInterval(window._clmTick);
@@ -2041,7 +2042,7 @@ function clmNext(){
   G = { p, mode: "clm", score: 0, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   $("rankBox").classList.add("hide");
   const badge = p.d ? `<span class="badge ${p.d}">${p.d}</span>` : "";
-  $("gameLabel").innerHTML = `Contre-la-montre · ${clmLabel(CLM.combo)}${CLM.ranked ? "" : CLM.combo === "tous-toutes" ? " · hors classement" : " · entraînement"} · fiche ${CLM.seen}` + badge;
+  $("gameLabel").innerHTML = `Contre-la-montre · ${clmLabel(CLM.combo)}${CLM.ranked ? "" : CLM.combo.startsWith("tous-") ? " · hors classement" : " · entraînement"} · fiche ${CLM.seen}` + badge;
   $("guessInput").value = "";
   $("msg").textContent = ""; $("msg").className = "msg";
   $("clmLive").classList.remove("hide");
@@ -2094,7 +2095,7 @@ function clmEnd(quit){
   $("resultTitle").textContent = "Temps écoulé !";
   $("resultText").textContent = `${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} sur ${CLM.seen} fiche${CLM.seen>1?"s":""}`
     + (CLM.found ? `, en ${fmtTime(avg)} en moyenne.` : ".") + ` La dernière fiche était ${G.p.n}.`
-    + ` (${clmLabel(CLM.combo)})` + (CLM.ranked ? "" : CLM.combo === "tous-toutes" ? " Partie hors classement." : " Partie d'entraînement, hors classement.");
+    + ` (${clmLabel(CLM.combo)})` + (CLM.ranked ? "" : CLM.combo.startsWith("tous-") ? " Partie hors classement." : " Partie d'entraînement, hors classement.");
   G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} (${clmLabel(CLM.combo)}) : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
@@ -2105,7 +2106,7 @@ function clmEnd(quit){
 }
 async function showClmRank(el, quiet, combo){
   const d = clmDay();
-  combo = "tous-toutes";   // seul le mode Tous niveaux · toutes époques est classé
+  combo = d.last || "tous-toutes";   // la partie classée du jour (niveau « Tous ») ; le classement réunit toutes les époques
   el.dataset.combo = combo;
   const s = Object.assign({ key: d.key, combo }, d.games[combo] || {});
   el.classList.remove("hide");
@@ -2135,7 +2136,7 @@ async function showClmRank(el, quiet, combo){
   bindSel();
   let rows;
   try {
-    const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&combo=eq." + combo + "&select=pseudo,found,avg_ms&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
+    const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&combo=like.tous-*&select=pseudo,found,avg_ms,combo&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { if (!quiet) { el.innerHTML = H3 + sel() + `<div class="small muted">Classement indisponible pour le moment.</div>`; bindSel(); } return; }
   const me = s.sent || {};
@@ -2144,9 +2145,9 @@ async function showClmRank(el, quiet, combo){
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = H3 + sel() + `
-    <div class="me-line">${!rows.length ? "Personne n'a encore joué cette combinaison aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <div class="me-line">${!rows.length ? "Personne n'a encore été classé aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Mode « Tous niveaux · toutes époques » : mêmes fiches pour tout le monde aujourd'hui.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
+    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Seules les parties « Tous » niveaux sont classées ; les fiches du jour sont les mêmes pour ceux qui choisissent les mêmes époques.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`}`;
   bindSel();
   if ($(el.id + "ClmRefresh")) $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
@@ -2157,7 +2158,7 @@ $("clmGo").onclick = clmStart;
 
 /* ---------- série du jour ---------- */
 let DAILY = { list: [], idx: 0, res: [], key: "", start: 0, end: 0 };
-function fmtDur(ms){ const s = Math.max(0, Math.round(ms/1000)); const m = Math.floor(s/60); return m ? `${m} min ${String(s%60).padStart(2,"0")} s` : `${s} s`; }
+function fmtDur(ms){ const s = Math.max(0, Math.round(ms/1000)); const m = Math.floor(s/60); return m ? `${m}\u00a0min ${String(s%60).padStart(2,"0")}\u00a0s` : `${s}\u00a0s`; }
 function todayKey(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
 function seededRand(str){
   let h = 1779033703 ^ str.length;
@@ -2520,9 +2521,11 @@ function dpRender(){
     $("dpDay").innerHTML = `<div class="small" style="text-align:center;margin-bottom:8px">Partie du jour jouée : <strong>${f}/5 trouvé${f>1?"s":""}</strong> · ${t} pts · ${fmtDur((cur.end||0) - (cur.start||0))}</div>
       <button id="dpRank" style="width:100%">Voir le classement du jour</button>`;
     $("dpRank").onclick = () => openRank((el, q) => showRank(el, q));
+    $("dpDay").insertBefore($("dpInvite"), $("dpRank")); $("dpInvite").style.margin = "0 0 8px";   // envoyer, puis le classement
   } else {
     $("dpDay").innerHTML = `<button class="primary" id="dpGo" style="width:100%">${n ? `Reprendre la partie du jour (fiche ${n + 1} sur 5)` : "Jouer la partie du jour"}</button>`;
     $("dpGo").onclick = dailyGo;
+    $("dpDay").after($("dpInvite")); $("dpInvite").style.margin = "8px 0 0";
   }
   $("dtBox").classList.toggle("hide", !done); $("dtLock").classList.toggle("hide", done);
   if (done) dtRender();
