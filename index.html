@@ -1524,7 +1524,7 @@ function unpackToken(tok){
 const playerKey = p => norm(p.n);
 function baseUrl(){ return PUBLIC_URL || (location.origin + location.pathname); }
 $("shareGame").onclick = async () => {   /* partage du jeu entier (24/11) */
-  const url = baseUrl(), txt = "TALL&small players : retrouve le joueur de football à partir de sa carrière. À toi de jouer\u00a0!";
+  const url = baseUrl(), txt = "Retrouve le footballeur à partir de sa carrière\u00a0!";   /* texte dicté par Maxime (24/11) */
   if (navigator.share) { try { await navigator.share({ text: txt + "\n", url }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
   window.open("https://wa.me/?text=" + encodeURIComponent(txt + "\n" + url), "_blank", "noopener");
 };
