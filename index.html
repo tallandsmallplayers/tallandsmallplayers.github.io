@@ -7,8 +7,8 @@
 <meta property="og:title" content="TALL&amp;small players">
 <meta property="og:description" content="Retrouve le footballeur à partir de sa carrière, saison par saison.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://tallandsmallplayers.github.io/">
-<meta property="og:image" content="https://tallandsmallplayers.github.io/apercu.jpg">
+<meta property="og:url" content="https://tallandsmallplayers.com/">
+<meta property="og:image" content="https://tallandsmallplayers.com/apercu.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <title>TALL&amp;small players</title>
@@ -417,14 +417,14 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</h2>
-      <p class="small muted" style="margin:0 0 10px;text-align:center">Les mêmes 5&nbsp;joueurs pour tout le monde&nbsp;:<br>2&nbsp;faciles, 2&nbsp;moyens et 1&nbsp;difficile.<br>Une seule partie classée par jour.</p>
+      <p class="small muted" style="margin:0 0 10px;text-align:center">Les mêmes 5&nbsp;joueurs pour tout le monde.<br>Une seule partie classée par jour.</p>
       <div id="dpDay"></div>
       <button id="dpInvite" style="width:100%">📲 Envoyer à des amis</button>
       <div class="dpRanks"><button id="dpRank">Voir le classement<br>du jour</button><button id="dpWeek">Voir le classement<br>de la semaine</button></div>
     </div>
     <div class="card clmPickCard" id="dpTrain" style="margin-top:12px">
       <h3 style="margin:0 0 6px;text-align:center">Entraînement</h3>
-      <p class="small muted" style="margin:0 0 10px">5 fiches tirées au hasard selon le niveau et l'époque choisis, autant de fois que tu veux. Ces parties ne comptent pas pour le classement.</p>
+      <p class="small muted" style="margin:0 0 10px">Ces parties ne comptent pas pour le classement.</p>
       <div id="dtBox">
         <div class="lbl">Niveau</div>
         <div class="levels" id="dtLv"><button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button></div>
@@ -1344,7 +1344,7 @@ function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj
 function decode(code){ return JSON.parse(decodeURIComponent(escape(atob(code.replace(/\s+/g,""))))); }
 
 /* ---------- liens de défi ---------- */
-const PUBLIC_URL = "https://tallandsmallplayers.github.io/";            // adresse publique du jeu, à renseigner une fois hébergé
+const PUBLIC_URL = "https://tallandsmallplayers.com/";            // adresse publique du jeu, à renseigner une fois hébergé
 const DEFI_DELAI = 0;             // défis créés avant le 22/11 : pas de délai officiel, tout le monde est classé
 const defiDelai = d => (d && d.l) || DEFI_DELAI;   // délai choisi par le créateur (5 min, 15 min, 1 h, 3 h ; 24 h pour les défis créés le 22/11 avant 21 h 30) ; anciens défis : aucun
 const finTxt = sec => { const d = new Date(sec*1000), n = new Date(), dm = new Date(); dm.setDate(n.getDate()+1);
@@ -1424,8 +1424,8 @@ const fmtTime = ms => (ms/1000).toFixed(1).replace(".",",") + " s";
 
 
 /* ---------- drapeau du pays du club ---------- */
-const DIV_CC = {"Équateur D1": "EC", "Corée du Sud D1": "KR", "Cameroun D1": "CM", "Paraguay D1": "PY", "1. divisjon": "NO", "1. liga": "CZ", "1. liga yougoslave": "YU", "2. Bundesliga": "DE", "2. Liga": "SK", "A Group": "BG", "A-League": "AU", "Allsvenskan": "SE", "Angola D1": "AO", "Arabie saoudite D1": "SA", "Argentine D1": "AR", "Argentine D2": "AR", "Autriche D1": "AT", "Autriche D2": "AT", "Azerbaïdjan D1": "AZ", "Belgique D1": "BE", "Bosnie D1": "BA", "Bundesliga": "DE", "CFA": "FR", "CFA 2": "FR", "Carioca D2": "BR", "Championship": "ENG", "China League One": "CN", "Chinese Super League": "CN", "Chypre D1": "CY", "Colombie D2": "CO", "Conference": "ENG", "Croatie D2": "HR", "D1 (Biélorussie)": "BY", "D1 (Bulgarie)": "BG", "D1 (Hong Kong)": "HK", "D1 (Ukraine)": "UA", "D1 (Yougoslavie)": "YU", "D2 (Ukraine)": "UA", "D2 (Yougoslavie)": "YU", "D2 anglaise": "ENG", "D3 (Bulgarie)": "BG", "D3 (Danemark)": "DK", "D4 (Danemark)": "DK", "DH": "FR", "Division 1": "FR", "Division 1 belge": "BE", "Division 2": "FR", "Division 3": "FR", "Divisions inférieures": "IT", "Druga HNL": "HR", "Eerste Divisie": "NL", "Ekstraklasa": "PL", "Eliteserien": "NO", "Eredivisie": "NL", "Espagne D3": "ES", "First Division": "ENG", "Grèce D1": "GR", "Grèce D2": "GR", "Géorgie D1": "GE", "ISL": "IN", "Indian Super League": "IN", "Indonésie D1": "ID", "J.League": "JP", "J1 League": "JP", "J2 League": "JP", "Japon D2": "JP", "League One": "ENG", "League Two": "ENG", "Liga": "ES", "Liga 1": "PE", "Liga 2": "ES", "Liga 2 (Portugal)": "PT", "Liga MX": "MX", "Ligue 1": "FR", "Ligue 2": "FR", "Ligue nationale A": "CH", "Luxembourg D1": "LU", "MLS": "US", "Manchester League": "ENG", "Mestaruussarja": "FI", "Mexique D1": "MX", "NASL": "US", "National": "FR", "National 2": "FR", "National 3": "FR", "Nationalliga A": "CH", "Norvège D3": "NO", "Norvège D4": "NO", "Norvège D5": "NO", "Oberliga": "DE", "Ouzbékistan D1": "UZ", "Pays-Bas (amateur)": "NL", "Pologne D3": "PL", "Pologne D4": "PL", "Pologne D5": "PL", "Pologne D7": "PL", "Preferente": "ES", "Premier Division": "SCO", "Premier League": "ENG", "Premier League libyenne": "LY", "Premier League russe": "RU", "Premier-Liga (Russie)": "RU", "Premiership": "SCO", "Primeira Divisão": "PT", "Primeira Liga": "PT", "Primera A": "CO", "Primera B": "AR", "Primera B Nacional": "AR", "Primera División": "AR", "Primera División (Argentine)": "AR", "Prva HNL": "HR", "Qatar Stars League": "QA", "Regionalliga": "DE", "Regionalliga Nord": "DE", "Regionalliga Süd": "DE", "Régional 1": "FR", "Réunion D1": "FR", "Saint-Marin D1": "SM", "Second Division": "ENG", "Segunda B": "ES", "Segunda División": "ES", "Segunda División B": "ES", "Serie A": "IT", "Serie B": "IT", "Serie C": "IT", "Serie C1": "IT", "Serie C2": "IT", "Serie D": "IT", "Suisse D1": "CH", "Suisse D2": "CH", "Suisse D3": "CH", "Suisse D4": "CH", "Super League": "GR", "Super League chinoise": "CN", "Superliga": "DK", "Suède D2": "SE", "Suède D3": "SE", "Série A": "BR", "Série A (Brésil)": "BR", "Série B": "BR", "Série B (Brésil)": "BR", "Série C (Brésil)": "BR", "Süper Lig": "TR", "Tchéquie D2": "CZ", "Tercera División": "ES", "Thai Premier League": "TH", "Third Division": "ENG", "Tippeligaen": "NO", "Treća HNL": "HR", "UAE Pro League": "AE", "USASA": "US", "USL": "US", "USL (États-Unis)": "US", "Uruguay D1": "UY", "Veikkausliiga": "FI", "Vyshcha Liha": "UA", "Écosse D1": "SCO", "Égypte D1": "EG", "Émirats D1": "AE", "DDR-Oberliga": "DE", "Portugal D3": "PT", "Émirats D2": "AE", "Danemark D1": "DK", "Danemark D2": "DK", "Colombie D1": "CO", "Chili D1": "CL", "Kazakhstan D1": "KZ", "Irlande D2": "IE", "Serbie D1": "RS", "Roumanie D1": "RO", "Slovaquie D1": "SK", "Belgique D2": "BE", "Belgique D3": "BE", "Écosse D4": "SCO", "Turquie D2": "TR", "Série D (Brésil)": "BR", "Paulista": "BR", "Gaúcho D2": "BR", "Paulista D2": "BR", "Andorre D1": "AD", "Espagne D6": "ES", "Espagne D5": "ES", "Finlande D2": "FI", "Malaisie D1": "MY", "Argentine D3": "AR", "Fourth Division": "ENG", "Suède D4": "SE", "Isthmian League": "ENG", "Iran D1": "IR", "Maroc D1": "MA", "Ligue 3": "FR", "Slovénie D2": "SI", "Slovénie D1": "SI", "Chili D2": "CL", "France (autres)": "FR", "Thaïlande D1": "TH", "Thaïlande D2": "TH", "Israël D1": "IL", "Côte d'Ivoire D1": "CI", "Angleterre (amateur)": "ENG"};
-const CLUB_CC = {"APOEL":"CY","Lokeren":"BE","Anderlecht":"BE","Saint-Trond":"BE","FC Malines":"BE","Standard de Liège":"BE","Danubio":"UY","Nacional":"UY","Universidad de Chile":"CL","Deportivo Pesquero":"PE","Alianza Lima":"PE","Hajduk Split":"HR","Proleter Zrenjanin":"RS","Étoile rouge de Belgrade":"RS","Loznica":"RS","Sartid Smederevo":"RS","Partizan Belgrade":"RS","Radnički Pirot":"RS","JS Saint-Pierroise":"FR"};
+const DIV_CC = {"Sénégal D1": "SN", "Uruguay D2": "UY", "Équateur D1": "EC", "Corée du Sud D1": "KR", "Cameroun D1": "CM", "Paraguay D1": "PY", "1. divisjon": "NO", "1. liga": "CZ", "1. liga yougoslave": "YU", "2. Bundesliga": "DE", "2. Liga": "SK", "A Group": "BG", "A-League": "AU", "Allsvenskan": "SE", "Angola D1": "AO", "Arabie saoudite D1": "SA", "Argentine D1": "AR", "Argentine D2": "AR", "Autriche D1": "AT", "Autriche D2": "AT", "Azerbaïdjan D1": "AZ", "Belgique D1": "BE", "Bosnie D1": "BA", "Bundesliga": "DE", "CFA": "FR", "CFA 2": "FR", "Carioca D2": "BR", "Championship": "ENG", "China League One": "CN", "Chinese Super League": "CN", "Chypre D1": "CY", "Colombie D2": "CO", "Conference": "ENG", "Croatie D2": "HR", "D1 (Biélorussie)": "BY", "D1 (Bulgarie)": "BG", "D1 (Hong Kong)": "HK", "D1 (Ukraine)": "UA", "D1 (Yougoslavie)": "YU", "D2 (Ukraine)": "UA", "D2 (Yougoslavie)": "YU", "D2 anglaise": "ENG", "D3 (Bulgarie)": "BG", "D3 (Danemark)": "DK", "D4 (Danemark)": "DK", "DH": "FR", "Division 1": "FR", "Division 1 belge": "BE", "Division 2": "FR", "Division 3": "FR", "Divisions inférieures": "IT", "Druga HNL": "HR", "Eerste Divisie": "NL", "Ekstraklasa": "PL", "Eliteserien": "NO", "Eredivisie": "NL", "Espagne D3": "ES", "First Division": "ENG", "Grèce D1": "GR", "Grèce D2": "GR", "Géorgie D1": "GE", "ISL": "IN", "Indian Super League": "IN", "Indonésie D1": "ID", "J.League": "JP", "J1 League": "JP", "J2 League": "JP", "Japon D2": "JP", "League One": "ENG", "League Two": "ENG", "Liga": "ES", "Liga 1": "PE", "Liga 2": "ES", "Liga 2 (Portugal)": "PT", "Liga MX": "MX", "Ligue 1": "FR", "Ligue 2": "FR", "Ligue nationale A": "CH", "Luxembourg D1": "LU", "MLS": "US", "Manchester League": "ENG", "Mestaruussarja": "FI", "Mexique D1": "MX", "NASL": "US", "National": "FR", "National 2": "FR", "National 3": "FR", "Nationalliga A": "CH", "Norvège D3": "NO", "Norvège D4": "NO", "Norvège D5": "NO", "Oberliga": "DE", "Ouzbékistan D1": "UZ", "Pays-Bas (amateur)": "NL", "Pologne D3": "PL", "Pologne D4": "PL", "Pologne D5": "PL", "Pologne D7": "PL", "Preferente": "ES", "Premier Division": "SCO", "Premier League": "ENG", "Premier League libyenne": "LY", "Premier League russe": "RU", "Premier-Liga (Russie)": "RU", "Premiership": "SCO", "Primeira Divisão": "PT", "Primeira Liga": "PT", "Primera A": "CO", "Primera B": "AR", "Primera B Nacional": "AR", "Primera División": "AR", "Primera División (Argentine)": "AR", "Prva HNL": "HR", "Qatar Stars League": "QA", "Regionalliga": "DE", "Regionalliga Nord": "DE", "Regionalliga Süd": "DE", "Régional 1": "FR", "Réunion D1": "FR", "Saint-Marin D1": "SM", "Second Division": "ENG", "Segunda B": "ES", "Segunda División": "ES", "Segunda División B": "ES", "Serie A": "IT", "Serie B": "IT", "Serie C": "IT", "Serie C1": "IT", "Serie C2": "IT", "Serie D": "IT", "Suisse D1": "CH", "Suisse D2": "CH", "Suisse D3": "CH", "Suisse D4": "CH", "Super League": "GR", "Super League chinoise": "CN", "Superliga": "DK", "Suède D2": "SE", "Suède D3": "SE", "Série A": "BR", "Série A (Brésil)": "BR", "Série B": "BR", "Série B (Brésil)": "BR", "Série C (Brésil)": "BR", "Süper Lig": "TR", "Tchéquie D2": "CZ", "Tercera División": "ES", "Thai Premier League": "TH", "Third Division": "ENG", "Tippeligaen": "NO", "Treća HNL": "HR", "UAE Pro League": "AE", "USASA": "US", "USL": "US", "USL (États-Unis)": "US", "Uruguay D1": "UY", "Veikkausliiga": "FI", "Vyshcha Liha": "UA", "Écosse D1": "SCO", "Égypte D1": "EG", "Émirats D1": "AE", "DDR-Oberliga": "DE", "Portugal D3": "PT", "Émirats D2": "AE", "Danemark D1": "DK", "Danemark D2": "DK", "Colombie D1": "CO", "Chili D1": "CL", "Kazakhstan D1": "KZ", "Irlande D2": "IE", "Serbie D1": "RS", "Roumanie D1": "RO", "Slovaquie D1": "SK", "Belgique D2": "BE", "Belgique D3": "BE", "Écosse D4": "SCO", "Turquie D2": "TR", "Série D (Brésil)": "BR", "Paulista": "BR", "Gaúcho D2": "BR", "Paulista D2": "BR", "Andorre D1": "AD", "Espagne D6": "ES", "Espagne D5": "ES", "Finlande D2": "FI", "Malaisie D1": "MY", "Argentine D3": "AR", "Fourth Division": "ENG", "Suède D4": "SE", "Isthmian League": "ENG", "Iran D1": "IR", "Maroc D1": "MA", "Ligue 3": "FR", "Slovénie D2": "SI", "Slovénie D1": "SI", "Chili D2": "CL", "France (autres)": "FR", "Thaïlande D1": "TH", "Thaïlande D2": "TH", "Israël D1": "IL", "Côte d'Ivoire D1": "CI", "Angleterre (amateur)": "ENG"};
+const CLUB_CC = {"Gyeongju KHNP": "KR", "APOEL":"CY","Lokeren":"BE","Anderlecht":"BE","Saint-Trond":"BE","FC Malines":"BE","Standard de Liège":"BE","Danubio":"UY","Nacional":"UY","Universidad de Chile":"CL","Deportivo Pesquero":"PE","Alianza Lima":"PE","Hajduk Split":"HR","Proleter Zrenjanin":"RS","Étoile rouge de Belgrade":"RS","Loznica":"RS","Sartid Smederevo":"RS","Partizan Belgrade":"RS","Radnički Pirot":"RS","JS Saint-Pierroise":"FR"};
 function flagEmoji(cc){
   if (cc === "ENG") return "🏴\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}";
   if (cc === "SCO") return "🏴\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}";
@@ -2068,7 +2068,7 @@ function clmPickRender(){
   paintSel("clmLv", CLM_SEL.lv, "tous"); paintSel("clmEra", CLM_SEL.era, "toutes");
   const n = clmPool(CLM_SEL).length, combo = clmCombo(CLM_SEL), g = clmRankedDone() ? { done: true } : null;
   const main = combo.startsWith("tous-");
-  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (!main ? "Entraînement : cette combinaison n'est pas classée." : g && g.done ? "Déjà jouée aujourd'hui : partie hors classement." : (combo === "tous-toutes" ? "Partie classée : mêmes fiches du jour pour tout le monde." : "Partie classée : mêmes fiches du jour pour ceux qui choisissent ces époques."));
+  $("clmPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}`;   // classée ou entraînement : indiqué par le bouton (« Commencer », « Commencer (entraînement) », « Rejouer (hors classement) »)
   $("clmGo").disabled = n < 4;
   $("clmGo").textContent = n < 4 ? "Pas assez de joueurs" : (!main ? "Commencer (entraînement)" : g && g.done ? "Rejouer (hors classement)" : "Commencer");
 }
@@ -2408,7 +2408,9 @@ async function showRank(el, quiet){
   try { rows = await sbRanking(saved.key); }
   catch(e){ if (!quiet) el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
   const me = saved.sent || {};
-  const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.points === me.points && r.ms === me.ms);
+  const pk = v => String(v || "").trim().toLowerCase();
+  const mi = me.dup ? rows.findIndex(r => pk(r.pseudo) === pk(me.pseudo))   // partie déjà comptée sur un autre appareil : on repère la ligne du pseudo
+    : rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.points === me.points && r.ms === me.ms);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found}/5</td><td class="n">${r.points} pts</td><td class="n">${mmss(r.ms)}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
@@ -2416,7 +2418,6 @@ async function showRank(el, quiet){
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     ${me.dup ? `<div class="small muted" style="margin:0 0 6px">Ton pseudo avait déjà une partie du jour enregistrée sur un autre appareil : seule la première compte.</div>` : ""}
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée${el.id === "viewRankBox" ? " et se met à jour toutes les 30 secondes" : ""}.</div>
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="rkRefresh">Actualiser</button></div>`}`;
   if ($("rkRefresh")) $("rkRefresh").onclick = () => showRank(el);
 }
@@ -2574,7 +2575,7 @@ function trioPool(sel){ return trioData().eligible.filter(([i]) => (!sel.lv.leng
 function trioPickRender(){
   paintSel("trioLv", TRIO_SEL.lv, "tous"); paintSel("trioEra", TRIO_SEL.era, "toutes");
   const n = trioPool(TRIO_SEL).length, main = !TRIO_SEL.lv.length;
-  $("trioPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}. ` + (main ? "Partie classée : classement général." : "Entraînement : cette combinaison n'est pas classée.");
+  $("trioPickInfo").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}`;   // classée ou entraînement : indiqué par le bouton
   $("trioGo").disabled = n < 5;
   $("trioGo").textContent = n < 5 ? "Pas assez de joueurs" : (main ? "Commencer" : "Commencer (entraînement)");
 }
@@ -2668,7 +2669,7 @@ function dpRender(){
   const cur = saved && saved.key === key && saved.start ? saved : null, n = (cur && cur.res || []).length, done = n >= 5;
   if (done) {
     const f = cur.res.filter(r=>r.won).length, t = cur.res.reduce((s,r)=>s+r.pts,0);
-    $("dpDay").innerHTML = `<div class="small" style="text-align:center;margin-bottom:8px">Partie du jour jouée : <strong>${f}/5 trouvé${f>1?"s":""}</strong><br>${t} pts · ${fmtDur((cur.end||0) - (cur.start||0))}</div>`;
+    $("dpDay").innerHTML = `<div class="small" style="text-align:center;margin-bottom:8px">Partie du jour : <strong>${f}/5 trouvé${f>1?"s":""}</strong><br>${t} pts · ${fmtDur((cur.end||0) - (cur.start||0))}</div>`;
     $("dpInvite").style.margin = "0";
   } else {
     $("dpDay").innerHTML = `<button class="primary" id="dpGo" style="width:100%">${n ? `Reprendre la partie du jour (fiche ${n + 1} sur 5)` : "Jouer la partie du jour"}</button>`;
@@ -2686,7 +2687,7 @@ const dtPool = sel => PLAYERS.map((p,i)=>[p,i]).filter(([p]) => (!sel.lv.length 
 function dtRender(){
   paintSel("dtLv", DT_SEL.lv, "tous"); paintSel("dtEra", DT_SEL.era, "toutes");
   const n = dtPool(DT_SEL).length;
-  $("dtCount").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""} · ${selLabel(DT_SEL)}. Partie non classée.`;
+  $("dtCount").textContent = `${n} joueur${n>1?"s":""} possible${n>1?"s":""}`;
   $("dtGo").disabled = n < 5; $("dtGo").textContent = n < 5 ? "Pas assez de joueurs pour ce choix" : "Commencer l'entraînement";
 }
 document.querySelectorAll("#dtLv button").forEach(b => b.onclick = () => { DT_SEL.lv = toggleSel(DT_SEL.lv, b.dataset.v, "tous", 3); lsSet("ts_dt_sel", DT_SEL); dtRender(); });
@@ -2830,7 +2831,7 @@ function drawDefiResult(r){
     lines.slice(0, lines.length > max ? max - 1 : max).forEach(l => { x.fillText(fit(l, W - 340), 170, y); y += 46; });
     if (lines.length > max) { x.fillText(`et ${lines.length - max + 1} autre${lines.length - max + 1 > 1 ? "s" : ""}`, 170, y); }
   }
-  x.textAlign = "center"; x.fillStyle = "#f2c94c"; x.font = "600 34px Barlow, Arial, sans-serif"; x.fillText("tallandsmallplayers.github.io", W/2, H - 150);
+  x.textAlign = "center"; x.fillStyle = "#f2c94c"; x.font = "600 34px Barlow, Arial, sans-serif"; x.fillText("tallandsmallplayers.com", W/2, H - 150);
   return c;
 }
 function shareCanvas(c, name, txt){
