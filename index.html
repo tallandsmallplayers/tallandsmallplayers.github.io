@@ -225,9 +225,9 @@ body.typing .trioCount{margin-bottom:6px}
 .mentions{text-align:center;font-size:11px;color:rgba(255,255,255,.45);margin:18px 0 10px}
 #installBox{margin-top:12px;padding:12px}
 .installMain{width:100%;font-weight:700;font-size:15px;padding:12px}
-.installSteps{margin-top:10px}
+.installSteps{margin-top:10px}.installTitle+.installSteps{margin-top:0}
 .installSteps ol{margin:0;padding-left:22px;font-size:15px;line-height:1.5}
-.installSteps li{margin:6px 0}
+.installSteps li{margin:6px 0}.installTitle{text-align:center;margin:0 0 10px;font-size:16px}.instTabs{display:flex;gap:8px;margin:0}#instBody:not(:empty){margin-top:10px}.instTabs button{flex:1 1 0}
 .installSteps .k{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;background:rgba(255,255,255,.08);font-weight:600}
 #createMsg:empty{display:none}
 #presetHits{margin-top:6px;font-size:14px;color:#7bd88f;min-height:0}
@@ -244,6 +244,17 @@ body.typing .trioCount{margin-bottom:6px}
 .dpRanks button{flex:1 1 0;font-size:13px;padding:7px 6px;line-height:1.25}
 /* Jeu libre retiré de l'accueil et des règles le 24/11/2026 (code conservé) : supprimer la ligne suivante pour le remettre */
 .jeuLibre{display:none !important}
+/* Bouton « Règles du jeu » de l'accueil masqué le 24/11/2026 (code et page des règles conservés) : supprimer la ligne suivante pour le remettre */
+#rulesBtn{display:none !important}
+/* Blocs du bas de l'accueil plus fins (24/11) */
+#home .card.compact{padding:6px 12px}
+#home .card.compact h2{font-size:14px;margin:0 0 4px}
+#home #viewForm input{padding:4px 10px;margin-top:0}
+#home #viewForm button{padding:4px 12px}
+#installBox{padding:6px 12px;margin-top:8px}
+#installBox .installTitle{font-size:14px;margin:0 0 5px}
+#installBox .instTabs button{padding:4px 8px}
+.friendSearch{margin-top:8px}.friendSearch .fsInput{width:100%;box-sizing:border-box;margin:0;padding:6px 10px;font-size:16px;text-align:left}.fsRes{margin-top:4px}
 .soloBlock .soloSettings{margin:0 !important;border-top-left-radius:0;border-top-right-radius:0;border-top:none}
 .playcount{text-align:center;font-size:10.5px;line-height:1.45;color:#fff;margin:12px 0 0;font-weight:500}.playcount span{white-space:nowrap}.playcount .sep{margin:0 10px}
 body:not(.home-bg) .playcount{display:none}
@@ -291,7 +302,7 @@ body:not(.home-bg) .playcount{display:none}
   #home .rulescard .rules-more{font-size:12px;line-height:1.35;margin-top:6px}
   #home .rulescard .rules-more h3{font-size:14px;margin:8px 0 1px}
 
-#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}#presetHits .pick{color:#7bd88f;text-decoration:underline}.pickTitle{text-align:center;white-space:nowrap;font-size:20px}.pickDesc{min-height:5.8em}.pickTitle .ico{width:22px;height:22px;vertical-align:-3px;margin-right:9px;color:var(--accent)}</style>
+#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}#presetHits .pick{color:#7bd88f;text-decoration:underline}.pickTitle{text-align:center;white-space:nowrap;font-size:20px}.pickDesc{min-height:0;font-size:min(14px,3.2vw)!important}.pickTitle .ico{width:22px;height:22px;vertical-align:-3px;margin-right:9px;color:var(--accent)}.pickTitle.gameTitle{font-size:17px;margin:0 0 8px}.pickTitle.gameTitle .ico{width:18px;height:18px;margin-right:7px}.gameTitle .badge{margin-left:8px;vertical-align:2px}#trioPick:not(.hide)~#trioTitle{display:none}</style>
 </head>
 <body class="home-bg">
 <div class="wrap">
@@ -303,14 +314,14 @@ body:not(.home-bg) .playcount{display:none}
   <section id="home">
     <div class="grid">
       <div class="dailyWrap"><button class="big" id="btnDaily"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
-      <div class="dailyWrap"><button class="big" id="btnClm"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>Contre-la-montre</strong><small id="clmSub">2 minutes, une nouvelle fiche toutes les 30 secondes</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnClm"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>Contre-la-montre</strong><small id="clmSub">30 secondes maximum par fiche</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnTrio"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M9 3.5 L4.5 5.3 L2.6 10.6 L6 11.9 L6.4 10.1 V20.5 H17.6 V10.1 L18 11.9 L21.4 10.6 L19.5 5.3 L15 3.5 Q12 6 9 3.5 Z"/></svg>Qui a joué dans ces 3 clubs ?</strong><small id="trioSub">3 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
     </div>
     <div class="soloBlock">
       <div class="dailyWrap jeuLibre"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
       <button class="big" id="btnCreate"><strong><svg class="ico ico3" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8.5" r="2.5"/><path d="M1.5 18.5c0-2.6 1.8-4.6 4-4.6 1 0 1.9.3 2.6.9"/><circle cx="22.5" cy="8.5" r="2.5"/><path d="M26.5 18.5c0-2.6-1.8-4.6-4-4.6-1 0-1.9.3-2.6.9"/><circle cx="14" cy="7.5" r="3.1"/><path d="M8.3 20.5c0-3.3 2.6-6 5.7-6s5.7 2.7 5.7 6"/></svg>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
     </div>
-    <p class="playcount hide" id="playCount" style="margin-top:130px"></p>
+    <p class="playcount hide" id="playCount" style="margin-top:175px"></p>
     <div class="card compact">
       <h2>Consulter une des <span id="nbFiches">560</span> fiches</h2>
       <form id="viewForm" class="row">
@@ -356,7 +367,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card hide" id="trioPick">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M9 3.5 L4.5 5.3 L2.6 10.6 L6 11.9 L6.4 10.1 V20.5 H17.6 V10.1 L18 11.9 L21.4 10.6 L19.5 5.3 L15 3.5 Q12 6 9 3.5 Z"/></svg>Qui a joué dans ces 3 clubs&nbsp;?</h2>
-      <p class="small muted pickDesc" style="margin:0 0 10px">3 minutes pour trouver le plus de joueurs. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seul le niveau «&nbsp;Tous&nbsp;» est classé.</p>
+      <p class="small muted pickDesc" style="margin:0 0 10px;text-align:center">3 minutes pour trouver le plus de joueurs.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="trioLv">
         <button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button>
@@ -365,10 +376,12 @@ body:not(.home-bg) .playcount{display:none}
       <div class="levels" id="trioEra">
         <button data-v="toutes">Toutes</button><button data-v="90">1990</button><button data-v="00">2000</button><button data-v="10">2010</button><button data-v="20">2020</button>
       </div>
-      <div class="small muted" id="trioPickInfo" style="margin:10px 0"></div>
+      <div class="small muted" id="trioPickInfo" style="margin:10px 0 0"></div>
+      <div class="small muted" style="margin:2px 0 10px">Seul le niveau «&nbsp;Tous&nbsp;» est classé.</div>
       <button class="primary" id="trioGo" style="width:100%">Commencer</button>
       <button id="trioPickRank" style="width:100%;margin-top:10px">Voir le classement</button>
     </div>
+    <h2 class="pickTitle gameTitle" id="trioTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M9 3.5 L4.5 5.3 L2.6 10.6 L6 11.9 L6.4 10.1 V20.5 H17.6 V10.1 L18 11.9 L21.4 10.6 L19.5 5.3 L15 3.5 Q12 6 9 3.5 Z"/></svg>Qui a joué dans ces 3 clubs&nbsp;?</h2>
     <div class="card" id="trioPlay">
       <div id="trioTime"></div>
       <div id="trioLast" class="hide"></div>
@@ -400,7 +413,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>Contre-la-montre</h2>
-      <p class="small muted pickDesc" style="margin:0 0 10px">2 minutes, une nouvelle fiche toutes les 30 secondes. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seul le niveau «&nbsp;Tous&nbsp;» est classé.</p>
+      <p class="small muted pickDesc" style="margin:0 0 10px;text-align:center">30 secondes maximum par fiche pendant 2 minutes.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="clmLv">
         <button data-v="tous">Tous</button><button data-v="facile">Facile</button><button data-v="moyen">Moyen</button><button data-v="difficile">Difficile</button>
@@ -409,7 +422,8 @@ body:not(.home-bg) .playcount{display:none}
       <div class="levels" id="clmEra">
         <button data-v="toutes">Toutes</button><button data-v="90">1990</button><button data-v="00">2000</button><button data-v="10">2010</button><button data-v="20">2020</button>
       </div>
-      <div class="small muted" id="clmPickInfo" style="margin:10px 0"></div>
+      <div class="small muted" id="clmPickInfo" style="margin:10px 0 0"></div>
+      <div class="small muted" style="margin:2px 0 10px">Seul le niveau «&nbsp;Tous&nbsp;» est classé.</div>
       <button class="primary" id="clmGo" style="width:100%">Commencer</button>
       <button id="clmPickRank" style="width:100%;margin-top:10px">Voir le classement</button>
     </div>
@@ -443,7 +457,7 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</h2>
-      <p class="small muted pickDesc" style="margin:0 0 10px">4 minutes pour marquer le plus de points. Plusieurs niveaux et époques peuvent être cochés&nbsp;; seul le niveau «&nbsp;Tous&nbsp;» est classé.</p>
+      <p class="small muted pickDesc" style="margin:0 0 10px;text-align:center">4 minutes pour marquer le plus de points.</p>
       <div class="lbl">Niveau</div>
       <div class="levels" id="levels">
         <button data-level="tous">Tous</button><button data-level="facile">Facile</button><button data-level="moyen">Moyen</button><button data-level="difficile">Difficile</button>
@@ -504,7 +518,7 @@ body:not(.home-bg) .playcount{display:none}
         <li>S'il y a plusieurs réponses, le nombre de joueurs possibles est indiqué ; un seul suffit pour passer au trio suivant.</li>
         <li>L'indice « Époque » donne la décennie où le joueur a disputé le plus de matchs.</li>
         <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles. Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : les autres servent d'entraînement.</li>
-        <li>Trois propositions par joueur : 100, 60 ou 30 points selon l'essai, indice poste −10, indice époque −15, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
+        <li>Deux propositions par joueur : 100 ou 60 points selon l'essai, indice poste −10, indice époque −20, indice nationalité −30, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
         <li>Le classement général retient le meilleur score de chaque joueur. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <h3 class="jeuLibre">Jeu libre</h3>
@@ -527,6 +541,7 @@ body:not(.home-bg) .playcount{display:none}
   <!-- PARTIE -->
   <section id="game" class="hide">
     <button class="back" data-home>← Accueil</button>
+    <h2 class="pickTitle gameTitle hide" id="gameTitle"></h2>
     <div class="topbar">
       <div class="score" id="score"><small class="pour">pour</small> 100 <small>points</small></div>
       <div class="total" id="sessionTotal"></div>
@@ -1082,7 +1097,6 @@ const PLAYERS = [
  {n:"Théo Hernandez", b:"1997-10-06", d:"facile", a:["theo hernandez", "theo"], p:"Défenseur", c:"France", r:[["2015-16", "Atlético Madrid B", "Tercera División", 9, 0],["2016-17", "Deportivo Alavés (prêt)", "Liga", 32, 1],["2017-18", "Real Madrid", "Liga", 13, 0],["2018-19", "Real Sociedad (prêt)", "Liga", 24, 1],["2019-20", "AC Milan", "Serie A", 33, 6],["2020-21", "AC Milan", "Serie A", 33, 7],["2021-22", "AC Milan", "Serie A", 32, 5],["2022-23", "AC Milan", "Serie A", 32, 4],["2023-24", "AC Milan", "Serie A", 32, 5],["2024-25", "AC Milan", "Serie A", 33, 4],["2025-26", "Al-Hilal", "Arabie saoudite D1", 31, 5],["2026-27", "Al-Hilal", "Arabie saoudite D1", 7, 1]]},
  {n:"Marquinhos", b:"1994-05-14", d:"facile", a:["marquinhos"], p:"Défenseur", c:"Brésil", r:[["2012-13", "Corinthians", "Série A", 6, 0],["2012-13", "AS Rome", "Serie A", 26, 0],["2013-14", "Paris SG", "Ligue 1", 21, 2],["2014-15", "Paris SG", "Ligue 1", 25, 2],["2015-16", "Paris SG", "Ligue 1", 29, 1],["2016-17", "Paris SG", "Ligue 1", 29, 3],["2017-18", "Paris SG", "Ligue 1", 26, 0],["2018-19", "Paris SG", "Ligue 1", 30, 3],["2019-20", "Paris SG", "Ligue 1", 19, 3],["2020-21", "Paris SG", "Ligue 1", 25, 3],["2021-22", "Paris SG", "Ligue 1", 32, 5],["2022-23", "Paris SG", "Ligue 1", 33, 2],["2023-24", "Paris SG", "Ligue 1", 21, 0],["2024-25", "Paris SG", "Ligue 1", 22, 2],["2025-26", "Paris SG", "Ligue 1", 14, 0],["2026-27", "Paris SG", "Ligue 1", 5, 3]]},
  {n:"Trent Alexander-Arnold", b:"1998-10-07", d:"facile", a:["alexander-arnold", "alexander arnold", "trent"], p:"Défenseur", c:"Angleterre", r:[["2016-17", "Liverpool", "Premier League", 7, 0],["2017-18", "Liverpool", "Premier League", 19, 1],["2018-19", "Liverpool", "Premier League", 29, 1],["2019-20", "Liverpool", "Premier League", 38, 4],["2020-21", "Liverpool", "Premier League", 36, 2],["2021-22", "Liverpool", "Premier League", 32, 2],["2022-23", "Liverpool", "Premier League", 37, 2],["2023-24", "Liverpool", "Premier League", 28, 3],["2024-25", "Liverpool", "Premier League", 33, 3],["2024-25", "Real Madrid", "Liga", 0, 0],["2025-26", "Real Madrid", "Liga", 21, 0],["2026-27", "Real Madrid", "Liga", 7, 0]]},
- {n:"Andrew Robertson", b:"1994-03-11", d:"moyen", a:["robertson", "andy robertson"], p:"Défenseur", c:"Écosse", r:[["2012-13", "Queen's Park", "Écosse D4", 34, 2],["2013-14", "Dundee United", "Écosse D1", 36, 3],["2014-15", "Hull City", "Premier League", 24, 0],["2015-16", "Hull City", "Championship", 42, 2],["2016-17", "Hull City", "Premier League", 33, 1],["2017-18", "Liverpool", "Premier League", 22, 1],["2018-19", "Liverpool", "Premier League", 36, 0],["2019-20", "Liverpool", "Premier League", 36, 2],["2020-21", "Liverpool", "Premier League", 38, 1],["2021-22", "Liverpool", "Premier League", 29, 3],["2022-23", "Liverpool", "Premier League", 34, 0],["2023-24", "Liverpool", "Premier League", 23, 3],["2024-25", "Liverpool", "Premier League", 33, 0],["2025-26", "Liverpool", "Premier League", 24, 1],["2026-27", "Tottenham Hotspur", "Premier League", 9, 0]]},
  {n:"Kyle Walker", b:"1990-05-28", d:"moyen", a:["walker"], p:"Défenseur", c:"Angleterre", r:[["2008-09", "Sheffield United", "Championship", 2, 0],["2008-09", "Northampton Town (prêt)", "League One", 9, 0],["2009-10", "Tottenham Hotspur", "Premier League", 2, 0],["2009-10", "Sheffield United (prêt)", "Championship", 26, 0],["2010-11", "Tottenham Hotspur", "Premier League", 1, 0],["2010-11", "Queens Park Rangers (prêt)", "Championship", 20, 0],["2010-11", "Aston Villa (prêt)", "Premier League", 15, 1],["2011-12", "Tottenham Hotspur", "Premier League", 37, 2],["2012-13", "Tottenham Hotspur", "Premier League", 36, 0],["2013-14", "Tottenham Hotspur", "Premier League", 26, 1],["2014-15", "Tottenham Hotspur", "Premier League", 15, 0],["2015-16", "Tottenham Hotspur", "Premier League", 33, 1],["2016-17", "Tottenham Hotspur", "Premier League", 33, 0],["2017-18", "Manchester City", "Premier League", 32, 0],["2018-19", "Manchester City", "Premier League", 33, 1],["2019-20", "Manchester City", "Premier League", 29, 1],["2020-21", "Manchester City", "Premier League", 24, 1],["2021-22", "Manchester City", "Premier League", 20, 0],["2022-23", "Manchester City", "Premier League", 27, 0],["2023-24", "Manchester City", "Premier League", 32, 0],["2024-25", "Manchester City", "Premier League", 15, 0],["2024-25", "AC Milan (prêt)", "Serie A", 11, 0],["2025-26", "Burnley", "Premier League", 36, 0],["2026-27", "Burnley", "Championship", 13, 0]]},
  {n:"Vincent Kompany", b:"1986-04-10", d:"moyen", a:["kompany"], p:"Défenseur", c:"Belgique", r:[["2003-04", "Anderlecht", "Belgique D1", 29, 2],["2004-05", "Anderlecht", "Belgique D1", 32, 2],["2005-06", "Anderlecht", "Belgique D1", 12, 1],["2006-07", "Hambourg SV", "Bundesliga", 6, 0],["2007-08", "Hambourg SV", "Bundesliga", 22, 1],["2008-09", "Hambourg SV", "Bundesliga", 1, 0],["2008-09", "Manchester City", "Premier League", 34, 1],["2009-10", "Manchester City", "Premier League", 25, 2],["2010-11", "Manchester City", "Premier League", 37, 0],["2011-12", "Manchester City", "Premier League", 31, 3],["2012-13", "Manchester City", "Premier League", 26, 1],["2013-14", "Manchester City", "Premier League", 28, 4],["2014-15", "Manchester City", "Premier League", 25, 0],["2015-16", "Manchester City", "Premier League", 14, 2],["2016-17", "Manchester City", "Premier League", 11, 3],["2017-18", "Manchester City", "Premier League", 17, 1],["2018-19", "Manchester City", "Premier League", 17, 1],["2019-20", "Anderlecht", "Belgique D1", 15, 1]]},
  {n:"César Azpilicueta", b:"1989-08-28", d:"moyen", a:["azpilicueta"], p:"Défenseur", c:"Espagne", r:[["2006-07", "CA Osasuna B", "Segunda División B", 24, 1],["2006-07", "CA Osasuna", "Liga", 1, 0],["2007-08", "CA Osasuna B", "Segunda División B", 3, 0],["2007-08", "CA Osasuna", "Liga", 29, 0],["2008-09", "CA Osasuna", "Liga", 36, 0],["2009-10", "CA Osasuna", "Liga", 33, 0],["2010-11", "Olympique de Marseille", "Ligue 1", 15, 0],["2011-12", "Olympique de Marseille", "Ligue 1", 30, 1],["2012-13", "Olympique de Marseille", "Ligue 1", 2, 0],["2012-13", "Chelsea", "Premier League", 27, 0],["2013-14", "Chelsea", "Premier League", 29, 0],["2014-15", "Chelsea", "Premier League", 29, 0],["2015-16", "Chelsea", "Premier League", 37, 2],["2016-17", "Chelsea", "Premier League", 38, 1],["2017-18", "Chelsea", "Premier League", 37, 2],["2018-19", "Chelsea", "Premier League", 38, 1],["2019-20", "Chelsea", "Premier League", 36, 2],["2020-21", "Chelsea", "Premier League", 26, 1],["2021-22", "Chelsea", "Premier League", 27, 1],["2022-23", "Chelsea", "Premier League", 25, 0],["2023-24", "Atlético Madrid", "Liga", 25, 0],["2024-25", "Atlético Madrid", "Liga", 14, 1],["2025-26", "FC Séville", "Liga", 17, 0]]},
@@ -1589,6 +1603,7 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 const BASE = 100, TRY_FACTOR = [1, 0.6, 0.3], HINT_COST = { p: 10, c: 25, e: 15 }, TYPO_COST = 10, MIN_FOUND = 10;
 /* Les 5 fiches du jour (partie du jour et entraînement) : une seule proposition, indices plus chers (24/11/2026) */
 const DAILY_HINT_COST = { p: 25, c: 50 };
+const TRIO_HINT_COST = { p: 10, c: 30, e: 20 };   /* trio : barème arrondi (choix de Maxime, 24/11) ; ×1,5 moyen, ×2 difficile */
 const hintCost = k => (G && G.mode === "daily" && DAILY_HINT_COST[k] != null) ? DAILY_HINT_COST[k] : HINT_COST[k];
 const LEVEL_COEF = { facile: 1, moyen: 1.5, difficile: 2 };   // pondération du jeu libre
 const coefOf = () => (G && G.mode === "solo") ? (LEVEL_COEF[G.p.d] || 1) : 1;
@@ -1598,16 +1613,24 @@ function computeScore(){
   const raw = Math.max(MIN_FOUND, Math.round(BASE * f) - hints - (G.approx ? TYPO_COST : 0));   // minimum garanti si le joueur est trouvé
   return Math.round(raw * coefOf());
 }
+const GT_ICO = { daily: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>', clm: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>' };
+function setGameTitle(kind, badge){   /* titre centré de l'écran de jeu (24/11) */
+  const t = $("gameTitle"), txt = { daily: "Les 5 fiches du jour", clm: "Contre-la-montre" }[kind];
+  t.classList.toggle("hide", !txt); t.innerHTML = txt ? GT_ICO[kind] + txt + (badge || "") : "";
+  document.querySelector("#game .topbar").style.display = kind === "clm" ? "none" : "";
+}
 function startGame(player, mode){
-  $("clmLive").classList.add("hide");
+  $("clmLive").classList.add("hide"); $("careerCard").classList.remove("hide");
   $("rankBox").classList.add("hide");
   $("shareImg").classList.remove("hide");
   G = { p: player, mode, score: 100, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   G.score = computeScore();
   if (mode === "chrono") { G.start = performance.now(); G.defi = DEFI; clearInterval(window._tick); window._tick = setInterval(renderScore, 100); }
   const badge = player.d ? `<span class="badge ${player.d}">${player.d}</span>` : "";
+  $("score").style.visibility = ""; $("gameLabel").style.display = "";
+  setGameTitle(mode === "daily" ? "daily" : "", "");
   $("gameLabel").innerHTML = mode === "solo" ? `Joueur ${orderIdx} sur ${order.length}` + badge
-    : mode === "daily" ? `${DAILY.train ? "Entraînement" : "Les 5 fiches du jour"} · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` + badge
+    : mode === "daily" ? (DAILY.train ? `Entraînement · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` : "") + badge
     : mode === "chrono" ? "Défi entre amis · 2 essais" : "Défi d'un ami";
   $("guessInput").value = ""; $("msg").textContent = ""; $("msg").className = "msg";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
@@ -1833,6 +1856,22 @@ function soloEnd(){
   if (!best || SESSION.total > best.points) lsSet("ts_solo_best5", { key: SESSION.key, points: SESSION.total });
   showSoloRank($("rankBox"));
 }
+/* Recherche d'un ami dans un classement (24/11) : affichée dès qu'il y a plus de 10 joueurs */
+function friendSearch(el, rows, line){
+  if (!rows || rows.length <= 10) return;
+  const t = el.querySelector("table"); if (!t) return;
+  const q0 = el.dataset.fq || "";
+  t.insertAdjacentHTML("afterend", `<div class="friendSearch"><input class="fsInput" placeholder="Rechercher un ami" value="${esc(q0)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"><table class="fsRes"></table></div>`);
+  const inp = el.querySelector(".fsInput"), res = el.querySelector(".fsRes");
+  const norm = v => String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const run = () => {
+    el.dataset.fq = inp.value; const q = norm(inp.value);
+    if (!q) { res.innerHTML = ""; return; }
+    const m = []; rows.forEach((r, i) => { if (norm(r.pseudo).includes(q)) m.push(line(r, i)); });
+    res.innerHTML = m.length ? m.slice(0, 10).join("") : `<tr><td class="muted">Aucun joueur trouvé</td></tr>`;
+  };
+  inp.oninput = run; inp.onkeydown = e => { if (e.key === "Enter") inp.blur(); }; run();
+}
 async function showSoloRank(el, quiet, view){
   const H3 = "<h3>Classement du Jeu libre</h3>";
   el.classList.remove("hide");
@@ -1863,6 +1902,7 @@ async function showSoloRank(el, quiet, view){
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 4 minutes. Le classement est conservé d'un jour à l'autre.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}SoloRefresh">Actualiser</button></div>`}`;
+  friendSearch(el, rows, line);
   if ($(el.id + "SoloRefresh")) $(el.id + "SoloRefresh").onclick = () => showSoloRank(el, false, view);
 }
 function renderSession(){
@@ -2197,7 +2237,7 @@ function clmSub(){
   $("clmSub").innerHTML = s && s.done
     ? `Dernière partie : ${s.found}${s.seen ? "/" + s.seen : ""} trouvé${s.found>1?"s":""}`
       + (s.res && s.res.length ? `<span class="sq">${s.res.map(x => x ? "🟩" : "⬛").join("")}</span>` : "")
-    : "2 minutes, une nouvelle fiche toutes les 30 secondes";
+    : "30 secondes maximum par fiche";
 }
 const clmPool = sel => PLAYERS.filter(p => (!sel.lv.length || sel.lv.includes(p.d)) && (!sel.era.length || sel.era.includes(p.e)));
 function clmList(ranked, sel){
@@ -2246,15 +2286,16 @@ function clmNext(){
   G = { p, mode: "clm", score: 0, tries: [], hintsUsed: {}, revealed: new Set(), over: false, expert: false };
   $("rankBox").classList.add("hide");
   const badge = p.d ? `<span class="badge ${p.d}">${p.d}</span>` : "";
-  $("gameLabel").innerHTML = `Contre-la-montre · ${clmLabel(CLM.combo)}${CLM.ranked ? "" : CLM.combo.startsWith("tous-") ? " · hors classement" : " · entraînement"} · fiche ${CLM.seen}` + badge;
+  $("gameLabel").innerHTML = "";
+  setGameTitle("clm", "");   /* ligne « Contre-la-montre · niveaux · époques · fiche n » et « N trouvé » retirées (24/11) */
   $("guessInput").value = "";
   $("msg").textContent = ""; $("msg").className = "msg";
-  $("clmLive").classList.remove("hide");
+  $("clmLive").classList.remove("hide"); $("careerCard").classList.remove("hide");
   $("clmFlash").textContent = CLM.flash; $("clmFlash").className = CLM.flash ? (CLM.flashOk ? "good" : "bad") : "";
   $("guessCard").classList.remove("hide"); $("resultCard").classList.add("hide");
   $("giveUp").textContent = "Passer (0 pt)";
   $("giveUp").parentElement.classList.remove("hide");
-  $("hints").innerHTML = ""; $("tries").textContent = "";
+  $("hints").innerHTML = ""; $("tries").textContent = "";   /* niveau retiré du contre-la-montre (choix de Maxime, 24/11) */
   renderCareer(); clmRender();
   if ($("game").classList.contains("hide")) show("game");
   $("guessInput").focus();
@@ -2297,9 +2338,8 @@ function clmEnd(quit){
   $("guessCard").classList.add("hide");
   const rc = $("resultCard"); rc.classList.remove("hide"); rc.classList.remove("lost");
   $("resultTitle").textContent = "Temps écoulé !";
-  $("resultText").textContent = `${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} sur ${CLM.seen} fiche${CLM.seen>1?"s":""}`
-    + (CLM.found ? `, en ${fmtTime(avg)} en moyenne.` : ".") + ` La dernière fiche était ${G.p.n}.`
-    + ` (${clmLabel(CLM.combo)})` + (CLM.ranked ? "" : CLM.combo.startsWith("tous-") ? " Partie hors classement." : " Partie d'entraînement, hors classement.");
+  $("resultText").innerHTML = `${CLM.found} trouvé${CLM.found>1?"s":""} sur ${CLM.seen}<br>Dernière fiche : ${esc(G.p.n)}`;   /* résultat allégé (choix de Maxime, 24/11) */
+  $("careerCard").classList.add("hide");   /* fiche du dernier joueur masquée en fin de partie (24/11) */
   G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} (${clmLabel(CLM.combo)}) : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
@@ -2314,7 +2354,7 @@ async function showClmRank(el, quiet, combo){
   el.dataset.combo = combo;
   const s = Object.assign({ key: d.key, combo }, d.games[combo] || {});
   el.classList.remove("hide");
-  const H3 = `<h3>Classement du Contre-la-montre</h3>`;
+  const H3 = el.id === "rankBox" ? "" : `<h3>Classement du Contre-la-montre</h3>`;   /* fin de partie : titre retiré (24/11) */
   const sel = () => ""; const selOld = () => { const [lv, era] = combo.split("-");
     return `<div class="clmSel"><select id="${el.id}ClmLv">${Object.entries(CLM_LV).map(([k,v]) => `<option value="${k}" ${k===lv?"selected":""}>${v}</option>`).join("")}</select>`
       + `<select id="${el.id}ClmEra">${CLM_ERA_ORDER.map(k => [k, CLM_ERA[k]]).map(([k,v]) => `<option value="${k}" ${k===era?"selected":""}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join("")}</select></div>`; };
@@ -2347,9 +2387,9 @@ async function showClmRank(el, quiet, combo){
   el.innerHTML = H3 + sel() + `
     <div class="me-line">${!rows.length ? "Personne n'a encore été classé aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>
-    <div class="small muted" style="margin-top:6px">Classement par nombre de joueurs trouvés, puis temps moyen de réponse. Seules les parties « Tous » niveaux sont classées ; les fiches du jour sont les mêmes pour ceux qui choisissent les mêmes époques.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
+    ${el.id === "rankBox" ? "" : `<div class="small muted" style="margin-top:6px">Classement : joueurs trouvés, puis temps moyen.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>`}
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`}`;
-  bindSel();
+  bindSel(); friendSearch(el, rows, line);
   if ($(el.id + "ClmRefresh")) $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
 }
 $("btnClm").onclick = clmPick;
@@ -2365,11 +2405,28 @@ function seededRand(str){
   for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
   return function(){ h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
 }
-function dailyPick(key){
+function dailyPickRaw(key, excl){
   const rnd = seededRand("TALLsmall-" + key);
   const byName = PLAYERS.map((p,i)=>i).filter(i => !PLAYERS[i].x || PLAYERS[i].x <= key).sort((a,b) => PLAYERS[a].n.localeCompare(PLAYERS[b].n));   // x = date d'ajout : une fiche ajoutée n'entre dans le tirage qu'à partir de ce jour-là
-  const pick = (lvl, n) => { const c = byName.filter(i => PLAYERS[i].d === lvl); const out = []; while (out.length < n && c.length) out.push(c.splice(Math.floor(rnd()*c.length),1)[0]); return out; };
+  const pick = (lvl, n) => { let c = byName.filter(i => PLAYERS[i].d === lvl); if (excl) { const f = c.filter(i => !excl.has(PLAYERS[i].n)); if (f.length >= n) c = f; } const out = []; while (out.length < n && c.length) out.push(c.splice(Math.floor(rnd()*c.length),1)[0]); return out; };
   return [...pick("facile",2), ...pick("moyen",2), ...pick("difficile",1)];
+}
+/* Depuis le 25/11/2026 : un joueur sorti dans les 5 fiches du jour ne revient pas avant 30 jours (choix de Maxime) ; le reste au hasard.
+   Calcul jour après jour depuis DP_START (mémorisé) ; les jours antérieurs gardent l'ancien tirage. Exclusion par nom (stable si des fiches sont ajoutées). */
+const DP_START = "2026-11-25", DP_GAP = 30, DP_CACHE = {};
+const dpKey = t => { const d = new Date(t); return d.getUTCFullYear() + "-" + String(d.getUTCMonth()+1).padStart(2,"0") + "-" + String(d.getUTCDate()).padStart(2,"0"); };
+const dpTime = k => { const [y,m,d] = k.split("-").map(Number); return Date.UTC(y, m-1, d); };
+function dailyPick(key){
+  if (key < DP_START) return dailyPickRaw(key);
+  if (DP_CACHE[key]) return DP_CACHE[key];
+  const end = dpTime(key);
+  for (let t = dpTime(DP_START); t <= end; t += 864e5) {
+    const k = dpKey(t); if (DP_CACHE[k]) continue;
+    const excl = new Set();
+    for (let j = 1; j <= DP_GAP; j++) { const pk = dpKey(t - j*864e5); (pk < DP_START ? dailyPickRaw(pk) : DP_CACHE[pk] || []).forEach(i => excl.add(PLAYERS[i].n)); }
+    DP_CACHE[k] = dailyPickRaw(k, excl);
+  }
+  return DP_CACHE[key];
 }
 const SYMB = r => !r.won ? "⬛" : r.tries === 0 ? "🟩" : r.tries === 1 ? "🟨" : "🟧";
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -2403,7 +2460,7 @@ function dailyStart(){
 function dailyEnd(won){
   DAILY.res.push({ won, tries: G.tries.length, hints: Object.keys(G.hintsUsed).length, pts: won ? G.score : 0 });
   const last = DAILY.res.length >= DAILY.list.length;
-  if (last) { DAILY.end = Date.now(); clearInterval(window._dtick); }
+  if (last) { DAILY.end = Date.now(); clearInterval(window._dtick); $("score").style.visibility = "hidden"; $("gameLabel").style.display = "none"; }   /* fin de partie : ni « pour N points » ni niveau (choix de Maxime, 24/11) */
   /* 5 fiches du jour : le titre (« Bravo : … » / « Il s'agissait de … ») suffit ; on ne garde que la mention de la faute */
   $("resultText").textContent = won && G.approx ? `Réponse acceptée malgré l'orthographe (« ${G.approx} », −${TYPO_COST} points).` : "";
   if (DAILY.train) {   // entraînement : ni enregistrement, ni classement, ni partage
@@ -2562,6 +2619,7 @@ async function showRank(el, quiet){
     ${me.dup ? `<div class="small muted" style="margin:0 0 6px">Ton pseudo avait déjà une partie du jour enregistrée sur un autre appareil : seule la première compte.</div>` : ""}
     <table>${body}</table>
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="rkRefresh">Actualiser</button></div>`}`;
+  friendSearch(el, rows, line);
   if ($("rkRefresh")) $("rkRefresh").onclick = () => showRank(el);
 }
 function dailyDoneSub(saved){
@@ -2592,20 +2650,21 @@ async function showWeekRank(el, quiet){
   let body = rows.slice(0, 10).map(line).join("");
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   const [y,m,d] = wk.split("-");
-  const vainq = last && last.length ? `<div class="small" style="margin-top:8px">Vainqueur de la semaine dernière : <strong>${esc(last[0].pseudo)}</strong> (${last[0].points} pts)</div>` : "";
+  const vainq = last && last.length ? `<div class="small" style="margin-top:8px;text-align:center">Vainqueur de la semaine dernière<br><strong>${esc(last[0].pseudo)}</strong> · ${last[0].points}&nbsp;pts</div>` : "";
   el.innerHTML = H3 + `
     <div class="me-line">${!rows.length ? "Personne n'a encore joué cette semaine." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     ${rows.length ? `<table>${body}</table>` : ""}
-    <div class="small muted" style="margin-top:6px">Semaine du lundi ${Number(d)} ${MOIS[Number(m)-1]} : total des points des parties du jour (j = jours joués). Plus tu joues de jours, plus tu marques. À égalité, le temps total le plus court passe devant.</div>
+    <div class="small muted" style="margin-top:6px">j = jours joués</div>
     ${vainq}
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="wkRefresh">Actualiser</button></div>`}`;
+  friendSearch(el, rows, line);
   if ($("wkRefresh")) $("wkRefresh").onclick = () => showWeekRank(el);
 }
 function openRank(render){
   show("rankView");
   const box = $("viewRankBox");
   render(box, false);
-  window._rankLive = setInterval(() => { if (!box.querySelector("input")) render(box, true); }, 30000);
+  window._rankLive = setInterval(() => { if (!box.querySelector("input:not(.fsInput)") && !(document.activeElement && document.activeElement.classList.contains("fsInput"))) render(box, true); }, 30000);
 }
 
 /* ---------- Qui a joué dans ces 3 clubs ? ---------- */
@@ -2642,7 +2701,7 @@ function trioPick(){
 const trioLeft = () => TRIO_TOTAL - (Date.now() - TRIO.start);
 function trioScore(){
   const t = TRIO.cur;
-  const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hintP ? HINT_COST.p : 0) - (t.hint ? HINT_COST.c : 0) - (t.hintE ? HINT_COST.e : 0) - (t.approx ? TYPO_COST : 0));
+  const raw = Math.max(MIN_FOUND, Math.round(BASE * (TRY_FACTOR[t.tries.length] ?? 0)) - (t.hintP ? TRIO_HINT_COST.p : 0) - (t.hint ? TRIO_HINT_COST.c : 0) - (t.hintE ? TRIO_HINT_COST.e : 0) - (t.approx ? TYPO_COST : 0));
   return Math.round(raw * (LEVEL_COEF[t.level] || 1));
 }
 function trioRenderTime(){
@@ -2654,8 +2713,8 @@ function trioRender(){
   const t = TRIO.cur, D = trioData();
   $("trioClubs").innerHTML = t.clubs.map(c => { const f = clubFlag(c, D.div[c] || ""); return `<div>${f ? `<span class="flag">${f}</span>` : ""}<span>${esc(c)}</span></div>`; }).join("");
   const n = t.sol.length;
-  $("trioCount").innerHTML = `<span class="badge ${t.level}">${t.level}</span> ` + (n > 1 ? `${n} joueurs possibles dans notre base\u00a0: un seul suffit` : "1 joueur possible dans notre base");
-  $("trioTries").textContent = t.tries.length ? "Propositions : " + t.tries.join(", ") : "";
+  $("trioCount").innerHTML = (n > 1 ? `${n} joueurs possibles dans notre base\u00a0: un seul suffit` : "1 joueur possible dans notre base");
+  $("trioTries").textContent = "";   /* ligne « Propositions : … » retirée (choix de Maxime, 24/11) */
   const box = $("trioHints"); box.innerHTML = "";
   const coef = LEVEL_COEF[t.level] || 1;
   [["hintP", "Poste", "p", i => PLAYERS[i].p], ["hint", "Nationalité", "c", i => PLAYERS[i].c], ["hintE", "Époque", "e", i => "années " + ({"90":"1990","00":"2000","10":"2010","20":"2020"}[PLAYERS[i].e] || "")]].forEach(([key, label, k, get]) => {
@@ -2663,7 +2722,7 @@ function trioRender(){
       const vals = [...new Set(t.sol.map(get).filter(Boolean))];
       const sp = document.createElement("span"); sp.className = "hint-val"; sp.textContent = `${label} : ` + (vals.join(" ou ") || "inconnu"); box.appendChild(sp);
     } else {
-      const b = document.createElement("button"); b.innerHTML = `${label}<br><small>(−${Math.round(HINT_COST[k] * coef)} pts)</small>`;
+      const b = document.createElement("button"); b.innerHTML = `${label}<br><small>(−${Math.round(TRIO_HINT_COST[k] * coef)} pts)</small>`;
       b.onclick = () => { t[key] = true; trioRender(); $("trioInput").focus(); }; box.appendChild(b);
     }
   });
@@ -2745,9 +2804,8 @@ $("trioForm").onsubmit = e => {
   const known = PLAYERS.some(p => checkGuess(v, p));
   if (!known) { $("trioMsg").textContent = "Ce joueur n'est pas dans notre base : essaie un autre nom."; $("trioMsg").className = "msg"; $("trioInput").value = ""; return; }
   t.tries.push(v);
-  if (t.tries.length >= 3) { trioClose(false); return; }
-  const left = 3 - t.tries.length;
-  $("trioMsg").textContent = left === 1 ? "Il n'a pas joué dans ces 3 clubs. Dernier essai." : `Il n'a pas joué dans ces 3 clubs. Encore ${left} essais.`;
+  if (t.tries.length >= 2) { trioClose(false); return; }   /* 2 essais par trio (choix de Maxime, 24/11) */
+  $("trioMsg").textContent = "Non. Encore 1 essai.";
   $("trioMsg").className = "msg bad"; $("trioInput").value = ""; trioRender();
 };
 $("trioPass").onclick = () => { if (TRIO && TRIO.live) trioClose(false); };
@@ -2785,6 +2843,7 @@ async function showTrioRank(el, quiet, view){
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 3 minutes.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>
     ${el.id === "trioRankBox" ? "" : `<div class="row"><button id="${el.id}TrioRefresh">Actualiser</button></div>`}`;
+  friendSearch(el, rows, line);
   if ($(el.id + "TrioRefresh")) $(el.id + "TrioRefresh").onclick = () => showTrioRank(el, false, view);
 }
 function rankBtns(){
@@ -3040,15 +3099,32 @@ if (/[?&]jour\b/.test(location.search)) { show("dailyPage"); dpRender(); }
   window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; });
   $("installBtn").textContent = ios ? "📲 Installe le jeu sur ton iPhone" : "📲 Installe le jeu sur ton téléphone";
   $("installBox").classList.remove("hide");
+  const st = $("installSteps");
+  if (ios) {   /* iPhone : titre (pas un bouton) + onglets Safari / Chrome ; les étapes s'affichent au toucher (24/11) */
+    const inChrome = /CriOS/.test(ua);
+    const steps = {
+      safari: `<ol><li>Touche le bouton rond <span class="k">•••</span> en bas à droite de l'écran, puis <span class="k">Partager</span>.</li>
+         <li>Touche <span class="k">Sur l'écran d'accueil</span> (fais défiler si besoin).</li>
+         <li>Touche <span class="k">Ajouter</span>. C'est fini !</li></ol>`,
+      chrome: `<ol><li>Touche le bouton <span class="k">Partager</span> (carré avec une flèche) dans la barre d'adresse.</li>
+         <li>Touche <span class="k">Ajouter à l'écran d'accueil</span> (fais défiler si besoin).</li>
+         <li>Touche <span class="k">Ajouter</span>. C'est fini !</li></ol>`
+    };
+    const bt = $("installBtn"), ti = document.createElement("h3");
+    ti.className = "installTitle"; ti.textContent = bt.textContent; bt.replaceWith(ti);
+    const other = !inSafari && !inChrome ? `<p class="small" style="margin:0 0 6px;text-align:center">D'abord, ouvre cette page dans <b>Safari</b> ou <b>Chrome</b>.</p>` : "";
+    st.innerHTML = other + `<div class="levels instTabs"><button data-b="safari">Safari</button><button data-b="chrome">Chrome</button></div><div id="instBody"></div>`;
+    st.classList.remove("hide");
+    let cur = null;
+    const pick = b => { cur = cur === b ? null : b;
+      st.querySelectorAll(".instTabs button").forEach(x => x.classList.toggle("on", x.dataset.b === cur));
+      $("instBody").innerHTML = cur ? steps[cur] : ""; };
+    st.querySelectorAll(".instTabs button").forEach(x => x.onclick = () => pick(x.dataset.b));
+    return;
+  }
   $("installBtn").onclick = async () => {
     if (deferred) { deferred.prompt(); try { await deferred.userChoice; } catch(e){} deferred = null; return; }
-    const st = $("installSteps");
-    st.innerHTML = ios
-      ? (inSafari ? "" : `<p class="small" style="margin:0 0 6px">D'abord, ouvre cette page dans <b>Safari</b>.</p>`)
-        + `<ol><li>Touche le bouton rond <span class="k">•••</span> en bas à droite de l'écran, puis <span class="k">Partager</span>.</li>
-           <li>Touche <span class="k">Sur l'écran d'accueil</span> (fais défiler si besoin).</li>
-           <li>Touche <span class="k">Ajouter</span>. C'est fini !</li></ol>`
-      : `<ol><li>Touche le menu <span class="k">⋮</span> en haut à droite.</li>
+    st.innerHTML = `<ol><li>Touche le menu <span class="k">⋮</span> en haut à droite.</li>
            <li>Touche <span class="k">Installer l'application</span> ou <span class="k">Ajouter à l'écran d'accueil</span>.</li>
            <li>Confirme. C'est fini !</li></ol>`;
     st.classList.toggle("hide");
