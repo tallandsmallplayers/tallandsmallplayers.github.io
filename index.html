@@ -227,6 +227,8 @@ body.typing div.wrap{padding-top:8px}
 #presetHits:empty{display:none}
 .soloBlock{margin-top:8px;display:flex;flex-direction:column;gap:8px}
 .soloBlock #btnSolo{width:100%;margin:0}
+.dpRanks{display:flex;gap:8px;margin-top:8px}
+.dpRanks button{flex:1 1 0;font-size:13px;padding:7px 6px;line-height:1.25}
 /* Jeu libre retiré de l'accueil et des règles le 24/11/2026 (code conservé) : supprimer la ligne suivante pour le remettre */
 .jeuLibre{display:none !important}
 .soloBlock .soloSettings{margin:0 !important;border-top-left-radius:0;border-top-right-radius:0;border-top:none}
@@ -389,9 +391,10 @@ body:not(.home-bg) .playcount{display:none}
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</h2>
-      <p class="small muted" style="margin:0 0 10px">Les mêmes 5&nbsp;joueurs pour tout le monde&nbsp;: 2&nbsp;faciles, 2&nbsp;moyens et 1&nbsp;difficile. Une seule partie classée par jour.</p>
+      <p class="small muted" style="margin:0 0 10px;text-align:center">Les mêmes 5&nbsp;joueurs pour tout le monde&nbsp;:<br>2&nbsp;faciles, 2&nbsp;moyens et 1&nbsp;difficile.<br>Une seule partie classée par jour.</p>
       <div id="dpDay"></div>
       <button id="dpInvite" style="width:100%">📲 Envoyer à des amis</button>
+      <div class="dpRanks"><button id="dpRank">Voir le classement<br>du jour</button><button id="dpWeek">Voir le classement<br>de la semaine</button></div>
     </div>
     <div class="card clmPickCard" id="dpTrain" style="margin-top:12px">
       <h3 style="margin:0 0 6px;text-align:center">Entraînement</h3>
@@ -444,6 +447,7 @@ body:not(.home-bg) .playcount{display:none}
         <li>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile) ; une seule partie classée par jour.</li>
         <li>Une seule proposition par joueur : 100 points si c'est le bon, 0 sinon. Même règle pour l'entraînement.</li>
         <li>Indice poste −25, indice nationalité −50, réponse acceptée avec une faute −10. Un joueur trouvé rapporte au moins 10 points.</li>
+        <li>Classement de la semaine : total des points des parties du jour, du lundi au dimanche (à égalité, le temps total le plus court). Le vainqueur de la semaine précédente est affiché.</li>
         <li>« Passer » donne la réponse et 0 point.</li>
         <li>Classement du jour : d'abord le nombre de joueurs trouvés, puis les points (500 au maximum), puis le temps total, compté du premier au dernier joueur, pauses comprises.</li>
         <li>Le partage du score ne dévoile pas les réponses.</li>
@@ -2261,10 +2265,12 @@ async function sbRanking(key){
 const mmss = ms => { const t = Math.round(ms/1000); return Math.floor(t/60) + ":" + String(t%60).padStart(2,"0"); };
 const rangTxt = n => n === 1 ? "1er" : n + "e";
 async function showRank(el, quiet){
-  const saved = lsGet("ts_daily", null);
-  if (!saved || saved.key !== todayKey() || (saved.res||[]).length < 5) { el.classList.add("hide"); return; }
+  const st = lsGet("ts_daily", null);
+  const played = !!(st && st.key === todayKey() && (st.res||[]).length >= 5);
+  if (!played && el.id === "rankBox") { el.classList.add("hide"); return; }
+  const saved = played ? st : { key: todayKey(), sent: null };   // pas encore joué : on montre le classement sans sa ligne
   el.classList.remove("hide");
-  if (!saved.sent) {
+  if (played && !saved.sent) {
     const ps = lsGet("ts_pseudo", "");
     if (!ps) {
       el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
@@ -2286,7 +2292,7 @@ async function showRank(el, quiet){
   let rows;
   try { rows = await sbRanking(saved.key); }
   catch(e){ if (!quiet) el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
-  const me = saved.sent;
+  const me = saved.sent || {};
   const mi = rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.points === me.points && r.ms === me.ms);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found}/5</td><td class="n">${r.points} pts</td><td class="n">${mmss(r.ms)}</td></tr>`;
   let body = rows.slice(0, 10).map(line).join("");
@@ -2305,6 +2311,35 @@ function dailyDoneSub(saved){
   if (!done) { $("dailySub").textContent = "Les mêmes 5 joueurs pour tout le monde aujourd'hui"; return; }
   const t = saved.res.reduce((s,r)=>s+r.pts,0), ms = (saved.end || 0) - (saved.start || 0), f = saved.res.filter(r=>r.won).length;
   $("dailySub").innerHTML = `Déjà joué aujourd'hui : ${f}/${n} trouvé${f>1?"s":""}<span class="sq">${saved.res.map(SYMB).join("")}</span>`;
+}
+/* ---------- classement de la semaine des 5 fiches du jour (lundi-dimanche, total des points ; vue Supabase weekly_ranking) ---------- */
+function weekKey(dayKey, back){
+  const [y,m,d] = dayKey.split("-").map(Number), dt = new Date(y, m-1, d);
+  dt.setDate(dt.getDate() - ((dt.getDay() + 6) % 7) - 7 * (back || 0));
+  return dt.getFullYear() + "-" + String(dt.getMonth()+1).padStart(2,"0") + "-" + String(dt.getDate()).padStart(2,"0");
+}
+async function showWeekRank(el, quiet){
+  const H3 = "<h3>Classement de la semaine</h3>", wk = weekKey(todayKey()), prev = weekKey(todayKey(), 1);
+  el.classList.remove("hide");
+  if (!quiet) el.innerHTML = H3 + `<div class="small muted">Chargement du classement…</div>`;
+  const q = w => fetch(SB_URL + "/weekly_ranking?week=eq." + w + "&select=pseudo,points,found,ms,days&order=points.desc,ms.asc&limit=1000", { headers: { apikey: SB_KEY } }).then(r => { if (!r.ok) throw new Error("lecture " + r.status); return r.json(); });
+  let rows, last;
+  try { [rows, last] = await Promise.all([q(wk), q(prev).catch(() => [])]); }
+  catch(e){ if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  const ps = (lsGet("ts_pseudo", "") || "").trim().toLowerCase();
+  const mi = ps ? rows.findIndex(r => (r.pseudo || "").trim().toLowerCase() === ps) : -1;
+  const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.days}&nbsp;j</td><td class="n">${r.points} pts</td></tr>`;
+  let body = rows.slice(0, 10).map(line).join("");
+  if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
+  const [y,m,d] = wk.split("-");
+  const vainq = last && last.length ? `<div class="small" style="margin-top:8px">Vainqueur de la semaine dernière : <strong>${esc(last[0].pseudo)}</strong> (${last[0].points} pts)</div>` : "";
+  el.innerHTML = H3 + `
+    <div class="me-line">${!rows.length ? "Personne n'a encore joué cette semaine." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    ${rows.length ? `<table>${body}</table>` : ""}
+    <div class="small muted" style="margin-top:6px">Semaine du lundi ${Number(d)} ${MOIS[Number(m)-1]} : total des points des parties du jour (j = jours joués). Plus tu joues de jours, plus tu marques. À égalité, le temps total le plus court passe devant.</div>
+    ${vainq}
+    ${el.id === "rankBox" ? "" : `<div class="row"><button id="wkRefresh">Actualiser</button></div>`}`;
+  if ($("wkRefresh")) $("wkRefresh").onclick = () => showWeekRank(el);
 }
 function openRank(render){
   show("rankView");
@@ -2522,18 +2557,18 @@ function dpRender(){
   const cur = saved && saved.key === key && saved.start ? saved : null, n = (cur && cur.res || []).length, done = n >= 5;
   if (done) {
     const f = cur.res.filter(r=>r.won).length, t = cur.res.reduce((s,r)=>s+r.pts,0);
-    $("dpDay").innerHTML = `<div class="small" style="text-align:center;margin-bottom:8px">Partie du jour jouée : <strong>${f}/5 trouvé${f>1?"s":""}</strong> · ${t} pts · ${fmtDur((cur.end||0) - (cur.start||0))}</div>
-      <button id="dpRank" style="width:100%">Voir le classement du jour</button>`;
-    $("dpRank").onclick = () => openRank((el, q) => showRank(el, q));
-    $("dpDay").insertBefore($("dpInvite"), $("dpRank")); $("dpInvite").style.margin = "0 0 8px";   // envoyer, puis le classement
+    $("dpDay").innerHTML = `<div class="small" style="text-align:center;margin-bottom:8px">Partie du jour jouée : <strong>${f}/5 trouvé${f>1?"s":""}</strong><br>${t} pts · ${fmtDur((cur.end||0) - (cur.start||0))}</div>`;
+    $("dpInvite").style.margin = "0";
   } else {
     $("dpDay").innerHTML = `<button class="primary" id="dpGo" style="width:100%">${n ? `Reprendre la partie du jour (fiche ${n + 1} sur 5)` : "Jouer la partie du jour"}</button>`;
     $("dpGo").onclick = dailyGo;
-    $("dpDay").after($("dpInvite")); $("dpInvite").style.margin = "8px 0 0";
+    $("dpInvite").style.margin = "8px 0 0";
   }
   $("dtBox").classList.toggle("hide", !done); $("dtLock").classList.toggle("hide", done);
   if (done) dtRender();
 }
+$("dpRank").onclick = () => openRank((el, q) => showRank(el, q));
+$("dpWeek").onclick = () => openRank((el, q) => showWeekRank(el, q));
 /* Entraînement des 5 fiches : niveau et époque au choix, sans classement */
 let DT_SEL = normSel(lsGet("ts_dt_sel", null));
 const dtPool = sel => PLAYERS.map((p,i)=>[p,i]).filter(([p]) => (!sel.lv.length || sel.lv.includes(p.d)) && (!sel.era.length || sel.era.includes(p.e))).map(([,i])=>i);
