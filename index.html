@@ -177,7 +177,7 @@
 .resHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap;margin-bottom:6px}
 .resHead h2{margin:0;flex:1 1 auto;min-width:0;font-size:1.25rem;line-height:1.2}
 .resHead #nextBtn{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
-.resFoot{gap:8px}
+.resFoot{gap:8px;justify-content:center}
 .resFoot button.mini{flex:0 0 auto;padding:6px 11px !important;font-size:.8rem !important;min-height:0 !important}
 .rank .msg:empty{display:none}
 #clmLive{margin:-4px 0 8px}
@@ -228,6 +228,12 @@ body.typing div.wrap{padding-top:8px}
 .soloBlock{margin-top:8px;display:flex;flex-direction:column;gap:8px}
 .soloBlock #btnSolo{width:100%;margin:0}
 .dpRanks{display:flex;gap:8px;margin-top:8px}
+.finRes{display:block;text-align:center;line-height:1.5}
+#resultText:not(:empty) .finRes:not(:first-child){margin-top:10px}
+.resFoot:not(:has(button:not(.hide))){display:none}
+#resultCard #shareMsg:empty, #resultText:empty{display:none}
+.finRes .sq{letter-spacing:2px}
+.endRanks{margin-top:12px}
 .dpRanks button{flex:1 1 0;font-size:13px;padding:7px 6px;line-height:1.25}
 /* Jeu libre retiré de l'accueil et des règles le 24/11/2026 (code conservé) : supprimer la ligne suivante pour le remettre */
 .jeuLibre{display:none !important}
@@ -1671,7 +1677,7 @@ async function showSoloRank(el, quiet, view){
 }
 function renderSession(){
   const el = $("sessionTotal");
-  if (G && G.mode === "daily") { const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length; el.innerHTML = `${f}/${DAILY.list.length} trouvés <small>· ${t} pts · ⏱ ${fmtDur((DAILY.end || Date.now()) - DAILY.start)}</small>`; return; }
+  if (G && G.mode === "daily") { const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length; const nf = Math.min(DAILY.list.length, Math.max(DAILY.res.length, (DAILY.idx || 0) + 1)); el.innerHTML = `${f}/${nf} trouvé${f>1?"s":""} <small>· ${t} pts · ⏱ ${fmtDur((DAILY.end || Date.now()) - DAILY.start)}</small>`; return; }
   if (!G || G.mode !== "solo" || SESSION.over) { el.textContent = ""; return; }   // fin du Jeu libre : ligne du haut retirée
   el.textContent = "";   // Jeu libre : chrono, points et trouvés affichés dans le bandeau de la zone de réponse
 }
@@ -2213,23 +2219,30 @@ function dailyEnd(won){
   DAILY.res.push({ won, tries: G.tries.length, hints: Object.keys(G.hintsUsed).length, pts: won ? G.score : 0 });
   const last = DAILY.res.length >= DAILY.list.length;
   if (last) { DAILY.end = Date.now(); clearInterval(window._dtick); }
+  /* 5 fiches du jour : le titre (« Bravo : … » / « Il s'agissait de … ») suffit ; on ne garde que la mention de la faute */
+  $("resultText").textContent = won && G.approx ? `Réponse acceptée malgré l'orthographe (« ${G.approx} », −${TYPO_COST} points).` : "";
   if (DAILY.train) {   // entraînement : ni enregistrement, ni classement, ni partage
     renderSession(); $("shareImg").classList.add("hide");
     const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length;
-    $("resultText").textContent += last ? ` Entraînement terminé : ${f}/${DAILY.list.length} trouvé${f>1?"s":""}, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}.`
-      : ` Entraînement : ${t} points après ${DAILY.res.length} joueur${DAILY.res.length>1?"s":""}.`;
+    if (last) $("resultText").insertAdjacentHTML("beforeend", `<span class="finRes">Entraînement terminé<br><strong>${f}/${DAILY.list.length} trouvé${f>1?"s":""}</strong> · ${t} pts · ${fmtDur(DAILY.end - DAILY.start)}<br><span class="sq">${DAILY.res.map(SYMB).join("")}</span></span>`);
     return;
   }
   lsSet("ts_daily", { key: DAILY.key, res: DAILY.res, start: DAILY.start, end: DAILY.end });
   renderSession();
   const t = DAILY.res.reduce((s,r)=>s+r.pts,0);
   if (DAILY.res.length < DAILY.list.length) {
-    $("resultText").textContent += ` Les 5 fiches du jour : ${t} points après ${DAILY.res.length} joueur${DAILY.res.length>1?"s":""}.`;
+    $("shareImg").classList.add("hide");   // partage seulement à la fin de la partie
   } else {
     const f = DAILY.res.filter(r=>r.won).length;
-    $("resultText").textContent += ` Les 5 fiches du jour terminées : ${f}/${DAILY.list.length} trouvés, ${t} points, en ${fmtDur(DAILY.end - DAILY.start)}. ${DAILY.res.map(SYMB).join("")}`;
+    $("resultText").insertAdjacentHTML("beforeend", `<span class="finRes">Les 5 fiches du jour terminées<br><strong>${f}/${DAILY.list.length} trouvé${f>1?"s":""}</strong> · ${t} pts · ${fmtDur(DAILY.end - DAILY.start)}<br><span class="sq">${DAILY.res.map(SYMB).join("")}</span></span>`);
     G.shareText = baseUrl() + "?jour";   // l'image porte le résultat : le message ne contient que le lien
-    showRank($("rankBox"));
+    /* fin de partie : deux boutons vers les classements plutôt que le tableau ; le score est envoyé en arrière-plan */
+    $("resultText").insertAdjacentHTML("beforeend", `<span class="dpRanks endRanks"><button id="endRankDay">Voir le classement<br>du jour</button><button id="endRankWeek">Voir le classement<br>de la semaine</button></span>`);
+    $("endRankDay").onclick = () => openRank((el, q) => showRank(el, q));
+    $("endRankWeek").onclick = () => openRank((el, q) => showWeekRank(el, q));
+    const ps = lsGet("ts_pseudo", "");
+    if (ps) { const sv = lsGet("ts_daily", null); if (sv && !sv.sent) sbSend(sv, ps).catch(() => {}); }
+    else showRank($("rankBox"));   // pas encore de pseudo : on le demande pour publier le score
   }
 }
 
