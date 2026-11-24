@@ -227,6 +227,8 @@ body.typing div.wrap{padding-top:8px}
 #presetHits:empty{display:none}
 .soloBlock{margin-top:8px;display:flex;flex-direction:column;gap:8px}
 .soloBlock #btnSolo{width:100%;margin:0}
+/* Jeu libre retiré de l'accueil et des règles le 24/11/2026 (code conservé) : supprimer la ligne suivante pour le remettre */
+.jeuLibre{display:none !important}
 .soloBlock .soloSettings{margin:0 !important;border-top-left-radius:0;border-top-right-radius:0;border-top:none}
 .playcount{text-align:center;font-size:10.5px;line-height:1.45;color:#fff;margin:12px 0 0;font-weight:500}.playcount span{white-space:nowrap}.playcount .sep{margin:0 10px}
 body:not(.home-bg) .playcount{display:none}
@@ -274,7 +276,7 @@ body:not(.home-bg) .playcount{display:none}
       <div class="dailyWrap"><button class="big" id="btnTrio"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M9 3.5 L4.5 5.3 L2.6 10.6 L6 11.9 L6.4 10.1 V20.5 H17.6 V10.1 L18 11.9 L21.4 10.6 L19.5 5.3 L15 3.5 Q12 6 9 3.5 Z"/></svg>Qui a joué dans ces 3 clubs ?</strong><small id="trioSub">3 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
     </div>
     <div class="soloBlock">
-      <div class="dailyWrap"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
+      <div class="dailyWrap jeuLibre"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
       <button class="big" id="btnCreate"><strong><svg class="ico ico3" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8.5" r="2.5"/><path d="M1.5 18.5c0-2.6 1.8-4.6 4-4.6 1 0 1.9.3 2.6.9"/><circle cx="22.5" cy="8.5" r="2.5"/><path d="M26.5 18.5c0-2.6-1.8-4.6-4-4.6-1 0-1.9.3-2.6.9"/><circle cx="14" cy="7.5" r="3.1"/><path d="M8.3 20.5c0-3.3 2.6-6 5.7-6s5.7 2.7 5.7 6"/></svg>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
     </div>
     <p class="playcount hide" id="playCount" style="margin-top:62px"></p>
@@ -282,7 +284,7 @@ body:not(.home-bg) .playcount{display:none}
       <h2>Consulter une des <span id="nbFiches">560</span> fiches</h2>
       <form id="viewForm" class="row">
         <input id="viewInput" name="fiche-footballeur" placeholder="Nom d'un joueur de la base" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" style="flex:1 1 160px">
-        <button class="primary" type="submit" style="flex:0 0 auto">Afficher</button>
+        <button type="submit" style="flex:0 0 auto">Afficher</button>
       </form>
       <div class="msg bad small" id="viewMsg"></div>
       <div id="viewOut" class="hide" style="margin-top:10px">
@@ -440,8 +442,8 @@ body:not(.home-bg) .playcount{display:none}
       <h3>Les 5 fiches du jour</h3>
       <ul>
         <li>Les mêmes 5 joueurs pour tout le monde (2 faciles, 2 moyens, 1 difficile) ; une seule partie classée par jour.</li>
-        <li>Trois propositions par joueur : 100 points au 1<sup>er</sup> essai, 60 au 2<sup>e</sup>, 30 au 3<sup>e</sup>.</li>
-        <li>Indice poste −10, indice nationalité −25, réponse acceptée avec une faute −10. Un joueur trouvé rapporte au moins 10 points.</li>
+        <li>Une seule proposition par joueur : 100 points si c'est le bon, 0 sinon. Même règle pour l'entraînement.</li>
+        <li>Indice poste −25, indice nationalité −50, réponse acceptée avec une faute −10. Un joueur trouvé rapporte au moins 10 points.</li>
         <li>« Passer » donne la réponse et 0 point.</li>
         <li>Classement du jour : d'abord le nombre de joueurs trouvés, puis les points (500 au maximum), puis le temps total, compté du premier au dernier joueur, pauses comprises.</li>
         <li>Le partage du score ne dévoile pas les réponses.</li>
@@ -466,13 +468,13 @@ body:not(.home-bg) .playcount{display:none}
         <li>S'il y a plusieurs réponses, le nombre de joueurs possibles est indiqué ; un seul suffit pour passer au trio suivant.</li>
         <li>L'indice « Époque » donne la décennie où le joueur a disputé le plus de matchs.</li>
         <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Le niveau d'un trio est celui du joueur le plus facile à trouver parmi les réponses possibles. Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : les autres servent d'entraînement.</li>
-        <li>Mêmes points que « Les 5 fiches du jour » : 100, 60 ou 30 points selon l'essai, indice poste −10, indice époque −15, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
+        <li>Trois propositions par joueur : 100, 60 ou 30 points selon l'essai, indice poste −10, indice époque −15, indice nationalité −25, réponse acceptée avec une faute −10, « Passer » 0 point. Comme au jeu libre, les points d'un trio moyen sont multipliés par 1,5 et ceux d'un difficile par 2. Un joueur qui n'est pas dans notre base ne compte pas comme une erreur.</li>
         <li>Le classement général retient le meilleur score de chaque joueur. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
-      <h3>Jeu libre</h3>
-      <ul>
+      <h3 class="jeuLibre">Jeu libre</h3>
+      <ul class="jeuLibre">
         <li>Une partie dure 4 minutes. Les joueurs sont tirés au hasard selon le niveau et l'époque choisis ; on peut cocher plusieurs niveaux et plusieurs époques (ex. : facile et moyen, années 2000, 2010 et 2020). Le téléphone retient le dernier choix.</li>
-        <li>Mêmes points que « Les 5 fiches du jour » (3 propositions, indices, « Passer »), mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
+        <li>Trois propositions par joueur (100, 60 ou 30 points), indices et « Passer », mais les points d'un joueur moyen sont multipliés par 1,5 et ceux d'un difficile par 2, indices et fautes compris : un difficile trouvé du premier coup rapporte 200 points.</li>
         <li>Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées. Le classement général retient le meilleur score de chaque joueur ; il n'est pas remis à zéro chaque jour. On peut rejouer autant qu'on veut. Une partie quittée avant la fin n'est pas classée.</li>
       </ul>
       <p class="small muted" style="margin:14px 0 0">Sources des statistiques : Wikipédia et sites spécialisés.</p>
@@ -1380,11 +1382,14 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 
 /* Barème : 100 points de base ; 100 % au 1er essai, 60 % au 2e, 30 % au 3e ; chaque indice retire 25 points */
 const BASE = 100, TRY_FACTOR = [1, 0.6, 0.3], HINT_COST = { p: 10, c: 25, e: 15 }, TYPO_COST = 10, MIN_FOUND = 10;
+/* Les 5 fiches du jour (partie du jour et entraînement) : une seule proposition, indices plus chers (24/11/2026) */
+const DAILY_HINT_COST = { p: 25, c: 50 };
+const hintCost = k => (G && G.mode === "daily" && DAILY_HINT_COST[k] != null) ? DAILY_HINT_COST[k] : HINT_COST[k];
 const LEVEL_COEF = { facile: 1, moyen: 1.5, difficile: 2 };   // pondération du jeu libre
 const coefOf = () => (G && G.mode === "solo") ? (LEVEL_COEF[G.p.d] || 1) : 1;
 function computeScore(){
   const f = TRY_FACTOR[G.tries.length] ?? 0;
-  const hints = Object.keys(G.hintsUsed).reduce((s,k) => s + (HINT_COST[k] || 0), 0);
+  const hints = Object.keys(G.hintsUsed).reduce((s,k) => s + (hintCost(k) || 0), 0);
   const raw = Math.max(MIN_FOUND, Math.round(BASE * f) - hints - (G.approx ? TYPO_COST : 0));   // minimum garanti si le joueur est trouvé
   return Math.round(raw * coefOf());
 }
@@ -1452,7 +1457,7 @@ function renderHints(){
     if (G.hintsUsed[k] || G.over){
       const s = document.createElement("span"); s.className = "hint-val"; s.textContent = `${label} : ${G.p[k]}`; box.appendChild(s);
     } else {
-      const btn = document.createElement("button"); btn.textContent = `${label} (−${Math.round(HINT_COST[k] * coefOf())})`;
+      const btn = document.createElement("button"); btn.textContent = `${label} (−${Math.round(hintCost(k) * coefOf())})`;
       btn.onclick = () => { G.hintsUsed[k] = true; G.score = computeScore(); renderHints(); renderScore(); dailySaveCur(); };
       box.appendChild(btn);
     }
@@ -1510,7 +1515,7 @@ $("guessForm").onsubmit = e => {
   const res = G.mode === "chrono" ? checkGuessDefi(v, G.p) : checkGuess(v, G.p);
   if (res) { G.approx = (res === "approx") ? v : null; G.score = computeScore(); endGame(true); return; }
   G.tries.push(v); G.score = computeScore();
-  const maxTries = G.mode === "chrono" ? 2 : 3;
+  const maxTries = G.mode === "chrono" ? 2 : G.mode === "daily" ? 1 : 3;
   if (G.tries.length >= maxTries) { G.score = 0; endGame(false); return; }
   const left = maxTries - G.tries.length;
   $("msg").textContent = left === 1 ? "Ce n'est pas lui. Dernier essai." : `Ce n'est pas lui. Encore ${left} essais.`; $("msg").className = "msg bad";
@@ -1536,7 +1541,7 @@ function endGame(won){
   $("resultText").textContent = won
     ? `Trouvé ${n === 0 ? "du premier coup" : "après " + n + " proposition" + (n>1?"s":"") + " erronée" + (n>1?"s":"")}. Score : ${G.score} points.`
       + (G.approx ? ` Réponse acceptée malgré l'orthographe (« ${G.approx} », −${TYPO_COST} points).` : "")
-    : (G.tries.length >= 3 ? "Trois propositions manquées. " : "") + "Score : 0 point.";
+    : (G.mode === "daily" && G.tries.length ? "Ce n'est pas lui. " : G.tries.length >= 3 ? "Trois propositions manquées. " : "") + "Score : 0 point.";
   if (G.mode === "chrono") endDefi(won);
   if (G.mode === "daily") dailyEnd(won);
   if (G.mode === "solo") {
@@ -2192,8 +2197,7 @@ function dailyRestoreCur(){
   if (!s || s.key !== DAILY.key || !s.cur || s.cur.idx !== DAILY.idx) return;
   G.tries = (s.cur.tries || []).slice(); (s.cur.hints || []).forEach(k => G.hintsUsed[k] = true);
   G.score = computeScore();
-  const left = 3 - G.tries.length;
-  if (G.tries.length) { $("msg").textContent = left === 1 ? "Ce n'est pas lui. Dernier essai." : `Ce n'est pas lui. Encore ${left} essais.`; $("msg").className = "msg bad"; }
+  if (G.tries.length) { $("msg").textContent = "Ce n'est pas lui."; $("msg").className = "msg bad"; }
   renderHints(); renderScore(); renderTries();
 }
 function dailyStart(){
