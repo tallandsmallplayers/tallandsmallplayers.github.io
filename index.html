@@ -256,6 +256,21 @@ body:not(.home-bg) .playcount{display:none}
   #home .big small{font-size:12.5px;line-height:1.3;display:block}
   #home .card.compact{padding:9px 14px;margin:38px 0 0}
   #home #playCount:not(.hide)+.card.compact{margin-top:8px}
+  #quitModal,#idModal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}
+  #quitModal.hide,#idModal.hide{display:none}
+  #quitModal .qmBox,#idModal .qmBox{max-width:360px;width:100%;text-align:center;margin:0;background:#0b2413}
+  #quitModal h2,#idModal h2{margin:0 0 10px;font-size:19px}
+  #quitModal p,#idModal p{margin:0 0 10px;font-size:14.5px;line-height:1.4}
+  #idModal p.small{font-size:12.5px}
+  #quitModal .qmScore{margin-bottom:16px}
+  #quitModal button,#idModal button{width:100%;margin-top:8px}
+  #idModal input{width:100%;box-sizing:border-box;margin-top:8px;text-align:center;font-size:16px}
+  #idModal #idCode{letter-spacing:6px;-webkit-text-security:disc}
+  #idModal #idCode::placeholder{letter-spacing:normal}
+  #idModal .msg{min-height:0;margin-top:6px}
+  #idModal button{display:block;width:65%;margin-left:auto;margin-right:auto}
+  #idModal #idOk{margin-top:16px}
+  #idModal #idCancel{margin-top:60px}
   #home .card.compact .lbl{font-size:12px;color:var(--muted);margin:0 0 5px}
   #home .card.compact .levels{gap:5px;flex-wrap:nowrap}
   #home .card.compact .levels button{flex:1 1 0;padding:3px 2px;font-size:12px;line-height:1.1;min-width:0;border-radius:8px}
@@ -452,6 +467,8 @@ body:not(.home-bg) .playcount{display:none}
         <li>Une faute de frappe est tolérée à partir de 5 lettres, deux à partir de 10.</li>
         <li>Chaque joueur a un niveau (facile, moyen ou difficile) et une époque : la décennie où il a disputé le plus de matchs (les années 1980 sont rattachées aux années 1990).</li>
         <li>Une saison avec un prêt ou un transfert apparaît sur deux lignes. Quand les statistiques saison par saison ne sont pas disponibles, une ligne peut regrouper plusieurs saisons (ex. : 1988-90).</li>
+        <li>Pour être classé, on choisit un pseudo protégé par un code à 4 chiffres. Le code est demandé une seule fois par téléphone ou navigateur ; il permet de retrouver son pseudo sur un autre appareil. Après 3 codes faux, ce pseudo est bloqué 1 heure sur l'appareil utilisé.</li>
+        <li>Les 5 fiches du jour et le Contre-la-montre : une seule partie classée par jour et par pseudo, quel que soit l'appareil.</li>
       </ul>
       <h3>Les 5 fiches du jour</h3>
       <ul>
@@ -460,6 +477,7 @@ body:not(.home-bg) .playcount{display:none}
         <li>Indice poste −25, indice nationalité −50, réponse acceptée avec une faute −10. Un joueur trouvé rapporte au moins 10 points.</li>
         <li>Classement de la semaine : total des points des parties du jour, du lundi au dimanche (à égalité, le temps total le plus court). Le vainqueur de la semaine précédente est affiché.</li>
         <li>« Passer » donne la réponse et 0 point.</li>
+        <li>Revenir à l'accueil pendant la partie l'arrête définitivement, après confirmation : les fiches restantes comptent comme non trouvées. Un appel ou la mise en veille du téléphone ne l'arrête pas.</li>
         <li>Classement du jour : d'abord le nombre de joueurs trouvés, puis les points (500 au maximum), puis le temps total, compté du premier au dernier joueur, pauses comprises.</li>
         <li>Le partage du score ne dévoile pas les réponses.</li>
         <li>Une fois la partie du jour jouée, on peut s'entraîner autant qu'on veut sur 5 autres fiches, en choisissant le niveau et l'époque. Ces parties ne comptent pas pour le classement.</li>
@@ -1291,7 +1309,36 @@ const $ = id => document.getElementById(id);
 const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[’'`\-\.]/g," ").replace(/\s+/g," ").trim();
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
 function show(id){ if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; } ["home","intro","game","create","rankView","rulesView","trio","clmPick","soloPick","dailyPage"].forEach(s => $(s).classList.toggle("hide", s!==id)); document.body.classList.toggle("home-bg", id==="home"); { const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = "#0f2213"; } window.scrollTo(0,0); if (id === "home") { loadPlayCount(); if (typeof rankBtns === "function") { rankBtns(); clmSub(); } } }
-document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => show("home"));
+document.querySelectorAll("[data-home]").forEach(b => b.onclick = () => { if (dailyQuitGuard()) return; show("home"); });
+/* 5 fiches du jour (partie classée) : revenir à l'accueil arrête la partie définitivement, après confirmation */
+function dailyInProgress(){
+  return !!(G && G.mode === "daily" && DAILY && !DAILY.train && DAILY.key === todayKey()
+    && DAILY.res.length < DAILY.list.length && !$("game").classList.contains("hide"));
+}
+function dailyQuitGuard(){
+  if (!dailyInProgress()) return false;
+  const f = DAILY.res.filter(r => r.won).length, n = DAILY.list.length;
+  let m = $("quitModal");
+  if (!m) { m = document.createElement("div"); m.id = "quitModal"; document.body.appendChild(m); }
+  m.innerHTML = `<div class="qmBox card"><h2>Quitter la partie&nbsp;?</h2>
+    <p>Si tu reviens à l'accueil, ta partie du jour s'arrête définitivement. Les fiches restantes comptent comme non trouvées.</p>
+    <p class="qmScore">Ton score serait de <strong>${f}/${n}&nbsp;trouvé${f>1?"s":""}</strong>.</p>
+    <button class="primary" id="qmStay">Continuer la partie</button><button id="qmQuit">Quitter quand même</button></div>`;
+  m.classList.remove("hide");
+  $("qmStay").onclick = () => m.classList.add("hide");
+  $("qmQuit").onclick = () => { m.classList.add("hide"); dailyAbandon(); show("home"); };
+  return true;
+}
+function dailyAbandon(){
+  if (!G.over) DAILY.res.push({ won: false, tries: G.tries.length, hints: Object.keys(G.hintsUsed).length, pts: 0, quit: true });
+  while (DAILY.res.length < DAILY.list.length) DAILY.res.push({ won: false, tries: 0, hints: 0, pts: 0, quit: true });
+  DAILY.end = Date.now(); clearInterval(window._dtick);
+  if (G.timer) clearInterval(G.timer);
+  G.over = true;
+  const sv = { key: DAILY.key, res: DAILY.res, start: DAILY.start, end: DAILY.end };
+  lsSet("ts_daily", sv);
+  if (hasId()) sbSend(sv, myPseudo()).catch(() => {});
+}
 
 function encode(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
 function decode(code){ return JSON.parse(decodeURIComponent(escape(atob(code.replace(/\s+/g,""))))); }
@@ -1646,20 +1693,15 @@ function soloEnd(){
 async function showSoloRank(el, quiet, view){
   const H3 = "<h3>Classement du Jeu libre</h3>";
   el.classList.remove("hide");
-  const ps = lsGet("ts_pseudo", "");
+  let ps = myPseudo();
   if (!view && !SESSION.sent) {
-    if (!ps) {
-      el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement.</div>
-        <div class="row"><input id="soloPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
-        <button class="primary" id="soloSend">Publier mon score</button></div><div class="msg bad small" id="soloMsg"></div>`;
-      $("soloSend").onclick = () => { const v = $("soloPseudo").value.trim(); if (!v) { $("soloMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showSoloRank(el); };
-      return;
-    }
+    if (!hasId()) { idPrompt(el, H3, "Choisis ton pseudo pour apparaître dans le classement.", () => showSoloRank(el)); return; }
     el.innerHTML = H3 + `<div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/solo_scores", { method: "POST",
         headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ day: SESSION.key, device: deviceId(), pseudo: ps, points: SESSION.total, found: SESSION.found, played: SESSION.played, duree: 240 }) });
+        body: JSON.stringify({ day: SESSION.key, device: deviceId(), pseudo: ps, points: SESSION.total, found: SESSION.found, played: SESSION.played, duree: 240, ptoken: myToken() }) });
+      if (r.status !== 201 && await scoreRefused(r) === "token") { idPrompt(el, H3, "Confirme ton pseudo avec ton code pour publier ton score.", () => showSoloRank(el)); return; }
       if (r.status !== 201) throw new Error("envoi " + r.status);
       SESSION.sent = true;
     } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div><div class="row"><button id="soloRetry">Réessayer</button></div>`; $("soloRetry").onclick = () => showSoloRank(el); return; }
@@ -1796,8 +1838,8 @@ let DEFI_TIMER = null;
 async function sbDefiSend(row){
   const r = await fetch(SB_URL + "/defi_scores", { method: "POST",
     headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
-    body: JSON.stringify(row) });
-  if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
+    body: JSON.stringify({ ...row, ptoken: myToken() || null }) });
+  if (r.status !== 201 && r.status !== 409) { await scoreRefused(r); throw new Error("envoi " + r.status); }
 }
 async function sbDefiRows(tok){
   const r = await fetch(SB_URL + "/defi_ranking?defi=eq." + encodeURIComponent(tok) + "&select=pseudo,won,essai,ms,createur,created_at,rates&order=created_at.asc&limit=500", { headers: { apikey: SB_KEY } });
@@ -1863,11 +1905,11 @@ function openDefi(d){
     : `Le délai officiel s'est terminé ${/^\d/.test(finTxt(fin)) ? "à " : ""}${finTxt(fin)}. Tu peux jouer, mais ton résultat sera hors délai.`;
   const mine = lsGet("ts_crees", []);
   $("introCreator").textContent = mine.includes(d.tok) ? "Tu as créé ce défi : tu connais la réponse, ton résultat ne comptera pas." : "";
-  const knownPs = lsGet("ts_pseudo", "");
+  const knownPs = hasId() ? myPseudo() : "";
   $("pseudo").value = knownPs;
   $("pseudoName").textContent = knownPs;
   $("pseudoKnown").classList.toggle("hide", !knownPs);
-  $("pseudoAsk").classList.toggle("hide", !!knownPs);
+  $("pseudoAsk").classList.add("hide");   // pseudo et code demandés dans la fenêtre « Ton pseudo » en appuyant sur Commencer
   $("introMsg").textContent = "";
   /* Une seule partie par défi et par téléphone : une partie commencée reprend où elle en était (chrono compris), une partie terminée ne se rejoue pas */
   const createurDefi = mine.includes(d.tok), cur = defiCur(d.tok);
@@ -1880,11 +1922,10 @@ function openDefi(d){
   $("introRank").classList.add("hide");
   showDefiRank($("introRank"), d, null);
 }
-$("pseudoChange").onclick = () => { $("pseudoKnown").classList.add("hide"); $("pseudoAsk").classList.remove("hide"); $("pseudo").focus(); $("pseudo").select(); };
+$("pseudoChange").onclick = () => askId(ps => { $("pseudoName").textContent = ps; $("pseudoKnown").classList.remove("hide"); }, { change: true });
 $("startDefi").onclick = () => {
-  const ps = $("pseudo").value.trim();
-  if (!ps) { $("introMsg").textContent = "Indique un pseudo."; return; }
-  lsSet("ts_pseudo", ps);
+  if (!hasId()) { askId(() => $("startDefi").onclick()); return; }
+  const ps = myPseudo();
   const cur = defiCur(DEFI.tok);
   if (!cur) logPlay("defi");
   startGame(DEFI.player, "chrono");
@@ -2136,21 +2177,17 @@ async function showClmRank(el, quiet, combo){
       + `<select id="${el.id}ClmEra">${CLM_ERA_ORDER.map(k => [k, CLM_ERA[k]]).map(([k,v]) => `<option value="${k}" ${k===era?"selected":""}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join("")}</select></div>`; };
   const bindSel = () => { const f = () => showClmRank(el, false, $(el.id+"ClmLv").value + "-" + $(el.id+"ClmEra").value); if ($(el.id+"ClmLv")) { $(el.id+"ClmLv").onchange = f; $(el.id+"ClmEra").onchange = f; } };
   if (s.done && !s.sent) {
-    const ps = lsGet("ts_pseudo", "");
-    if (!ps) {
-      el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement du jour.</div>
-        <div class="row"><input id="clmPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
-        <button class="primary" id="clmSend">Publier mon score</button></div><div class="msg bad small" id="clmMsg"></div>`;
-      $("clmSend").onclick = () => { const v = $("clmPseudo").value.trim(); if (!v) { $("clmMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showClmRank(el, false, combo); };
-      return;
-    }
+    const ps = myPseudo();
+    if (!hasId()) { idPrompt(el, H3, "Choisis ton pseudo pour apparaître dans le classement du jour.", () => showClmRank(el, false, combo)); return; }
     el.innerHTML = H3 + `<div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/clm_scores", { method: "POST",
         headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen, combo }) });
-      if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
-      const d2 = clmDay(); d2.games[combo].sent = { pseudo: ps, found: s.found, avg: s.avg }; lsSet("ts_clm", d2); s.sent = d2.games[combo].sent;
+        body: JSON.stringify({ day: s.key, device: deviceId(), pseudo: ps, found: s.found, avg_ms: s.avg, seen: s.seen, combo, ptoken: myToken() }) });
+      const why = r.status === 201 ? null : await scoreRefused(r);
+      if (why === "token") { idPrompt(el, H3, "Confirme ton pseudo avec ton code pour publier ton score.", () => showClmRank(el, false, combo)); return; }
+      if (r.status !== 201 && !why) throw new Error("envoi " + r.status);
+      const d2 = clmDay(); d2.games[combo].sent = { pseudo: ps, found: s.found, avg: s.avg, dup: why === "pseudo" }; lsSet("ts_clm", d2); s.sent = d2.games[combo].sent;
     } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture du classement.</div>`; return; }
   } else if (!quiet) el.innerHTML = H3 + sel() + `<div class="small muted">Chargement du classement…</div>`;
   bindSel();
@@ -2245,15 +2282,78 @@ function dailyEnd(won){
     $("resultText").insertAdjacentHTML("beforeend", `<span class="dpRanks endRanks"><button id="endRankDay">Voir le classement<br>du jour</button><button id="endRankWeek">Voir le classement<br>de la semaine</button></span>`);
     $("endRankDay").onclick = () => openRank((el, q) => showRank(el, q));
     $("endRankWeek").onclick = () => openRank((el, q) => showWeekRank(el, q));
-    const ps = lsGet("ts_pseudo", "");
-    if (ps) { const sv = lsGet("ts_daily", null); if (sv && !sv.sent) sbSend(sv, ps).catch(() => {}); }
-    else showRank($("rankBox"));   // pas encore de pseudo : on le demande pour publier le score
+    if (hasId()) { const sv = lsGet("ts_daily", null); if (sv && !sv.sent) sbSend(sv, myPseudo()).catch(() => {}); }
+    else showRank($("rankBox"));   // pas encore de pseudo (ou code à confirmer) : on le demande pour publier le score
   }
 }
 
 /* ---------- classement commun des 5 fiches du jour (Supabase) ---------- */
 const SB_URL = "https://vfsrjwmawfmnyfnqztou.supabase.co/rest/v1";
 const SB_KEY = "sb_publishable_g2kUCH_YC_R2S0J6uryGQw_i4dbj0l8";
+
+/* ---------- pseudo protégé par un code à 4 chiffres ----------
+   Le code n'est demandé qu'une fois par navigateur : le pseudo et un jeton (ts_ptoken) restent en mémoire.
+   Supabase (fonction pseudo_login) : crée le pseudo s'il est libre, sinon vérifie le code ; 3 erreurs = pseudo bloqué 1 h.
+   Chaque score envoyé porte le jeton (ptoken), vérifié par Supabase pour les pseudos protégés. */
+function myPseudo(){ return lsGet("ts_pseudo", ""); }
+function myToken(){ return lsGet("ts_ptoken", ""); }
+function hasId(){ return !!(myPseudo() && myToken()); }
+function idForget(){ lsSet("ts_ptoken", ""); }
+function askId(onDone, opts){
+  opts = opts || {};
+  let m = $("idModal");
+  if (!m) { m = document.createElement("div"); m.id = "idModal"; document.body.appendChild(m); }
+  const pre = opts.pseudo != null ? opts.pseudo : (opts.change ? "" : myPseudo());
+  m.innerHTML = `<form class="qmBox card" id="idForm" autocomplete="off"><h2>${opts.title || "Ton pseudo"}</h2>
+    <p>Choisis ton pseudo et un code à 4&nbsp;chiffres.</p>
+    <input id="idPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" value="${esc(pre)}">
+    <input id="idCode" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Code à 4 chiffres" autocomplete="off">
+    <div class="msg bad small" id="idMsg"></div>
+    <button class="primary" type="submit" id="idOk">Valider</button><button type="button" id="idCancel">${opts.cancel || "Annuler"}</button></form>`;
+  m.classList.remove("hide");
+  const msg = t => { $("idMsg").textContent = t; };
+  const msgH = h => { $("idMsg").innerHTML = h; };
+  $("idCancel").onclick = () => { m.classList.add("hide"); if (opts.onCancel) opts.onCancel(); };
+  $("idCode").oninput = () => { $("idCode").value = $("idCode").value.replace(/\D/g, "").slice(0, 4); };
+  setTimeout(() => (pre ? $("idCode") : $("idPseudo")).focus(), 50);
+  $("idForm").onsubmit = async e => {
+    e.preventDefault();
+    const ps = $("idPseudo").value.trim(), code = $("idCode").value;
+    if (!ps) return msg("Indique un pseudo.");
+    if (!/^\d{4}$/.test(code)) return msg("Le code doit comporter 4 chiffres.");
+    $("idOk").disabled = true; msg("");
+    let d;
+    try {
+      const r = await fetch(SB_URL + "/rpc/pseudo_login", { method: "POST",
+        headers: { apikey: SB_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ p_pseudo: ps, p_code: code, p_device: deviceId() }) });
+      if (!r.ok) throw new Error("rpc " + r.status);
+      d = await r.json();
+    } catch(err) { $("idOk").disabled = false; return msg("Connexion impossible pour le moment. Réessaie dans un instant."); }
+    $("idOk").disabled = false;
+    if (d.status === "created" || d.status === "ok") {
+      lsSet("ts_pseudo", d.pseudo); lsSet("ts_ptoken", d.token);
+      m.classList.add("hide"); onDone && onDone(d.pseudo); return;
+    }
+    if (d.status === "bad") { $("idCode").value = ""; return msgH(`Ce pseudo est déjà pris. Si c'est le tien, tape ton code, sinon choisis un autre pseudo.<br>Il te reste ${d.left} essai${d.left > 1 ? "s" : ""}.`); }
+    if (d.status === "blocked") {
+      const t = new Date(d.until), hh = String(t.getHours()).padStart(2, "0"), mm = String(t.getMinutes()).padStart(2, "0");
+      return msg(`Trop d'erreurs : ce pseudo est bloqué sur ce téléphone jusqu'à ${hh}\u00a0h\u00a0${mm}. Tu peux en choisir un autre.`);
+    }
+    msg("Pseudo ou code non valide.");
+  };
+}
+/* Encart « pseudo » dans un classement : bouton qui ouvre la fenêtre pseudo + code, puis relance l'envoi */
+function idPrompt(el, head, intro, retry){
+  el.innerHTML = head + `<div class="small muted">${intro}</div><div class="row" style="margin-top:8px"><button class="primary" type="button">Choisir mon pseudo</button></div>`;
+  el.querySelector("button").onclick = () => askId(retry);
+}
+/* Réponse d'envoi d'un score : jeton refusé -> on redemande le code ; doublon de pseudo -> message */
+async function scoreRefused(r){
+  if (r.status === 401 || r.status === 403) { idForget(); return "token"; }
+  if (r.status === 409) { const t = await r.text().catch(() => ""); return /pseudo/.test(t) ? "pseudo" : "device"; }
+  return null;
+}
 function deviceId(){
   let d = lsGet("ts_device", null);
   if (!d) {
@@ -2270,8 +2370,13 @@ async function sbSend(saved, pseudo){
   const sum = dailySummary(saved);
   const r = await fetch(SB_URL + "/daily_scores", { method: "POST",
     headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
-    body: JSON.stringify({ day: saved.key, device: deviceId(), pseudo, found: sum.found, points: sum.points, ms: sum.ms }) });
-  if (r.status !== 201 && r.status !== 409) throw new Error("envoi " + r.status);
+    body: JSON.stringify({ day: saved.key, device: deviceId(), pseudo, found: sum.found, points: sum.points, ms: sum.ms, ptoken: myToken() || null }) });
+  if (r.status !== 201) {
+    const why = await scoreRefused(r);
+    if (why === "token") throw new Error("token");
+    if (why === "pseudo") { saved.sent = { pseudo, ...sum, dup: true }; lsSet("ts_daily", saved); return; }
+    if (why !== "device") throw new Error("envoi " + r.status);
+  }
   saved.sent = { pseudo, ...sum };
   lsSet("ts_daily", saved);
 }
@@ -2289,21 +2394,13 @@ async function showRank(el, quiet){
   const saved = played ? st : { key: todayKey(), sent: null };   // pas encore joué : on montre le classement sans sa ligne
   el.classList.remove("hide");
   if (played && !saved.sent) {
-    const ps = lsGet("ts_pseudo", "");
-    if (!ps) {
-      el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Choisis un pseudo pour apparaître dans le classement de tous les joueurs.</div>
-        <div class="row"><input id="rkPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
-        <button class="primary" id="rkSend">Publier mon score</button></div><div class="msg bad small" id="rkMsg"></div>`;
-      $("rkSend").onclick = () => {
-        const v = $("rkPseudo").value.trim();
-        if (!v) { $("rkMsg").textContent = "Indique un pseudo."; return; }
-        lsSet("ts_pseudo", v); showRank(el);
-      };
-      return;
-    }
+    const ps = myPseudo();
+    if (!hasId()) { idPrompt(el, `<h3>Classement des 5 fiches du jour</h3>`, "Choisis ton pseudo pour apparaître dans le classement de tous les joueurs.", () => showRank(el)); return; }
     el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Envoi de ton score…</div>`;
     try { await sbSend(saved, ps); }
-    catch(e){ el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture des 5 fiches du jour.</div>`; return; }
+    catch(e){
+      if (e.message === "token") { idPrompt(el, `<h3>Classement des 5 fiches du jour</h3>`, "Confirme ton pseudo avec ton code pour publier ton score.", () => showRank(el)); return; }
+      el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment. Ton score sera envoyé à la prochaine ouverture des 5 fiches du jour.</div>`; return; }
   } else if (!quiet) {
     el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Chargement du classement…</div>`;
   }
@@ -2317,6 +2414,7 @@ async function showRank(el, quiet){
   if (mi >= 10) body += (mi > 10 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = `<h3>Classement des 5 fiches du jour</h3>
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    ${me.dup ? `<div class="small muted" style="margin:0 0 6px">Ton pseudo avait déjà une partie du jour enregistrée sur un autre appareil : seule la première compte.</div>` : ""}
     <table>${body}</table>
     <div class="small muted" style="margin-top:6px">Classement par joueurs trouvés, puis points, puis temps. Il évolue au fil de la journée${el.id === "viewRankBox" ? " et se met à jour toutes les 30 secondes" : ""}.</div>
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="rkRefresh">Actualiser</button></div>`}`;
@@ -2516,20 +2614,15 @@ $("trioRankBtn").onclick = () => openRank((el, q) => showTrioRank(el, q, true));
 async function showTrioRank(el, quiet, view){
   const H3 = "<h3>Classement de « Qui a joué dans ces 3 clubs ? »</h3>";
   el.classList.remove("hide");
-  const ps = lsGet("ts_pseudo", "");
+  const ps = myPseudo();
   if (!view && !TRIO.sent) {
-    if (!ps) {
-      el.innerHTML = H3 + `<div class="small muted">Choisis un pseudo pour apparaître dans le classement.</div>
-        <div class="row"><input id="trioPseudo" maxlength="20" placeholder="Ton pseudo" autocomplete="nickname" style="flex:1 1 140px">
-        <button class="primary" id="trioSend">Publier mon score</button></div><div class="msg bad small" id="trioPMsg"></div>`;
-      $("trioSend").onclick = () => { const v = $("trioPseudo").value.trim(); if (!v) { $("trioPMsg").textContent = "Indique un pseudo."; return; } lsSet("ts_pseudo", v); showTrioRank(el); };
-      return;
-    }
+    if (!hasId()) { idPrompt(el, H3, "Choisis ton pseudo pour apparaître dans le classement.", () => showTrioRank(el)); return; }
     el.innerHTML = H3 + `<div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/trio_scores", { method: "POST",
         headers: { apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ day: TRIO.key, device: deviceId(), pseudo: ps, points: TRIO.total, found: TRIO.found, played: TRIO.played }) });
+        body: JSON.stringify({ day: TRIO.key, device: deviceId(), pseudo: ps, points: TRIO.total, found: TRIO.found, played: TRIO.played, ptoken: myToken() }) });
+      if (r.status !== 201 && await scoreRefused(r) === "token") { idPrompt(el, H3, "Confirme ton pseudo avec ton code pour publier ton score.", () => showTrioRank(el)); return; }
       if (r.status !== 201) throw new Error("envoi " + r.status);
       TRIO.sent = true;
     } catch(e) { el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div><div class="row"><button id="trioRetry">Réessayer</button></div>`; $("trioRetry").onclick = () => showTrioRank(el); return; }
@@ -2774,6 +2867,14 @@ $("shareImgClose").onclick = () => $("shareOverlay").classList.add("hide");
 
 /* Lien d'invitation aux 5 fiches du jour (?jour) : ouvre directement la page du jeu */
 if (/[?&]jour\b/.test(location.search)) { show("dailyPage"); dpRender(); }
+/* Première ouverture du site sur ce navigateur : pseudo + code proposés tout de suite (« Plus tard » possible : reproposé à la prochaine visite).
+   Pas sur un lien de défi : le pseudo y est demandé en appuyant sur « Commencer ». */
+(function(){
+  if (hasId() || /[?&#]d=/.test(location.search + location.hash)) return;
+  try { if (sessionStorage.getItem("ts_id_later")) return; } catch(e){}
+  setTimeout(() => askId(null, { title: "Bienvenue !", cancel: "Jouer sans login",
+    onCancel: () => { try { sessionStorage.setItem("ts_id_later", "1"); } catch(e){} } }), 400);
+})();
 /* Ouverture directe d'un lien de défi */
 (function(){
   const s = location.search + location.hash;
