@@ -207,6 +207,10 @@ body.typing #guessCard{padding:8px 10px}
 body.typing #careerCard{margin-bottom:0}
 body.typing #guessCard{position:sticky;top:0;border-radius:10px;margin-bottom:8px}
 body.typing div.wrap{padding-top:8px}
+body.typing #trio>.back{margin:0 0 6px;font-size:14px}
+body.typing #trioTime{margin-bottom:6px}
+body.typing .trioClubs div{padding:8px 6px}
+body.typing .trioCount{margin-bottom:6px}
 #guessCard .gcTools{gap:5px}#guessCard .hints{gap:5px}
 #guessCard .msg{font-size:14px;margin-top:6px;line-height:1.25}
 #guessCard .msg:empty{display:none}
@@ -251,6 +255,7 @@ body:not(.home-bg) .playcount{display:none}
   #home .big strong{font-size:16px;margin-bottom:0}
   #home .big small{font-size:12.5px;line-height:1.3;display:block}
   #home .card.compact{padding:9px 14px;margin:38px 0 0}
+  #home #playCount:not(.hide)+.card.compact{margin-top:8px}
   #home .card.compact .lbl{font-size:12px;color:var(--muted);margin:0 0 5px}
   #home .card.compact .levels{gap:5px;flex-wrap:nowrap}
   #home .card.compact .levels button{flex:1 1 0;padding:3px 2px;font-size:12px;line-height:1.1;min-width:0;border-radius:8px}
@@ -287,7 +292,7 @@ body:not(.home-bg) .playcount{display:none}
       <div class="dailyWrap jeuLibre"><button class="big" id="btnSolo"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 7.6V3.2M15.3 10l4.2-1.4M14 13.9l2.6 3.6M10 13.9l-2.6 3.6M8.7 10 4.5 8.6"/></svg>Jeu libre</strong><small id="soloSub">4 minutes pour marquer le plus de points</small></button><button class="rankBtn hide" id="soloRankBtn">Classement</button></div>
       <button class="big" id="btnCreate"><strong><svg class="ico ico3" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8.5" r="2.5"/><path d="M1.5 18.5c0-2.6 1.8-4.6 4-4.6 1 0 1.9.3 2.6.9"/><circle cx="22.5" cy="8.5" r="2.5"/><path d="M26.5 18.5c0-2.6-1.8-4.6-4-4.6-1 0-1.9.3-2.6.9"/><circle cx="14" cy="7.5" r="3.1"/><path d="M8.3 20.5c0-3.3 2.6-6 5.7-6s5.7 2.7 5.7 6"/></svg>Défi entre amis</strong><small>Choisis un joueur et envoie le lien sur WhatsApp</small></button>
     </div>
-    <p class="playcount hide" id="playCount" style="margin-top:62px"></p>
+    <p class="playcount hide" id="playCount" style="margin-top:92px"></p>
     <div class="card compact">
       <h2>Consulter une des <span id="nbFiches">560</span> fiches</h2>
       <form id="viewForm" class="row">
@@ -2407,7 +2412,7 @@ function trioRender(){
   const t = TRIO.cur, D = trioData();
   $("trioClubs").innerHTML = t.clubs.map(c => { const f = clubFlag(c, D.div[c] || ""); return `<div>${f ? `<span class="flag">${f}</span>` : ""}<span>${esc(c)}</span></div>`; }).join("");
   const n = t.sol.length;
-  $("trioCount").innerHTML = `<span class="badge ${t.level}">${t.level}</span> ` + (n > 1 ? `${n} joueurs possibles dans notre base : un seul suffit` : "1 joueur possible dans notre base");
+  $("trioCount").innerHTML = `<span class="badge ${t.level}">${t.level}</span> ` + (n > 1 ? `${n} joueurs possibles dans notre base\u00a0: un seul suffit` : "1 joueur possible dans notre base");
   $("trioTries").textContent = t.tries.length ? "Propositions : " + t.tries.join(", ") : "";
   const box = $("trioHints"); box.innerHTML = "";
   const coef = LEVEL_COEF[t.level] || 1;
@@ -2830,13 +2835,16 @@ loadPlayCount();
 // Mode saisie (téléphone) : clavier ouvert -> en-tête réduit, réponse en haut (fixe au défilement), carrière complète dessous
 (() => {
   if (!window.matchMedia || !matchMedia("(pointer:coarse)").matches) return;
-  const inp = $("guessInput");
   const top = () => { if (document.body.classList.contains("typing")) window.scrollTo(0, 0); };
-  inp.addEventListener("focus", () => { const was = document.body.classList.contains("typing"); document.body.classList.add("typing"); if (!was) { top(); setTimeout(top, 350); } });
-  inp.addEventListener("blur", () => setTimeout(() => {
-    if (document.activeElement === inp) return;
-    document.body.classList.remove("typing");
-  }, 250));
+  ["guessInput", "trioInput"].forEach(id => {
+    const inp = $(id);
+    inp.addEventListener("focus", () => { const was = document.body.classList.contains("typing"); document.body.classList.add("typing"); if (!was) { top(); setTimeout(top, 350); setTimeout(top, 700); } });
+    inp.addEventListener("blur", () => setTimeout(() => {
+      if (document.activeElement === inp) return;
+      document.body.classList.remove("typing");
+    }, 250));
+  });
+  if (window.visualViewport) visualViewport.addEventListener("resize", top);
 })();
 </script>
 </body>
