@@ -291,6 +291,25 @@ body:not(.home-bg) .playcount{display:none}
   #home .big small{font-size:12.5px;line-height:1.3;display:block}
   #home .card.compact{padding:9px 14px;margin:76px 0 0}
   #home #playCount:not(.hide)+.card.compact{margin-top:8px}
+
+/* groupes d'amis (25/11) */
+#grpModal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}
+#grpModal.hide{display:none}
+#grpModal .qmBox{max-width:360px;width:100%;text-align:center;margin:0;background:#0b2413}
+#grpModal h2{margin:0 0 6px;font-size:19px}
+#grpModal p{margin:0 0 10px;font-size:14.5px;line-height:1.4}
+#grpModal input{width:100%;box-sizing:border-box;margin-top:4px;text-align:center;font-size:16px}
+#grpModal button{display:block;width:80%;margin:12px auto 0}
+#grpModal .gName{font-family:"Barlow Condensed",sans-serif;font-size:25px;font-weight:600;color:var(--accent);margin:2px 0 10px;overflow-wrap:anywhere}
+#grpModal .gRow{display:flex;gap:8px;margin-top:4px}#grpModal .gRow button{flex:1 1 0;width:auto;min-width:0;margin:8px 0 0;font-size:14px;padding-left:6px;padding-right:6px}
+#grpModal .msg{min-height:0;margin-top:6px}
+#grpModal #grpNo{margin-top:22px}
+.grpBar{margin:2px 0 0}.rank select.grpSel{width:100%;font-size:16px;padding:8px 10px;background:#fff;color:#1d3a1a;border:0;border-radius:8px}
+.grpCount{text-align:center;margin:6px 0 4px}
+.grpWait{text-align:center;margin-top:8px}
+.grpActs{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px}
+.grpActs .grpInvite{width:100%}
+.rank .linkBtn{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:13px;padding:6px;width:auto}
   #quitModal,#idModal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}
   #quitModal.hide,#idModal.hide{display:none}
   #quitModal .qmBox,#idModal .qmBox{max-width:360px;width:100%;text-align:center;margin:0;background:#0b2413}
@@ -2419,17 +2438,18 @@ async function showClmRank(el, quiet, combo){
     const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&combo=like.tous-*&select=pseudo,found,avg_ms,combo&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { if (!quiet) { el.innerHTML = H3 + sel() + `<div class="small muted">Classement indisponible pour le moment.</div>`; bindSel(); } return; }
+  const GP = await grpPrep(el, rows, (e, q) => showClmRank(e, q, combo), "Pas encore joué aujourd'hui"); rows = GP.rows;
   const me = s.sent || {};
   const mp = (me.pseudo || myPseudo() || "").trim().toLowerCase(), mi = mp ? rows.findIndex(r => (r.pseudo || "").trim().toLowerCase() === mp) : -1;
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">${r.found ? fmtTime(r.avg_ms) : "–"}</td></tr>`;
-  let body = rows.slice(0, 15).map(line).join("");
-  if (mi >= 15) body += (mi > 15 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
-  el.innerHTML = H3 + sel() + `
-    <div class="me-line">${!rows.length ? "Personne n'a encore été classé aujourd'hui." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
-    <table>${body}</table>
+  let body = rows.slice(0, GP.lim).map(line).join("");
+  if (mi >= GP.lim) body += (mi > GP.lim ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
+  el.innerHTML = H3 + GP.bar + sel() + `
+    <div class="me-line">${!rows.length ? (GP.g ? "Personne du groupe n'a encore été classé aujourd'hui." : "Personne n'a encore été classé aujourd'hui.") : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <table>${body}</table>${GP.foot}
     ${el.id === "rankBox" ? "" : `<div class="small muted" style="margin-top:6px">Classement : joueurs trouvés, puis temps moyen.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>`}
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`}`;
-  bindSel(); friendSearch(el, rows, line);
+  bindSel(); GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($(el.id + "ClmRefresh")) $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
 }
 $("btnClm").onclick = clmPick;
@@ -2648,19 +2668,20 @@ async function showRank(el, quiet){
   let rows;
   try { rows = await sbRanking(saved.key); }
   catch(e){ if (!quiet) el.innerHTML = `<h3>Classement des 5 fiches du jour</h3><div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  const GP = await grpPrep(el, rows, (e, q) => showRank(e, q), "Pas encore joué aujourd'hui"); rows = GP.rows;
   const me = saved.sent || {};
   const pk = v => String(v || "").trim().toLowerCase();
   const mi = me.dup ? rows.findIndex(r => pk(r.pseudo) === pk(me.pseudo))   // partie déjà comptée sur un autre appareil : on repère la ligne du pseudo
     : rows.findIndex(r => r.pseudo === me.pseudo && r.found === me.found && r.points === me.points && r.ms === me.ms);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found}/5</td><td class="n">${r.points} pts</td><td class="n">${mmss(r.ms)}</td></tr>`;
-  let body = rows.slice(0, 15).map(line).join("");
-  if (mi >= 15) body += (mi > 15 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
-  el.innerHTML = `<h3>Classement des 5 fiches du jour</h3>
+  let body = rows.slice(0, GP.lim).map(line).join("");
+  if (mi >= GP.lim) body += (mi > GP.lim ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
+  el.innerHTML = `<h3>Classement des 5 fiches du jour</h3>${GP.bar}
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     ${me.dup ? `<div class="small muted" style="margin:0 0 6px">Ton pseudo avait déjà une partie du jour enregistrée sur un autre appareil : seule la première compte.</div>` : ""}
-    <table>${body}</table>
+    <table>${body}</table>${GP.foot}
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="rkRefresh">Actualiser</button></div>`}`;
-  friendSearch(el, rows, line);
+  GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($("rkRefresh")) $("rkRefresh").onclick = () => showRank(el);
 }
 function dailyDoneSub(saved){
@@ -2685,19 +2706,20 @@ async function showWeekRank(el, quiet){
   let rows, last;
   try { [rows, last] = await Promise.all([q(wk), q(prev).catch(() => [])]); }
   catch(e){ if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  const GP = await grpPrep(el, rows, (e, q) => showWeekRank(e, q), "Pas encore joué cette semaine"); rows = GP.rows;
   const ps = (lsGet("ts_pseudo", "") || "").trim().toLowerCase();
   const mi = ps ? rows.findIndex(r => (r.pseudo || "").trim().toLowerCase() === ps) : -1;
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.days}&nbsp;j</td><td class="n">${r.points} pts</td><td class="n">${mmss(r.ms)}</td></tr>`;
-  let body = rows.slice(0, 15).map(line).join("");
-  if (mi >= 15) body += (mi > 15 ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
+  let body = rows.slice(0, GP.lim).map(line).join("");
+  if (mi >= GP.lim) body += (mi > GP.lim ? `<tr><td colspan="5" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   const [y,m,d] = wk.split("-");
   const vainq = last && last.length ? `<div class="small" style="margin-top:8px;text-align:center">Vainqueur de la semaine dernière<br><strong>${esc(last[0].pseudo)}</strong> · ${last[0].points}&nbsp;pts</div>` : "";
-  el.innerHTML = H3 + `
-    <div class="me-line">${!rows.length ? "Personne n'a encore joué cette semaine." : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+  el.innerHTML = H3 + GP.bar + `
+    <div class="me-line">${!rows.length ? (GP.g ? "Personne du groupe n'a encore joué cette semaine." : "Personne n'a encore joué cette semaine.") : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     ${rows.length ? `<table>${body}</table>` : ""}
-    ${vainq}
+    ${GP.g ? "" : vainq}${GP.foot}
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="wkRefresh">Actualiser</button></div>`}`;
-  friendSearch(el, rows, line);
+  GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($("wkRefresh")) $("wkRefresh").onclick = () => showWeekRank(el);
 }
 let RANK_FROM = null, RANK_Y = 0;
@@ -2707,7 +2729,157 @@ function openRank(render){
   show("rankView");
   const box = $("viewRankBox");
   render(box, false);
-  window._rankLive = setInterval(() => { if (!box.querySelector("input:not(.fsInput)") && !(document.activeElement && document.activeElement.classList.contains("fsInput"))) render(box, true); }, 30000);
+  window._rankLive = setInterval(() => { if (!box.querySelector("input:not(.fsInput)") && !(document.activeElement && (document.activeElement.classList.contains("fsInput") || document.activeElement.classList.contains("grpSel"))) && !($("grpModal") && !$("grpModal").classList.contains("hide"))) render(box, true); }, 30000);
+}
+
+/* ---------- groupes d'amis (25/11/2026, choix de Maxime) ----------
+   Supabase : tables grp / grp_members (fermées) et fonctions grp_create, grp_join, grp_leave, grp_info, grp_mine (jeton du pseudo vérifié).
+   Classement d'un groupe = classement général filtré sur ses membres, affiché en entier (pas de limite à 15).
+   Menu déroulant en haut de chaque classement ; dernier choix mémorisé pour tous les jeux (ts_grp_sel).
+   « Pas encore joué » : membres actifs seulement (a = a joué ou rejoint le groupe depuis 7 jours). Lien d'invitation : ?g=CODE.
+   Limites côté Supabase : 10 groupes par joueur, 100 membres par groupe, nom de 30 caractères. */
+const pkeyOf = v => String(v || "").trim().toLowerCase();
+function grpList(){ return lsGet("ts_groups", []) || []; }
+function grpCur(){
+  const c = lsGet("ts_grp_sel", ""), g = c && grpList().find(x => x.code === c);
+  return g ? { ...g, set: new Set((g.members || []).map(m => pkeyOf(m.p))) } : null;
+}
+async function grpRpc(fn, args){
+  const r = await fetch(SB_URL + "/rpc/" + fn, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(args) });
+  if (!r.ok) throw new Error(fn + " " + r.status);
+  return r.json();
+}
+let GRP_AT = 0;
+async function grpRefresh(force){
+  if (!hasId()) { if (grpList().length) lsSet("ts_groups", []); return; }
+  if (!force && Date.now() - GRP_AT < 20000) return;
+  try {
+    const d = await grpRpc("grp_mine", { p_pseudo: myPseudo(), p_token: myToken() });
+    if (d && d.status === "ok") { lsSet("ts_groups", d.groups || []); GRP_AT = Date.now(); }
+  } catch(e){}
+}
+/* Prépare un classement : menu des groupes, filtre sur le groupe choisi, pied de groupe (pas encore joué, inviter, quitter) */
+async function grpPrep(el, rows, rerender, waitTxt){
+  await grpRefresh();
+  const g = grpCur(), list = grpList();
+  const opts = `<option value="">Tous les joueurs</option>`
+    + list.map(x => `<option value="${esc(x.code)}"${g && g.code === x.code ? " selected" : ""}>${esc(x.name)}</option>`).join("")
+    + (list.length < 10 ? `<option value="+">+ Créer un groupe</option>` : "");
+  const bar = `<div class="grpBar"><select class="grpSel" aria-label="Classement à afficher">${opts}</select></div>`;
+  if (!g) return { rows, lim: 15, g: null, bar: bar + `<div style="height:8px"></div>`, foot: "", bind: () => grpBind(el, rerender, null) };
+  const f = rows.filter(r => g.set.has(pkeyOf(r.pseudo)));
+  const seen = new Set(f.map(r => pkeyOf(r.pseudo)));
+  const wait = (g.members || []).filter(m => m.a && !seen.has(pkeyOf(m.p))).map(m => esc(m.p));
+  const nb = seen.size + wait.length;
+  return { rows: f, lim: 1e4, g,
+    bar: bar + `<div class="small muted grpCount">${nb} membre${nb > 1 ? "s" : ""}</div>`,
+    foot: (wait.length ? `<div class="small muted grpWait">${waitTxt || "Pas encore joué"} : ${wait.join(", ")}</div>` : "")
+      + `<div class="grpActs"><button type="button" class="grpInvite">Inviter dans ce groupe</button><button type="button" class="grpLeave linkBtn">Quitter le groupe</button></div>`,
+    bind: () => grpBind(el, rerender, g) };
+}
+function grpBind(el, rerender, g){
+  const s = el.querySelector(".grpSel");
+  if (s) s.onchange = () => {
+    if (s.value === "+") { s.value = g ? g.code : ""; grpCreate(() => rerender(el, false)); return; }
+    lsSet("ts_grp_sel", s.value); el.dataset.fq = ""; rerender(el, false);
+  };
+  const i = el.querySelector(".grpInvite"); if (i && g) i.onclick = () => grpShowLink(g.code, g.name, false);
+  const l = el.querySelector(".grpLeave"); if (l && g) l.onclick = () => grpLeave(g, () => rerender(el, false));
+}
+function grpModal(html){
+  let m = $("grpModal");
+  if (!m) { m = document.createElement("div"); m.id = "grpModal"; document.body.appendChild(m); }
+  m.innerHTML = `<div class="qmBox card">${html}</div>`;
+  m.classList.remove("hide");
+  return m;
+}
+function grpClose(){ const m = $("grpModal"); if (m) m.classList.add("hide"); }
+function grpErr(st, verb){
+  return ({ max: `Tu fais déjà partie de 10 groupes : quittes-en un pour ${verb || "en rejoindre un autre"}.`,
+    full: "Ce groupe est complet (100 membres).",
+    unknown: "Ce lien de groupe n'est plus valable.",
+    invalid: "Le nom doit comporter entre 1 et 30 caractères." })[st] || "Connexion impossible pour le moment. Réessaie dans un instant.";
+}
+const grpLink = code => baseUrl() + "?g=" + code;
+function grpCreate(after){
+  if (!hasId()) { askId(() => grpCreate(after), { title: "Ton pseudo" }); return; }
+  grpModal(`<h2>Créer un groupe</h2><p>Donne un nom à ton groupe, puis envoie le lien à tes amis.</p>
+    <input id="grpName" maxlength="30" placeholder="Nom du groupe" autocomplete="off">
+    <div class="msg bad small" id="grpMsg"></div>
+    <button class="primary" type="button" id="grpOk">Créer le groupe</button><button type="button" id="grpNo">Annuler</button>`);
+  setTimeout(() => $("grpName") && $("grpName").focus(), 50);
+  $("grpNo").onclick = grpClose;
+  $("grpName").onkeydown = e => { if (e.key === "Enter") $("grpOk").click(); };
+  $("grpOk").onclick = async () => {
+    const n = $("grpName").value.trim();
+    if (!n) { $("grpMsg").textContent = "Indique un nom de groupe."; return; }
+    $("grpOk").disabled = true;
+    let d; try { d = await grpRpc("grp_create", { p_pseudo: myPseudo(), p_token: myToken(), p_name: n }); } catch(e){ d = { status: "net" }; }
+    $("grpOk").disabled = false;
+    if (d.status === "token") { idForget(); grpClose(); askId(() => grpCreate(after), { title: "Confirme ton pseudo" }); return; }
+    if (d.status !== "ok") { $("grpMsg").textContent = grpErr(d.status, "en créer un autre"); return; }
+    lsSet("ts_grp_sel", d.code); await grpRefresh(true);
+    grpShowLink(d.code, d.name, true);
+    if (after) after();
+  };
+}
+function grpShowLink(code, name, created){
+  const url = grpLink(code);
+  grpModal(`<h2>${created ? "Groupe créé" : "Inviter dans le groupe"}</h2><div class="gName">${esc(name)}</div>
+    <p>Envoie ce lien à tes amis pour qu'ils rejoignent le groupe.</p>
+    <div class="gRow"><button class="primary" type="button" id="grpWa">WhatsApp</button><button type="button" id="grpCopy">Copier le lien</button></div>
+    <div class="msg small" id="grpMsg"></div><button type="button" id="grpNo">Fermer</button>`);
+  $("grpWa").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(`Rejoins mon groupe « ${name} » sur TALL&small players :\n` + url), "_blank", "noopener");
+  $("grpCopy").onclick = async () => { try { await navigator.clipboard.writeText(url); $("grpMsg").textContent = "Lien copié."; } catch(e){ $("grpMsg").textContent = url; } };
+  $("grpNo").onclick = grpClose;
+}
+function grpLeave(g, after){
+  grpModal(`<h2>Quitter le groupe ?</h2><div class="gName">${esc(g.name)}</div>
+    <p>Tu pourras le rejoindre plus tard avec le lien d'invitation.</p>
+    <div class="msg bad small" id="grpMsg"></div>
+    <button class="primary" type="button" id="grpOk">Quitter le groupe</button><button type="button" id="grpNo">Annuler</button>`);
+  $("grpNo").onclick = grpClose;
+  $("grpOk").onclick = async () => {
+    $("grpOk").disabled = true;
+    let d; try { d = await grpRpc("grp_leave", { p_pseudo: myPseudo(), p_token: myToken(), p_code: g.code }); } catch(e){ d = { status: "net" }; }
+    $("grpOk").disabled = false;
+    if (d.status === "token") { idForget(); grpClose(); askId(() => grpLeave(g, after), { title: "Confirme ton pseudo" }); return; }
+    if (d.status !== "ok") { $("grpMsg").textContent = grpErr(d.status); return; }
+    lsSet("ts_grp_sel", ""); await grpRefresh(true); grpClose(); if (after) after();
+  };
+}
+/* Ouverture d'un lien d'invitation ?g=CODE */
+async function grpInvite(code){
+  let info; try { info = await grpRpc("grp_info", { p_code: code }); } catch(e){ return; }
+  if (!info) { grpModal(`<h2>Groupe introuvable</h2><p>Ce lien de groupe n'est plus valable.</p><button type="button" id="grpNo">Fermer</button>`); $("grpNo").onclick = grpClose; return; }
+  await grpRefresh(true);
+  if (grpList().some(x => x.code === info.code)) {
+    lsSet("ts_grp_sel", info.code);
+    grpModal(`<h2>Tu fais déjà partie du groupe</h2><div class="gName">${esc(info.name)}</div><button class="primary" type="button" id="grpNo">Fermer</button>`);
+    $("grpNo").onclick = grpClose; return;
+  }
+  grpModal(`<h2>Tu es invité dans le groupe</h2><div class="gName">${esc(info.name)}</div>
+    <p class="small muted">${info.members} membre${info.members > 1 ? "s" : ""}</p>
+    <div class="msg bad small" id="grpMsg"></div>
+    <button class="primary" type="button" id="grpOk">Rejoindre le groupe</button><button type="button" id="grpNo">Plus tard</button>`);
+  $("grpNo").onclick = grpClose;
+  $("grpOk").onclick = () => grpJoin(info);
+}
+async function grpJoin(info){
+  if (!hasId()) { grpClose(); askId(() => grpJoin(info), { title: "Ton pseudo" }); return; }
+  if ($("grpOk")) $("grpOk").disabled = true;
+  let d; try { d = await grpRpc("grp_join", { p_pseudo: myPseudo(), p_token: myToken(), p_code: info.code }); } catch(e){ d = { status: "net" }; }
+  if ($("grpOk")) $("grpOk").disabled = false;
+  if (d.status === "token") { idForget(); grpClose(); askId(() => grpJoin(info), { title: "Confirme ton pseudo" }); return; }
+  if (d.status !== "ok") {
+    if (!$("grpMsg")) grpInvite(info.code);
+    setTimeout(() => { if ($("grpMsg")) $("grpMsg").textContent = grpErr(d.status); }, $("grpMsg") ? 0 : 600);
+    return;
+  }
+  lsSet("ts_grp_sel", d.code); await grpRefresh(true);
+  grpModal(`<h2>Bienvenue dans le groupe</h2><div class="gName">${esc(d.name)}</div>
+    <p>Le classement du groupe s'affiche dans le classement de chaque jeu.</p><button class="primary" type="button" id="grpNo">Jouer</button>`);
+  $("grpNo").onclick = grpClose;
 }
 
 /* ---------- Qui a joué dans ces 2 clubs ? ---------- */
@@ -2867,17 +3039,18 @@ async function showTrioRank(el, quiet, view){
     const r = await fetch(SB_URL + "/trio_ranking_all?select=pseudo,points,found,played&order=points.desc,played.asc&limit=1000", { headers: { apikey: SB_KEY } });
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
+  const GP = await grpPrep(el, rows, (e, q) => showTrioRank(e, q, view), "Pas encore joué"); rows = GP.rows;
   const best = lsGet("ts_trio_best3", null) || { points: -1 };
   const mi = rows.findIndex(r => r.pseudo === ps && r.points === best.points);
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">sur ${r.played}</td></tr>`;
-  let body = rows.slice(0, 15).map(line).join("");
-  if (mi >= 15) body += (mi > 15 ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
+  let body = rows.slice(0, GP.lim).map(line).join("");
+  if (mi >= GP.lim) body += (mi > GP.lim ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   const endBox = el.id === "trioRankBox";   /* fin de partie : classement sans titre ni note, comme le contre-la-montre (choix de Maxime, 25/11) */
-  el.innerHTML = (endBox ? "" : H3) + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
-    <table>${body}</table>
+  el.innerHTML = (endBox ? "" : H3) + GP.bar + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <table>${body}</table>${GP.foot}
     ${endBox ? "" : `<div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 2 minutes.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>`}
     ${el.id === "trioRankBox" ? "" : `<div class="row"><button id="${el.id}TrioRefresh">Actualiser</button></div>`}`;
-  friendSearch(el, rows, line);
+  GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($(el.id + "TrioRefresh")) $(el.id + "TrioRefresh").onclick = () => showTrioRank(el, false, view);
 }
 function rankBtns(){
@@ -3139,7 +3312,7 @@ if (/[?&]jour\b/.test(location.search)) { show("dailyPage"); dpRender(); }
 /* Première ouverture du site sur ce navigateur : pseudo + code proposés tout de suite (« Plus tard » possible : reproposé à la prochaine visite).
    Pas sur un lien de défi : le pseudo y est demandé en appuyant sur « Commencer ». */
 (function(){
-  if (hasId() || /[?&#]d=/.test(location.search + location.hash)) return;
+  if (hasId() || /[?&#][dg]=/.test(location.search + location.hash)) return;   /* lien de défi ou de groupe : pseudo demandé au moment voulu */
   try { if (sessionStorage.getItem("ts_id_later")) return; } catch(e){}
   setTimeout(() => askId(null, { title: "Bienvenue !", cancel: "Jouer sans login",
     onCancel: () => { try { sessionStorage.setItem("ts_id_later", "1"); } catch(e){} } }), 400);
@@ -3151,6 +3324,14 @@ if (/[?&]jour\b/.test(location.search)) { show("dailyPage"); dpRender(); }
   const code = extractToken(s);
   if (SHORT_RE.test(code)) { resolveShort(code).then(tok => openDefi(readDefi(tok))).catch(() => {}); return; }
   try { openDefi(readDefi(s)); } catch(e){}
+})();
+
+/* Ouverture directe d'un lien d'invitation à un groupe (?g=CODE) */
+(function(){
+  const m = /[?&]g=([A-Za-z0-9]{6})(?![A-Za-z0-9])/.exec(location.search);
+  if (!m) return;
+  try { history.replaceState(null, "", location.pathname); } catch(e){}
+  setTimeout(() => grpInvite(m[1].toUpperCase()), 300);
 })();
 
 /* ---------- installation sur l'écran d'accueil ---------- */
