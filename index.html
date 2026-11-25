@@ -96,6 +96,7 @@
   .result.lost{border-left-color:var(--bad)}
   .muted{color:var(--muted)}
   .rank{margin-bottom:12px}
+  .rank .rkSub{text-align:center;font-size:15px;color:var(--text);margin:-2px 0 10px}   /* sous-titre centré sous le titre du jeu (26/11) */
   .rank h3{margin:0 0 6px;font-size:17px;text-align:center;color:var(--accent)}
   .dailyWrap{display:flex;flex-direction:column;position:relative}
   #home .big{text-align:center;align-items:center}
@@ -567,7 +568,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
         <li>Le nom de famille suffit (accents et majuscules ignorés). Une faute de frappe est tolérée à partir de 7&nbsp;lettres.</li>
         <li>2 minutes pour trouver le plus de joueurs possible. Une nouvelle fiche arrive toutes les 30 secondes. Avant de jouer, choisis un ou plusieurs niveaux et une ou plusieurs époques (ou « Tous » et « Toutes ») ; le téléphone retient le dernier choix.</li>
         <li>Une seule proposition par fiche, sans indice : juste ou fausse, la fiche suivante arrive.</li>
-        <li>Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : tu peux rejouer autant que tu veux : le classement du jour retient ton meilleur score, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Les fiches sont tirées au hasard à chaque partie. Les autres combinaisons servent d'entraînement.</li>
+        <li>Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : tu peux rejouer autant que tu veux : le classement de la semaine (du lundi au dimanche) retient ton meilleur score, d'abord au nombre de joueurs trouvés, puis au temps moyen de réponse. Les fiches sont tirées au hasard à chaque partie. Les autres combinaisons servent d'entraînement.</li>
       </ul></div>
       <div class="rsec" data-g="defi"><h3>Défi entre amis</h3>
       <ul>
@@ -584,7 +585,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
         <li>Un joueur qui n'est pas dans notre base ne compte pas comme une erreur : tu peux proposer un autre nom.</li>
         <li>Pas d'indice. « Passer » permet de changer de paire.</li>
         <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : les autres servent d'entraînement.</li>
-        <li>Le score est le nombre de paires trouvées. Le classement général retient le meilleur score de chaque joueur ; à égalité, celui qui a vu le moins de paires passe devant. Une partie quittée avant la fin n'est pas classée.</li>
+        <li>Le score est le nombre de paires trouvées. Le classement de la semaine (du lundi au dimanche) retient le meilleur score de chaque joueur ; à égalité, celui qui a vu le moins de paires passe devant. Une partie quittée avant la fin n'est pas classée.</li>
       </ul></div>
       <h3 class="jeuLibre">Jeu libre</h3>
       <ul class="jeuLibre">
@@ -2439,14 +2440,14 @@ async function showClmRank(el, quiet, combo){
   el.dataset.combo = combo;
   const s = Object.assign({ key: d.key, combo }, d.games[combo] || {});
   el.classList.remove("hide");
-  const H3 = el.id === "rankBox" ? "" : `<h3>Classement du Contre-la-montre</h3>`;   /* fin de partie : titre retiré (24/11) */
+  const H3 = el.id === "rankBox" ? "" : `<h3>Contre-la-montre</h3><div class="rkSub">Classement de la semaine</div>`;   /* fin de partie : titre retiré (24/11) */
   const sel = () => ""; const selOld = () => { const [lv, era] = combo.split("-");
     return `<div class="clmSel"><select id="${el.id}ClmLv">${Object.entries(CLM_LV).map(([k,v]) => `<option value="${k}" ${k===lv?"selected":""}>${v}</option>`).join("")}</select>`
       + `<select id="${el.id}ClmEra">${CLM_ERA_ORDER.map(k => [k, CLM_ERA[k]]).map(([k,v]) => `<option value="${k}" ${k===era?"selected":""}>${v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join("")}</select></div>`; };
   const bindSel = () => { const f = () => showClmRank(el, false, $(el.id+"ClmLv").value + "-" + $(el.id+"ClmEra").value); if ($(el.id+"ClmLv")) { $(el.id+"ClmLv").onchange = f; $(el.id+"ClmEra").onchange = f; } };
   if (s.done && !s.sent) {
     const ps = myPseudo();
-    if (!hasId()) { idPrompt(el, H3, "Choisis ton pseudo pour apparaître dans le classement du jour.", () => showClmRank(el, false, combo)); return; }
+    if (!hasId()) { idPrompt(el, H3, "Choisis ton pseudo pour apparaître dans le classement de la semaine.", () => showClmRank(el, false, combo)); return; }
     el.innerHTML = H3 + `<div class="small muted">Envoi de ton score…</div>`;
     try {
       const r = await fetch(SB_URL + "/clm_scores", { method: "POST",
@@ -2461,19 +2462,21 @@ async function showClmRank(el, quiet, combo){
   bindSel();
   let rows;
   try {
-    const r = await fetch(SB_URL + "/clm_ranking?day=eq." + s.key + "&combo=like.tous-*&select=pseudo,found,avg_ms,combo&order=found.desc,avg_ms.asc&limit=1000", { headers: { apikey: SB_KEY } });
-    if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
+    /* classement de la semaine (lundi-dimanche) : meilleure partie de chaque pseudo (26/11, demande de Maxime) */
+    const r = await fetch(SB_URL + "/clm_ranking?day=gte." + weekKey(todayKey()) + "&combo=like.tous-*&select=pseudo,found,avg_ms,combo&order=found.desc,avg_ms.asc&limit=5000", { headers: { apikey: SB_KEY } });
+    if (!r.ok) throw new Error("lecture " + r.status);
+    const seen = new Set(); rows = (await r.json()).filter(x => { const k = (x.pseudo || "").trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   } catch(e) { if (!quiet) { el.innerHTML = H3 + sel() + `<div class="small muted">Classement indisponible pour le moment.</div>`; bindSel(); } return; }
-  const GP = await grpPrep(el, rows, (e, q) => showClmRank(e, q, combo), "Pas encore joué aujourd'hui"); rows = GP.rows;
+  const GP = await grpPrep(el, rows, (e, q) => showClmRank(e, q, combo), "Pas encore joué cette semaine"); rows = GP.rows;
   const me = s.sent || {};
   const mp = (me.pseudo || myPseudo() || "").trim().toLowerCase(), mi = mp ? rows.findIndex(r => (r.pseudo || "").trim().toLowerCase() === mp) : -1;
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">${r.found ? fmtTime(r.avg_ms) : "–"}</td></tr>`;
   let body = rows.slice(0, GP.lim).map(line).join("");
   if (mi >= GP.lim) body += (mi > GP.lim ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   el.innerHTML = H3 + GP.bar + sel() + `
-    <div class="me-line">${!rows.length ? (GP.g ? "Personne du groupe n'a encore été classé aujourd'hui." : "Personne n'a encore été classé aujourd'hui.") : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
+    <div class="me-line">${!rows.length ? (GP.g ? "Personne du groupe n'a encore été classé cette semaine." : "Personne n'a encore été classé cette semaine.") : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>${GP.foot}
-    ${el.id === "rankBox" ? "" : `<div class="small muted" style="margin-top:6px">Classement : joueurs trouvés, puis temps moyen.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>`}
+    
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}ClmRefresh">Actualiser</button></div>`}`;
   bindSel(); GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($(el.id + "ClmRefresh")) $(el.id + "ClmRefresh").onclick = () => showClmRank(el, false, combo);
@@ -3045,7 +3048,7 @@ $("trioAgain").onclick = trioChoose;
 $("trioShare").onclick = () => { G = { mode: "trio" }; $("shareImg").onclick(); };
 $("trioRankBtn").onclick = () => openRank((el, q) => showTrioRank(el, q, true));
 async function showTrioRank(el, quiet, view){
-  const H3 = "<h3>Classement de « Qui a joué dans ces 2 clubs ? »</h3>";
+  const H3 = "<h3>Qui a joué dans ces 2 clubs ?</h3><div class=\"rkSub\">Classement de la semaine</div>";
   el.classList.remove("hide");
   const ps = myPseudo();
   if (!view && !TRIO.sent) {
@@ -3062,19 +3065,18 @@ async function showTrioRank(el, quiet, view){
   } else if (!quiet) el.innerHTML = H3 + `<div class="small muted">Chargement du classement…</div>`;
   let rows;
   try {
-    const r = await fetch(SB_URL + "/trio_ranking_all?select=pseudo,points,found,played&order=points.desc,played.asc&limit=1000", { headers: { apikey: SB_KEY } });
+    const r = await fetch(SB_URL + "/trio_ranking_week?week=eq." + weekKey(todayKey()) + "&select=pseudo,points,found,played&order=points.desc,played.asc&limit=1000", { headers: { apikey: SB_KEY } });   /* classement de la semaine (26/11, demande de Maxime ; vue Supabase trio_ranking_week) */
     if (!r.ok) throw new Error("lecture " + r.status); rows = await r.json();
   } catch(e) { if (!quiet) el.innerHTML = H3 + `<div class="small muted">Classement indisponible pour le moment.</div>`; return; }
-  const GP = await grpPrep(el, rows, (e, q) => showTrioRank(e, q, view), "Pas encore joué"); rows = GP.rows;
-  const best = lsGet("ts_trio_best3", null) || { points: -1 };
-  const mi = rows.findIndex(r => r.pseudo === ps && r.points === best.points);
+  const GP = await grpPrep(el, rows, (e, q) => showTrioRank(e, q, view), "Pas encore joué cette semaine"); rows = GP.rows;
+  const mi = ps ? rows.findIndex(r => (r.pseudo || "").trim().toLowerCase() === ps.trim().toLowerCase()) : -1;
   const line = (r, i) => `<tr class="${i === mi ? "me" : ""}"><td>${rangTxt(i+1)}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.found} trouvé${r.found>1?"s":""}</td><td class="n">sur ${r.played}</td></tr>`;
   let body = rows.slice(0, GP.lim).map(line).join("");
   if (mi >= GP.lim) body += (mi > GP.lim ? `<tr><td colspan="4" class="muted">…</td></tr>` : "") + line(rows[mi], mi);
   const endBox = el.id === "trioRankBox";   /* fin de partie : classement sans titre ni note, comme le contre-la-montre (choix de Maxime, 25/11) */
   el.innerHTML = (endBox ? "" : H3) + GP.bar + `<div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     <table>${body}</table>${GP.foot}
-    ${endBox ? "" : `<div class="small muted" style="margin-top:6px">Meilleur score de chaque joueur sur 2 minutes.${el.id === "viewRankBox" ? " Mise à jour toutes les 30 secondes." : ""}</div>`}
+    
     ${el.id === "trioRankBox" ? "" : `<div class="row"><button id="${el.id}TrioRefresh">Actualiser</button></div>`}`;
   GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($(el.id + "TrioRefresh")) $(el.id + "TrioRefresh").onclick = () => showTrioRank(el, false, view);
