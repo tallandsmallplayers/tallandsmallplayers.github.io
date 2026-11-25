@@ -545,7 +545,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
       <ul>
         <li>Le nom de famille suffit (accents et majuscules ignorés). Une faute de frappe est tolérée à partir de 7&nbsp;lettres.</li>
         <li>Deux clubs s'affichent : trouve un joueur de notre base qui a joué dans les deux (les prêts comptent, les équipes réserves non). Une partie dure 2 minutes.</li>
-        <li>Une seule proposition par paire. S'il y a plusieurs réponses possibles, leur nombre est indiqué ; une seule suffit.</li>
+        <li>Une seule proposition par paire. Chaque paire a au moins deux réponses possibles dans notre base, et leur nombre est indiqué ; une seule suffit.</li>
         <li>Un joueur qui n'est pas dans notre base ne compte pas comme une erreur : tu peux proposer un autre nom.</li>
         <li>Pas d'indice. « Passer » permet de changer de paire.</li>
         <li>Avant de jouer, choisis un ou plusieurs niveaux (ou « Tous ») et une ou plusieurs époques (ou « Toutes ») ; le téléphone retient le dernier choix. Seules les parties « Tous » niveaux sont classées, quelles que soient les époques cochées : les autres servent d'entraînement.</li>
@@ -2724,17 +2724,18 @@ function trioData(){
 let TRIO = null;
 function trioPick(){
   const D = trioData();
-  for (let k = 0; k < 50; k++){
+  for (let k = 0; k < 200; k++){
     const pool = trioPool(TRIO);
     const [, cs] = pool[Math.floor(Math.random() * pool.length)];
     const pick = shuffle(cs.slice()).slice(0,2).sort((a,b) => a.localeCompare(b));
     const key = pick.join("|");
-    if (TRIO.seen.has(key) && k < 49) continue;
+    if (TRIO.seen.has(key) && k < 199) continue;
     TRIO.seen.add(key);
     const sol = []; D.sets.forEach((s,i) => { if (pick.every(c => s.has(c))) sol.push(i); });
+    if (sol.length < 2 && k < 199) continue;   /* au moins 2 joueurs possibles dans la base (25/11, choix de Maxime) */
     const order = ["facile","moyen","difficile"];
     const level = order[Math.min(...sol.map(i => order.indexOf(PLAYERS[i].d)).filter(x => x >= 0))] || "moyen";   // niveau du trio : celui du joueur le plus facile à trouver
-    if (TRIO.lv.length && !TRIO.lv.includes(level) && k < 49) continue;
+    if (TRIO.lv.length && !TRIO.lv.includes(level) && k < 199) continue;
     return { clubs: pick, sol, level };
   }
 }
