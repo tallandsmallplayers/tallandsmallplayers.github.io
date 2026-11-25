@@ -205,7 +205,10 @@ body.typing #guessInput,body.typing #guessForm button{padding-top:7px;padding-bo
 body.typing #clmTime{font-size:13px}
 body.typing #clmLive{margin:-2px 0 6px}
 body.typing #guessCard{padding:8px 10px}
-body.typing #careerCard{margin-bottom:0}
+body.typing #careerCard{margin-bottom:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+body.typing:has(#game:not(.hide)){overflow:hidden}
+body.typing:has(#game:not(.hide)) footer{display:none}
+body.typing #careerCard thead th{position:sticky;top:-6px;z-index:1;background:#0c2213}
 body.typing #guessCard{position:sticky;top:0;border-radius:10px;margin-bottom:8px}
 body.typing div.wrap{padding-top:8px}
 body.typing #trio>.back{margin:0 0 6px;font-size:14px}
@@ -3223,16 +3226,24 @@ loadPlayCount();
 // Mode saisie (téléphone) : clavier ouvert -> en-tête réduit, réponse en haut (fixe au défilement), carrière complète dessous
 (() => {
   if (!window.matchMedia || !matchMedia("(pointer:coarse)").matches) return;
-  const top = () => { if (document.body.classList.contains("typing")) window.scrollTo(0, 0); };
+  /* 25/11 (demande de Maxime) : pendant la saisie, le haut de l'écran reste fixe et seule la fiche défile */
+  const fit = () => {
+    const c = $("careerCard"); if (!c) return;
+    if (!document.body.classList.contains("typing") || $("game").classList.contains("hide")) { c.style.maxHeight = ""; c.style.overflowY = ""; return; }
+    const vv = window.visualViewport, h = vv ? vv.height + vv.offsetTop : window.innerHeight;
+    c.style.maxHeight = Math.max(120, Math.floor(h - c.getBoundingClientRect().top - 8)) + "px"; c.style.overflowY = "auto";
+  };
+  const top = () => { if (document.body.classList.contains("typing")) window.scrollTo(0, 0); fit(); };
   ["guessInput", "trioInput"].forEach(id => {
     const inp = $(id);
     inp.addEventListener("focus", () => { const was = document.body.classList.contains("typing"); document.body.classList.add("typing"); if (!was) { top(); setTimeout(top, 350); setTimeout(top, 700); } });
     inp.addEventListener("blur", () => setTimeout(() => {
       if (document.activeElement === inp) return;
-      document.body.classList.remove("typing");
+      document.body.classList.remove("typing"); fit();
     }, 250));
   });
-  if (window.visualViewport) visualViewport.addEventListener("resize", top);
+  if (window.visualViewport) { visualViewport.addEventListener("resize", top); visualViewport.addEventListener("scroll", fit); }
+  window.addEventListener("resize", fit);
 })();
 </script>
 </body>
