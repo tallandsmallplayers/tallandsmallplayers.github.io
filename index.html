@@ -313,6 +313,7 @@ body:not(.home-bg) .playcount{display:none}
 #home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}#presetHits .pick{color:#7bd88f;text-decoration:underline}.pickTitle{text-align:center;white-space:nowrap;font-size:20px}.pickDesc{min-height:0;font-size:min(14px,3.2vw)!important}.pickTitle .ico{width:22px;height:22px;vertical-align:-3px;margin-right:9px;color:var(--accent)}.pickTitle.gameTitle{font-size:17px;margin:0 0 8px}.pickTitle.gameTitle .ico{width:18px;height:18px;margin-right:7px}.gameTitle .badge{margin-left:8px;vertical-align:2px}#trioPick:not(.hide)~#trioTitle{display:none}#dpTrain .lbl,#dtCount{text-align:center}
 .dpSum{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}.dpDots{display:inline-flex;gap:6px}.dpDot{width:14px;height:14px;border-radius:50%;display:inline-block}.dpDot.ok{background:#2ecc71}.dpDot.ko{background:#eb5757}
 #dpDesc.played .dpD1{display:none}#dpDesc.played .dpD2{font-size:12px}
+#create label.lbl{font-size:16px;color:var(--text,#f4f7f2);margin:12px 0 6px}#create label.lbl#presetLabel{margin-top:4px}#defiDuree{display:grid;gap:6px;grid-template-columns:repeat(4,1fr)}#defiDuree button{padding:8px 2px;font-size:14px;min-width:0;line-height:normal}.pickTitle .ico.ico3{width:27px}
 </style>
 </head>
 <body class="home-bg">
@@ -608,9 +609,10 @@ body:not(.home-bg) .playcount{display:none}
   <section id="create" class="hide">
     <button class="rulesLink" type="button" data-rules="defi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><path d="M12 10.5v6" stroke-linecap="round"/><circle cx="12" cy="7.3" r="1.1" fill="currentColor" stroke="none"/></svg>Règles</button>
     <button class="back" data-home>← Accueil</button>
-    <div class="card">
-      <h2>Défi entre amis</h2>
-      <label for="presetSearch" id="presetLabel">Choisir un joueur de la base</label>
+    <div class="card clmPickCard">
+      <h2 class="pickTitle"><svg class="ico ico3" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="8.5" r="2.5"/><path d="M1.5 18.5c0-2.6 1.8-4.6 4-4.6 1 0 1.9.3 2.6.9"/><circle cx="22.5" cy="8.5" r="2.5"/><path d="M26.5 18.5c0-2.6-1.8-4.6-4-4.6-1 0-1.9.3-2.6.9"/><circle cx="14" cy="7.5" r="3.1"/><path d="M8.3 20.5c0-3.3 2.6-6 5.7-6s5.7 2.7 5.7 6"/></svg>Défi entre amis</h2>
+      <p class="small muted pickDesc" style="margin:0 0 10px;text-align:center">Choisis un joueur et fais-le deviner à tes amis.</p>
+      <label for="presetSearch" id="presetLabel" class="lbl">Choisir un joueur de la base</label>
       <input id="presetSearch" placeholder="Ex. : Zidane" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <div id="presetHits"></div>
       <select id="preset" hidden style="display:none"><option value="">— Choisis un joueur —</option></select>
@@ -633,13 +635,11 @@ body:not(.home-bg) .playcount{display:none}
       <label for="cRows">Carrière : une saison par ligne, au format « saison ; club ; matchs ; buts »</label>
       <textarea id="cRows" placeholder="1992-93 ; Bordeaux ; 35 ; 10&#10;1993-94 ; Bordeaux ; 34 ; 6"></textarea>
       </div>
-      <label>Lien valable</label>
+      <label class="lbl">Lien valable</label>
       <div class="levels" id="defiDuree"><button type="button" data-v="300">5 min</button><button type="button" data-v="900">15 min</button><button type="button" data-v="3600" class="on">1 h</button><button type="button" data-v="10800">3 h</button></div>
       <div class="msg bad" id="createMsg"></div>
-      <div class="row" style="margin-top:8px">
-        <button class="primary" id="genCode" style="flex:0 0 auto">Créer le lien du défi</button>
-        <button id="testCode" class="hide" style="flex:0 0 auto">Tester le défi</button>
-      </div>
+      <button class="primary" id="genCode" style="width:100%;margin-top:12px">Créer le lien du défi</button>
+      <button id="testCode" class="hide" style="width:100%;margin-top:10px">Tester le défi</button>
       <div id="codeBox" class="hide" style="margin-top:14px">
         <label>Lien à envoyer</label>
         <code class="code" id="codeOut"></code>
