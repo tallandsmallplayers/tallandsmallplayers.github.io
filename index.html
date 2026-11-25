@@ -2260,7 +2260,7 @@ function clmSub(){
   const s = clmSaved();
   $("clmSub").innerHTML = s && s.done
     ? `Dernière partie : ${s.found}${s.seen ? "/" + s.seen : ""} trouvé${s.found>1?"s":""}`
-      + (s.res && s.res.length ? `<span class="sq">${s.res.map(x => x ? "🟩" : "⬛").join("")}</span>` : "")
+      + (s.res && s.res.length ? `<span class="sq">${s.res.map(x => x ? "🟢" : "🔴").join("")}</span>` : "")
     : "30 secondes maximum par fiche";
 }
 const clmPool = sel => PLAYERS.filter(p => (!sel.lv.length || sel.lv.includes(p.d)) && (!sel.era.length || sel.era.includes(p.e)));
@@ -2452,7 +2452,8 @@ function dailyPick(key){
   }
   return DP_CACHE[key];
 }
-const SYMB = r => !r.won ? "⬛" : r.tries === 0 ? "🟩" : r.tries === 1 ? "🟨" : "🟧";
+const SYMB = r => !r.won ? "🔴" : r.tries === 0 ? "🟢" : r.tries === 1 ? "🟡" : "🟠";
+const DOTS = res => `<span class="dpDots">${res.map(r => `<span class="dpDot ${r.won ? "ok" : "ko"}"></span>`).join("")}</span>`;
 const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 function fmtDate(key){ const [y,m,d] = key.split("-"); return `${Number(d)} ${MOIS[Number(m)-1]} ${y.slice(2)}`; }
 function dailyShareText(key, res, ms){
@@ -2490,7 +2491,7 @@ function dailyEnd(won){
   if (DAILY.train) {   // entraînement : ni enregistrement, ni classement, ni partage
     renderSession(); $("shareImg").classList.add("hide");
     const t = DAILY.res.reduce((s,r)=>s+r.pts,0), f = DAILY.res.filter(r=>r.won).length;
-    if (last) $("resultText").insertAdjacentHTML("beforeend", `<span class="finRes"><span class="sq">${DAILY.res.map(SYMB).join("")}</span></span>`);
+    if (last) $("resultText").insertAdjacentHTML("beforeend", `<span class="finRes">${DOTS(DAILY.res)}</span>`);
     return;
   }
   lsSet("ts_daily", { key: DAILY.key, res: DAILY.res, start: DAILY.start, end: DAILY.end });
@@ -2500,7 +2501,7 @@ function dailyEnd(won){
     $("shareImg").classList.add("hide");   // partage seulement à la fin de la partie
   } else {
     const f = DAILY.res.filter(r=>r.won).length;
-    $("resultText").insertAdjacentHTML("beforeend", `<span class="finRes"><span class="sq">${DAILY.res.map(SYMB).join("")}</span></span>`);
+    $("resultText").insertAdjacentHTML("beforeend", `<span class="finRes">${DOTS(DAILY.res)}</span>`);
     G.shareText = baseUrl() + "?jour";   // l'image porte le résultat : le message ne contient que le lien
     /* fin de partie : deux boutons vers les classements plutôt que le tableau ; le score est envoyé en arrière-plan */
     $("resultText").insertAdjacentHTML("beforeend", `<span class="dpRanks endRanks"><button id="endRankDay">Classement du jour</button><button id="endRankWeek">Classement de la semaine</button></span>`);
@@ -3022,9 +3023,9 @@ function drawScoreCard(){
   x.fillStyle = "#ffffff"; x.font = "700 220px 'Barlow Condensed', Arial, sans-serif"; x.fillText(d.big, W/2, 760);
   if (d.unit) { x.fillStyle = "#cfdcd2"; x.font = "500 54px Barlow, Arial, sans-serif"; x.fillText(d.unit, W/2, 840); }
   x.fillStyle = "#ffffff"; x.font = "500 44px Barlow, Arial, sans-serif"; x.fillText(d.line, W/2, 930);
-  const col = r => !r.won ? "#2b2b2b" : r.tries === 0 ? "#3fbf5f" : r.tries === 1 ? "#f2c94c" : "#f08a3c";
+  const col = r => !r.won ? "#eb5757" : r.tries === 0 ? "#2ecc71" : r.tries === 1 ? "#f2c94c" : "#f08a3c";
   const n = d.res.length, s = Math.min(70, Math.floor((W-300) / Math.max(n,1)) - 12), tot = n*(s+12)-12;
-  d.res.forEach((r,i) => { x.fillStyle = col(r); roundRect(x, (W-tot)/2 + i*(s+12), 990, s, s, 10); x.fill(); });
+  d.res.forEach((r,i) => { x.fillStyle = col(r); x.beginPath(); x.arc((W-tot)/2 + i*(s+12) + s/2, 990 + s/2, s/2, 0, Math.PI*2); x.fill(); });
   if (d.time) { x.fillStyle = "#cfdcd2"; x.font = "500 36px Barlow, Arial, sans-serif"; x.fillText(`⏱ ${fmtDur(d.time)}`, W/2, 990 + s + 60); }
   x.fillStyle = "#f2c94c"; x.font = "600 46px Barlow, Arial, sans-serif"; x.fillText("Sauras-tu faire mieux ?", W/2, 1250);
   return c;
