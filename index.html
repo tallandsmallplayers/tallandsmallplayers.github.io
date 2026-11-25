@@ -233,6 +233,18 @@ body.typing .trioCount{margin-bottom:6px}
 .installSteps li{margin:6px 0}.installTitle{text-align:center;margin:0 0 10px;font-size:16px}.instTabs{display:flex;gap:8px;margin:0}#instBody:not(:empty){margin-top:10px}.instTabs button{flex:1 1 0}
 .installSteps .k{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;background:rgba(255,255,255,.08);font-weight:600}
 #createMsg:empty{display:none}
+/* Défi entre amis, clavier ouvert sur téléphone (26/11, demande de Maxime) : blocs et boutons resserrés pour voir la suite au-dessus du clavier */
+body.typingC h1.brand{display:none}
+body.typingC div.wrap{padding-top:8px}
+body.typingC #create>.back,body.typingC #create>.rulesLink{margin-bottom:4px}
+body.typingC #create .card{padding-top:10px;padding-bottom:10px}
+body.typingC #create .pickTitle{font-size:18px;margin:0 0 6px}
+body.typingC #create .pickDesc{display:none}
+body.typingC #presetSearch{padding-top:7px;padding-bottom:7px}
+body.typingC #create label.lbl{margin:8px 0 4px;font-size:14px}
+body.typingC #defiDuree button{padding:5px 2px}
+body.typingC #genCode{padding-top:8px;padding-bottom:8px;margin-top:8px!important}
+
 #presetHits{margin-top:6px;font-size:14px;color:#7bd88f;min-height:0}
 #presetHits:empty{display:none}
 .soloBlock{margin-top:8px;display:flex;flex-direction:column;gap:8px}
@@ -665,7 +677,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
         </div>
       </div>
       <div id="cPrevOut" class="hide" style="margin-top:12px">
-        <div class="small muted" style="margin-bottom:4px">Aperçu de la fiche à faire deviner :</div>
+        <!-- « Aperçu de la fiche à faire deviner : » retiré (26/11, demande de Maxime) -->
         <div id="cPrevHead"></div>
         <table style="margin-top:6px">
           <thead><tr><th>Saison</th><th>Club</th><th class="n">Matchs</th><th class="n">Buts</th></tr></thead>
@@ -3461,6 +3473,14 @@ async function loadPlayCount(){
 }
 loadPlayCount();
 
+
+/* Défi entre amis : mode resserré pendant la saisie du joueur (téléphone) */
+(() => {
+  if (!window.matchMedia || !matchMedia("(pointer:coarse)").matches) return;
+  const inp = $("presetSearch"); if (!inp) return;
+  inp.addEventListener("focus", () => { document.body.classList.add("typingC"); setTimeout(() => window.scrollTo(0, 0), 300); });
+  inp.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== inp) document.body.classList.remove("typingC"); }, 250));
+})();
 // Mode saisie (téléphone) : clavier ouvert -> en-tête réduit, réponse en haut (fixe au défilement), carrière complète dessous
 (() => {
   if (!window.matchMedia || !matchMedia("(pointer:coarse)").matches) return;
