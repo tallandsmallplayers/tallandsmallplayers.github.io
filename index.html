@@ -1673,7 +1673,7 @@ function startGame(player, mode){
   $("resHome").classList.add("hide");   // « ← Accueil » en haut suffit
   $("nextBtn").classList.toggle("hide", $("nextBtn").textContent === "Retour à l'accueil");
   $("shareRow").classList.add("hide"); $("shareMsg").textContent = "";
-  $("shareWa").textContent = "Envoyer mon résultat sur WhatsApp";
+  $("shareWa").textContent = "Envoyer mon résultat sur WhatsApp"; $("shareWa").onclick = null;
   $("giveUp").parentElement.classList.toggle("hide", false);
   $("giveUp").textContent = mode === "chrono" ? "Abandonner" : "Passer (0 pt)";
   renderCareer(); renderHints(); renderScore(); renderTries(); renderSession();
@@ -2179,7 +2179,7 @@ function endDefi(won){
     ? `TALL&small players – ${ps} : trouvé en ${fmtTime(ms)} (${essai === 1 ? "1er" : "2e"} essai)${horsDelai ? ", hors délai" : ""}.`
     : `TALL&small players – ${ps} : pas trouvé.`;
   G.shareText = txt + "\n" + defiLink(DEFI.tok);
-  $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
+  $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText); $("shareWa").onclick = null;
   $("shareRow").classList.remove("hide");
   const mine = { pseudo: ps, ms: Math.round(ms), won };
   const joues = lsGet("ts_defi_joues", []); if (!joues.includes(DEFI.tok)) { joues.push(DEFI.tok); lsSet("ts_defi_joues", joues.slice(-200)); }
@@ -2378,6 +2378,7 @@ function clmEnd(quit){
   G.shareText = `TALL&small players – Contre-la-montre du ${fmtDate(CLM.key)} (${clmLabel(CLM.combo)}) : ${CLM.found} joueur${CLM.found>1?"s":""} trouvé${CLM.found>1?"s":""} en 2 minutes` + (CLM.found ? ` (${fmtTime(avg)} en moyenne)` : "") + ".\n" + (PUBLIC_URL || location.href.split("?")[0]);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText);
   $("shareWa").textContent = "Envoyer mon score à des amis";   /* libellé dicté par Maxime (25/11) */
+  $("shareWa").removeAttribute("href"); $("shareWa").onclick = e => { e.preventDefault(); $("shareImg").onclick(); };   /* partage de l'image du score, comme les 5 fiches (25/11) */
   $("shareRow").classList.remove("hide"); $("shareMsg").textContent = "";
   $("shareImg").classList.add("hide");
   $("nextBtn").textContent = "Rejouer"; $("nextBtn").classList.remove("hide");
@@ -2434,7 +2435,7 @@ $("clmGo").onclick = clmStart;
 
 /* ---------- série du jour ---------- */
 let DAILY = { list: [], idx: 0, res: [], key: "", start: 0, end: 0 };
-function fmtDur(ms){ const s = Math.max(0, Math.round(ms/1000)); const m = Math.floor(s/60); return m ? `${m}\u00a0min ${String(s%60).padStart(2,"0")}\u00a0s` : `${s}\u00a0s`; }
+function fmtDur(ms){ const s = Math.max(0, Math.round(ms/1000)); const m = Math.floor(s/60); return `${m}\u00a0min ${String(s%60).padStart(2,"0")}`; }   /* « 4 min 35 », sans « s » (25/11, demande de Maxime) */
 function todayKey(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
 function seededRand(str){
   let h = 1779033703 ^ str.length;
@@ -2995,7 +2996,7 @@ function scoreCardData(){
   if (G.mode === "daily") {
     const res = DAILY.res, t = res.reduce((s,r)=>s+r.pts,0), found = res.filter(r=>r.won).length;
     const done = res.length >= DAILY.list.length;
-    return { title: `Les 5 fiches du jour · ${fmtDate(DAILY.key)}`, big: `${found}/${DAILY.list.length}`, unit: `trouvé${found>1?"s":""}`,
+    return { icon: "btnDaily", title: "Les 5 fiches du jour", date: fmtDate(DAILY.key), big: `${found}/${DAILY.list.length}`, unit: `trouvé${found>1?"s":""}`,
       line: `${t} points`, time: (done && DAILY.end ? DAILY.end : Date.now()) - DAILY.start, res };
   }
   if (G.mode === "chrono") {
@@ -3004,11 +3005,24 @@ function scoreCardData(){
     return { title: "Défi entre amis", big: won ? fmtTime(G.end - G.start) : "Raté", unit: won ? "" : "",
       line: won ? `Trouvé au ${G.tries.length === 0 ? "1er" : "2e"} essai` : "Deux essais manqués", res: [{ won, tries: G.tries.length }] };
   }
+  if (G.mode === "clm") {   /* image de partage du contre-la-montre : « 5/7 » et « 2 min 00 » (25/11, demande de Maxime) */
+    const f = CLM.found, n = CLM.seen;
+    return { icon: "btnClm", title: "Contre-la-montre", date: fmtDate(CLM.key), big: `${f}/${n}`, unit: `trouvé${f>1?"s":""}`,
+      line: CLM.combo !== "tous-toutes" ? clmLabel(CLM.combo) : "", time: CLM_TOTAL, res: CLM.res.map(v => ({ won: !!v, tries: 0 })).slice(-20) };
+  }
   if (G.mode === "trio") { const f = TRIO.found, n = TRIO.played;
-    return { title: "Qui a joué dans ces 2 clubs ?", big: `${f}`, unit: `trouvé${f>1?"s":""}`, line: `sur ${n} paire${n>1?"s":""} en 2 minutes`, time: TRIO_TOTAL, res: TRIO.res.slice(-20) }; }
+    return { icon: "btnTrio", title: "Qui a joué dans ces 2 clubs ?", date: fmtDate(TRIO.key || todayKey()), big: `${f}/${n}`, unit: `trouvé${f>1?"s":""}`, line: "", time: TRIO_TOTAL, res: TRIO.res.slice(-20) }; }   /* même présentation que le CLM (25/11) */
   const f = SESSION.found, n = SESSION.played;
   return { title: "Jeu libre", big: `${SESSION.total}`, unit: "pts", line: `${f} joueur${f>1?"s":""} trouvé${f>1?"s":""} sur ${n}`, time: (SESSION.end || Date.now()) - SESSION.start, res: SESSION.res.slice(-20) };
 }
+/* pictos de l'accueil, préchargés en images pour l'image de partage */
+const CARD_ICONS = {};
+["btnDaily", "btnClm", "btnTrio", "btnCreate"].forEach(id => {
+  const sv = document.querySelector("#" + id + " svg"); if (!sv) return;
+  const vb = (sv.getAttribute("viewBox") || "0 0 24 24").split(" ").map(Number);
+  let src = sv.outerHTML.replace(/currentColor/g, "#f2c94c").replace("<svg", `<svg xmlns="http://www.w3.org/2000/svg" width="${vb[2]*8}" height="${vb[3]*8}"`);
+  const im = new Image(); im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(src); CARD_ICONS[id] = im;
+});
 function drawScoreCard(){
   const d = scoreCardData(), W = 1080, H = 1350;
   const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
@@ -3018,10 +3032,16 @@ function drawScoreCard(){
   x.beginPath(); x.arc(W/2, H/2, 150, 0, Math.PI*2); x.stroke();
   x.fillStyle = "rgba(5,24,11,.80)"; roundRect(x, 110, 170, W-220, H-360, 36); x.fill();
   const logo = document.querySelector("h1.brand img");
-  if (logo && logo.naturalWidth) { const lw = 640, lh = lw * logo.naturalHeight / logo.naturalWidth; x.drawImage(logo, (W-lw)/2, 230, lw, lh); }
+  if (logo && logo.naturalWidth) { const lw = 640, lh = lw * logo.naturalHeight / logo.naturalWidth; x.drawImage(logo, (W-lw)/2, 200, lw, lh); }
   x.textAlign = "center"; x.fillStyle = "#f2c94c"; x.font = "700 46px 'Barlow Condensed', Arial, sans-serif";
-  x.fillText("PLAYERS", W/2, 420);
-  x.fillStyle = "#cfdcd2"; x.font = "500 44px Barlow, Arial, sans-serif"; x.fillText(d.title, W/2, 520);
+  x.fillText("PLAYERS", W/2, 390);
+  const ic = d.icon && CARD_ICONS[d.icon];   /* picto et titre identiques à l'accueil (25/11, demande de Maxime) */
+  if (ic && ic.complete && ic.naturalWidth) {
+    x.font = "600 50px Barlow, Arial, sans-serif"; const tw = x.measureText(d.title).width, ih = 54, iw = ih * ic.naturalWidth / ic.naturalHeight, gap = 18, x0 = (W - (iw + gap + tw)) / 2;
+    x.drawImage(ic, x0, 500 - ih + 6, iw, ih);
+    x.textAlign = "left"; x.fillStyle = "#ffffff"; x.fillText(d.title, x0 + iw + gap, 500); x.textAlign = "center";
+  } else { x.fillStyle = "#ffffff"; x.font = "600 50px Barlow, Arial, sans-serif"; x.fillText(d.title, W/2, 500); }
+  if (d.date) { x.fillStyle = "#cfdcd2"; x.font = "500 34px Barlow, Arial, sans-serif"; x.fillText(d.date.replace(/\s\d{2,4}$/, ""), W/2, 548); }   /* date sans l'année (25/11) */
   x.fillStyle = "#ffffff"; x.font = "700 220px 'Barlow Condensed', Arial, sans-serif"; x.fillText(d.big, W/2, 760);
   if (d.unit) { x.fillStyle = "#cfdcd2"; x.font = "500 54px Barlow, Arial, sans-serif"; x.fillText(d.unit, W/2, 840); }
   x.fillStyle = "#ffffff"; x.font = "500 44px Barlow, Arial, sans-serif"; x.fillText(d.line, W/2, 930);
@@ -3029,6 +3049,7 @@ function drawScoreCard(){
   const n = d.res.length, s = Math.min(70, Math.floor((W-300) / Math.max(n,1)) - 12), tot = n*(s+12)-12;
   d.res.forEach((r,i) => { x.fillStyle = col(r); x.beginPath(); x.arc((W-tot)/2 + i*(s+12) + s/2, 990 + s/2, s/2, 0, Math.PI*2); x.fill(); });
   if (d.time) { x.fillStyle = "#cfdcd2"; x.font = "500 36px Barlow, Arial, sans-serif"; x.fillText(`⏱ ${fmtDur(d.time)}`, W/2, 990 + s + 60); }
+  else if (d.note) { x.fillStyle = "#cfdcd2"; x.font = "500 36px Barlow, Arial, sans-serif"; x.fillText(d.note, W/2, 990 + s + 60); }
   x.fillStyle = "#f2c94c"; x.font = "600 46px Barlow, Arial, sans-serif"; x.fillText("Sauras-tu faire mieux ?", W/2, 1250);
   return c;
 }
