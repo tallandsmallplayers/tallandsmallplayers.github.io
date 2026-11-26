@@ -359,7 +359,7 @@ body:not(.home-bg) .playcount{display:none}
   #home .rulescard .rules-more{font-size:12px;line-height:1.35;margin-top:6px}
   #home .rulescard .rules-more h3{font-size:14px;margin:8px 0 1px}
 
-#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;margin-top:2px;font-weight:400;white-space:normal}#presetHits .pick{color:#7bd88f;text-decoration:underline}.pickTitle{text-align:center;white-space:nowrap;font-size:20px}.pickDesc{min-height:0;font-size:min(14px,3.2vw)!important}.pickTitle .ico{width:22px;height:22px;vertical-align:-3px;margin-right:9px;color:var(--accent)}.pickTitle.gameTitle{font-size:17px;margin:0 0 8px}.pickTitle.gameTitle .ico{width:18px;height:18px;margin-right:7px}.gameTitle .badge{margin-left:8px;vertical-align:2px}#trioPick:not(.hide)~#trioTitle{display:none}#dpTrain .lbl,#dtCount{text-align:center}
+#home .big .ico{width:20px;height:20px;vertical-align:-3px;margin-right:8px;color:var(--accent)}#home .big .ico3{width:28px}.rank td.p .rates{font-size:12px;color:#ff8a8a;font-style:italic;font-weight:400}#presetHits .pick{color:#7bd88f;text-decoration:underline}.pickTitle{text-align:center;white-space:nowrap;font-size:20px}.pickDesc{min-height:0;font-size:min(14px,3.2vw)!important}.pickTitle .ico{width:22px;height:22px;vertical-align:-3px;margin-right:9px;color:var(--accent)}.pickTitle.gameTitle{font-size:17px;margin:0 0 8px}.pickTitle.gameTitle .ico{width:18px;height:18px;margin-right:7px}.gameTitle .badge{margin-left:8px;vertical-align:2px}#trioPick:not(.hide)~#trioTitle{display:none}#dpTrain .lbl,#dtCount{text-align:center}
 .dpSum{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}.dpDots{display:inline-flex;gap:6px}.dpDot{width:14px;height:14px;border-radius:50%;display:inline-block}.dpDot.ok{background:#2ecc71}.dpDot.ko{background:#eb5757}
 #dpDesc.played .dpD1{display:none}#dpDesc.played .dpD2{font-size:12px}
 #create label.lbl{font-size:16px;color:var(--text,#f4f7f2);margin:12px 0 6px}#create label.lbl#presetLabel{margin-top:4px}#defiDuree{display:grid;gap:6px;grid-template-columns:repeat(4,1fr)}#defiDuree button{padding:8px 2px;font-size:14px;min-width:0;line-height:normal}.pickTitle .ico.ico3{width:27px}
@@ -669,12 +669,12 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
       <label class="lbl">Lien valable</label>
       <div class="levels" id="defiDuree"><button type="button" data-v="300">5 min</button><button type="button" data-v="900">15 min</button><button type="button" data-v="3600" class="on">1 h</button><button type="button" data-v="10800">3 h</button></div>
       <div class="msg bad" id="createMsg"></div>
-      <button class="primary" id="genCode" style="width:100%;margin-top:12px">Créer le lien du défi</button>
+      <button class="primary" id="genCode" style="width:100%;margin-top:12px">Envoyer le défi</button>
       <button id="testCode" class="hide" style="width:100%;margin-top:10px">Tester le défi</button>
       <div id="codeBox" class="hide" style="margin-top:14px">
-        <label>Lien à envoyer</label>
-        <code class="code" id="codeOut"></code>
-        <div class="row" style="margin-top:8px">
+        <!-- « Lien à envoyer » et le lien affiché retirés (26/11, demande de Maxime) ; le lien reste en mémoire pour « Copier le lien » -->
+        <code class="code hide" id="codeOut"></code>
+        <div class="row">
           <a class="btnlink primary" id="sendWa" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>
           <button id="copyCode" style="flex:0 0 auto">Copier le lien</button>
           <span class="small muted" id="copyMsg"></span>
@@ -1712,7 +1712,7 @@ function startGame(player, mode){
   G.score = computeScore();
   if (mode === "chrono") { G.start = performance.now(); G.defi = DEFI; clearInterval(window._tick); window._tick = setInterval(renderScore, 100); }
   const badge = player.d ? `<span class="badge ${player.d}">${player.d}</span>` : "";
-  $("score").style.visibility = ""; $("gameLabel").style.display = "";
+  $("score").style.visibility = ""; $("score").style.display = ""; $("gameLabel").style.display = "";
   setGameTitle(mode === "daily" ? "daily" : "", "");
   $("gameLabel").innerHTML = mode === "solo" ? `Joueur ${orderIdx} sur ${order.length}` + badge
     : mode === "daily" ? (DAILY.train ? `Entraînement · joueur ${DAILY.idx + 1} sur ${DAILY.list.length}` : "") + badge
@@ -1779,7 +1779,7 @@ function renderHints(){
 function renderScore(){
   if (G.mode === "chrono") {
     const ms = (G.over ? G.end : performance.now()) - G.start;
-    $("score").innerHTML = `${fmtTime(ms)} <small>chrono</small>`; return;
+    $("score").innerHTML = `${fmtDur(ms)} <small>chrono</small>`; return;   /* format « 1 min 43 » (26/11, demande de Maxime) */
   }
   $("score").innerHTML = `<small class="pour">pour</small> ${G.score} <small>points</small>`;   // valeur de la fiche en cours
 }
@@ -2073,6 +2073,12 @@ $("genCode").onclick = async () => {
         : hits.length > 1 ? "Plusieurs joueurs correspondent : précise le nom ou choisis dans la liste."
         : "Ce joueur n'est pas dans la base.";
     }
+    /* « Envoyer le défi » (26/11, choix A de Maxime) : crée le lien puis ouvre directement le partage (image + lien) ;
+       même joueur et même durée dans les 10 minutes : le lien déjà créé est réutilisé */
+    const durTxt = (($("defiDuree").querySelector("button.on") || {}).textContent || "1 h").trim();
+    const keyNow = $("preset").value + "|" + durTxt;
+    const sendIt = link => shareInvite(defiInviteCard(durTxt), "tallsmall-defi.png", "Essaye de trouver ce footballeur !\n" + link);
+    if (window._lastDefi && window._lastDefi.key === keyNow && Date.now() - window._lastDefi.at < 600000) { sendIt(window._lastDefi.link); return; }
     const ch = readChallenge();
     const t = Math.floor(Date.now()/1000);
     const v = $("preset").value;
@@ -2085,11 +2091,12 @@ $("genCode").onclick = async () => {
     $("genCode").disabled = true; $("createMsg").textContent = "Création du lien…";
     const link = await makeShortLink(tok);
     $("genCode").disabled = false; $("createMsg").textContent = "";
-    $("codeOut").textContent = link;
+    $("codeOut").textContent = link; $("codeOut").classList.add("hide"); $("copyMsg").textContent = "";
     $("sendWa").href = "https://wa.me/?text=" + encodeURIComponent("Essaye de trouver ce footballeur !\n" + link);
     { const dur = (($("defiDuree").querySelector("button.on") || {}).textContent || "1 h").trim();   /* image d'invitation au défi (26/11) */
       $("sendWa").onclick = e => { e.preventDefault(); shareInvite(defiInviteCard(dur), "tallsmall-defi.png", "Essaye de trouver ce footballeur !\n" + link); }; }
-    $("codeBox").classList.remove("hide"); $("copyMsg").textContent = "";
+    window._lastDefi = { key: keyNow, link, at: Date.now() };
+    sendIt(link);   /* si Safari refuse le partage après la création du lien, la fenêtre de l'image propose « Partager » pour un second toucher */
   }
   catch(err){ $("createMsg").textContent = err; }
 };
@@ -2099,7 +2106,7 @@ $("testCode").onclick = () => {
 };
 $("copyCode").onclick = async () => {
   try { await navigator.clipboard.writeText($("codeOut").textContent); $("copyMsg").textContent = "Lien copié."; }
-  catch(e){ $("copyMsg").textContent = "Copie impossible ici : sélectionne le lien et copie-le manuellement."; }
+  catch(e){ $("codeOut").classList.remove("hide"); $("copyMsg").textContent = "Copie impossible ici : sélectionne le lien ci-dessus et copie-le."; }   /* le lien masqué ne réapparaît qu'en cas d'échec de la copie */
 };
 
 
@@ -2136,19 +2143,21 @@ async function showDefiRank(el, d, mine){
   let head;
   const dl = fin ? " dans le délai" : "";
   if (mi >= 0 && cls(rows[mi]) === 0) head = mi === 0 ? `Tu es en tête (${winners.length} joueur${winners.length>1?"s ont":" a"} trouvé${dl})` : `Tu es ${rangTxt(mi+1)} sur ${winners.length}${dl}`;
-  else if (winners.length) head = `${fin && Date.now() > fin ? "Vainqueur" : "En tête"} : ${esc(winners[0].pseudo)} (${fmtTime(winners[0].ms)})`;
+  else if (winners.length) head = `${fin && Date.now() > fin ? "Vainqueur" : "En tête"} : ${esc(winners[0].pseudo)} (${fmtDur(winners[0].ms)})`;
   else head = rows.length ? "Personne n'a encore trouvé" + (fin ? " dans le délai" : "") : "Aucun résultat pour l'instant";
-  const etat = r => r.createur ? "créateur" : !r.won ? "pas trouvé" : r.off ? fmtTime(r.ms) : fmtTime(r.ms) + " (hors délai)";
+  const etat = r => r.createur ? "créateur" : !r.won ? "pas trouvé" : r.off ? fmtDur(r.ms) : fmtDur(r.ms) + " (hors délai)";   /* « 1 min 43 » (26/11) */
   const voitRates = mine || lsGet("ts_defi_joues", []).includes(d.tok) || lsGet("ts_crees", []).includes(d.tok);
-  const rate = r => voitRates && r.rates ? `<div class="rates">Raté : ${esc(r.rates)}</div>` : "";
+  const rate = r => voitRates && r.rates ? ` <span class="rates">Raté : ${esc(r.rates)}</span>` : "";   /* sur la même ligne que le pseudo (26/11) */
   let n = 0;
   const body = rows.map((r,i) => {
     const rang = cls(r) === 0 ? rangTxt(++n) : "–";
-    return `<tr class="${i === mi ? "me" : ""}"><td>${rang}</td><td class="p">${esc(r.pseudo)}${rate(r)}</td><td class="n">${r.won ? (r.essai === 1 ? "1er essai" : "2e essai") : ""}</td><td class="n">${etat(r)}</td></tr>`;
+    if (!r.won && !r.createur && voitRates && r.rates)   /* propositions ratées sur la ligne du joueur, à gauche de « pas trouvé » (26/11) */
+      return `<tr class="${i === mi ? "me" : ""}"><td>${rang}</td><td class="p" colspan="2" style="white-space:normal">${esc(r.pseudo)} <span class="rates">Raté : ${esc(r.rates)}</span></td><td class="n">${etat(r)}</td></tr>`;
+    return `<tr class="${i === mi ? "me" : ""}"><td>${rang}</td><td class="p">${esc(r.pseudo)}</td><td class="n">${r.won ? (r.essai === 1 ? "1er essai" : "2e essai") : ""}</td><td class="n">${etat(r)}</td></tr>`;
   }).join("");
   const live = fin ? Date.now() < fin + 60000 : true;
   const note = !fin ? "Classement : 1er essai devant 2e essai, puis du plus rapide au plus lent (de « Commencer » à la bonne réponse). Il se met à jour automatiquement." : Date.now() < fin
-    ? `Défi officiel jusqu'à ${finTxt(fin/1000)}. Le classement se met à jour automatiquement.`
+    ? `Défi officiel jusqu'à ${finTxt(fin/1000).replace(/(\d{1,2}):(\d{2})/, "$1 h $2")}`   /* une ligne (26/11, demande de Maxime) */
     : `Délai officiel terminé ${/^\d/.test(finTxt(fin/1000)) ? "à " : ""}${finTxt(fin/1000)}.`;
   let waRes = "";
   if (fin && Date.now() > fin) {   // après la fin du délai : bouton visible par tous (la mémoire du créateur n'est pas partagée entre Safari et l'icône de l'écran d'accueil)
@@ -2156,7 +2165,7 @@ async function showDefiRank(el, d, mine){
       ko: rows.filter(r => !r.won && !r.createur && r.off).map(r => ({ p: r.pseudo, rates: r.rates || "" })) };
     waRes = `<div class="row" style="margin-top:10px"><button class="primary" id="${el.id}ResImg">📸 Partager le résultat</button></div>`;
   }
-  el.innerHTML = `<h3>Classement du Défi entre amis</h3><div class="me-line">${head}</div>
+  el.innerHTML = `<h3>Classement du Défi entre amis</h3>`   /* ligne « En tête… / Tu es… » retirée (26/11, demande de Maxime) */ + `
     ${rows.length ? `<table>${body}</table>` : ""}
     <div class="small muted" style="margin-top:6px">${note}</div>${waRes}
     ${el.id === "rankBox" ? "" : `<div class="row"><button id="${el.id}Refresh">Actualiser</button></div>`}`;
@@ -2224,15 +2233,19 @@ function endDefi(won){
   const essai = G.tries.length + 1;
   const ps = lsGet("ts_pseudo", "");
   let statut = createur ? "Résultat non classé (créateur du défi)." : horsDelai ? "Hors délai : non classé pour la victoire." : fin ? "Dans le délai officiel." : "";
+  /* écran de fin allégé (26/11, revu avec Maxime) : plus de phrase « Trouvé en…, au 1er essai. Dans le délai officiel. » ;
+     restent l'orthographe acceptée, « Hors délai » et « créateur » */
+  if (statut === "Dans le délai officiel.") statut = "";
   $("resultText").textContent = won
-    ? `Trouvé en ${fmtTime(ms)}, au ${essai === 1 ? "1er" : "2e"} essai.` + (G.approx ? ` Réponse acceptée malgré l'orthographe (« ${G.approx} »).` : "") + " " + statut
+    ? (G.approx ? `Réponse acceptée malgré l'orthographe (« ${G.approx} »). ` : "") + statut
     : (G.tries.length >= 2 ? "Deux essais manqués. " : "") + statut;
+  $("score").style.display = "none"; $("gameLabel").style.display = "none";   /* chrono et « Défi entre amis · 2 essais » retirés de l'écran de fin */
   const txt = won
     ? `TALL&small players – ${ps} : trouvé en ${fmtTime(ms)} (${essai === 1 ? "1er" : "2e"} essai)${horsDelai ? ", hors délai" : ""}.`
     : `TALL&small players – ${ps} : pas trouvé.`;
   G.shareText = txt + "\n" + defiLink(DEFI.tok);
   $("shareWa").href = "https://wa.me/?text=" + encodeURIComponent(G.shareText); $("shareWa").onclick = null;
-  $("shareRow").classList.remove("hide");
+  /* bouton « Envoyer mon résultat sur WhatsApp » retiré : seul « 📸 Partager mon score à des amis » reste (26/11) */
   const mine = { pseudo: ps, ms: Math.round(ms), won };
   const joues = lsGet("ts_defi_joues", []); if (!joues.includes(DEFI.tok)) { joues.push(DEFI.tok); lsSet("ts_defi_joues", joues.slice(-200)); }
   defiClearCur();
@@ -3376,7 +3389,10 @@ async function trySharePng(){
   try {
     const text = shareTxt ? shareTxt : (G && G.mode === "daily" && G.shareText) ? G.shareText : "Mon score sur TALL&small players" + (PUBLIC_URL ? " : " + PUBLIC_URL : "");
     if (navigator.canShare && navigator.canShare({ files: [shareFile] })) { await navigator.share({ files: [shareFile], text }); $("shareImgMsg").textContent = ""; return true; }
-  } catch(e){ if (e && e.name === "AbortError") return true; }
+  } catch(e){
+    if (e && e.name === "AbortError") return true;
+    if (e && e.name === "NotAllowedError") { $("shareImgMsg").textContent = "Touche « Partager » pour envoyer."; return false; }   /* partage refusé hors du toucher (création du lien du défi) */
+  }
   $("shareImgMsg").textContent = "Le partage direct n'est pas disponible ici. Fais un appui long sur l'image pour l'enregistrer ou la partager (WhatsApp, Messages, TikTok…).";
   return false;
 }
