@@ -112,6 +112,7 @@
   .rank td.n{text-align:right;white-space:nowrap}
   .rank tr.me td{color:var(--accent);font-weight:600}
   .rank .row{margin-top:6px}
+  .rank .rkRow{flex-wrap:nowrap;gap:8px}.rank .rkRow button{white-space:nowrap;padding-left:10px;padding-right:10px;font-size:14.5px}.rank .rkRow button+button{flex:1}
   .small{font-size:14px}
   .switch{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-top:12px}
   .switch input{width:auto}
@@ -451,7 +452,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
       <div class="trioClubs" id="trioClubs"></div>
       <div class="trioCount" id="trioCount"></div>
       <form id="trioForm" class="row">
-        <input id="trioInput" name="reponse-footballeur" placeholder="Ta réponse" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
+        <input id="trioInput" name="reponse-footballeur" placeholder="Écris le nom du joueur" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
         <button class="primary" type="submit">Valider</button>
       </form>
       <div class="msg" id="trioMsg"></div>
@@ -617,7 +618,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
     <div class="card" id="guessCard">
       <div id="clmLive" class="hide"><div id="clmTime"></div><div id="clmFlash"></div></div>
       <form id="guessForm" class="row">
-        <input id="guessInput" name="reponse-footballeur" placeholder="Ta réponse" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
+        <input id="guessInput" name="reponse-footballeur" placeholder="Écris le nom du joueur" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
         <button class="primary" type="submit">Valider</button>
       </form>
       <div class="msg" id="msg"></div>
@@ -2709,9 +2710,10 @@ async function showRank(el, quiet){
     <div class="me-line">${mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     ${me.dup ? `<div class="small muted" style="margin:0 0 6px">Ton pseudo avait déjà une partie du jour enregistrée sur un autre appareil : seule la première compte.</div>` : ""}
     <table>${body}</table>${GP.foot}
-    ${el.id === "rankBox" ? "" : `<div class="row"><button id="rkRefresh">Actualiser</button></div>`}`;
+    ${el.id === "rankBox" ? "" : `<div class="row rkRow"><button id="rkRefresh">Actualiser</button>${el.id === "viewRankBox" ? `<button id="rkToWeek">Classement de la semaine</button>` : ""}</div>`}`;
   GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($("rkRefresh")) $("rkRefresh").onclick = () => showRank(el);
+  if ($("rkToWeek")) $("rkToWeek").onclick = () => rankSwitch((e, q) => showWeekRank(e, q));   /* passage jour ↔ semaine (26/11, demande de Maxime) */
 }
 function dailyDoneSub(saved){
   saved = saved || lsGet("ts_daily", null);
@@ -2747,17 +2749,23 @@ async function showWeekRank(el, quiet){
     <div class="me-line">${!rows.length ? (GP.g ? "Personne du groupe n'a encore joué cette semaine." : "Personne n'a encore joué cette semaine.") : mi >= 0 ? `Tu es ${rangTxt(mi+1)} sur ${rows.length} joueur${rows.length>1?"s":""}` : `${rows.length} joueur${rows.length>1?"s":""} classé${rows.length>1?"s":""}`}</div>
     ${rows.length ? `<table>${body}</table>` : ""}
     ${GP.g ? "" : vainq}${GP.foot}
-    ${el.id === "rankBox" ? "" : `<div class="row"><button id="wkRefresh">Actualiser</button></div>`}`;
+    ${el.id === "rankBox" ? "" : `<div class="row rkRow"><button id="wkRefresh">Actualiser</button>${el.id === "viewRankBox" ? `<button id="wkToDay">Classement du jour</button>` : ""}</div>`}`;
   GP.bind(); friendSearch(el, GP.g ? [] : rows, line);
   if ($("wkRefresh")) $("wkRefresh").onclick = () => showWeekRank(el);
+  if ($("wkToDay")) $("wkToDay").onclick = () => rankSwitch((e, q) => showRank(e, q));
 }
 let RANK_FROM = null, RANK_Y = 0;
 function openRank(render){
   const cur = ["home","intro","game","create","trio","clmPick","soloPick","dailyPage"].find(s => !$(s).classList.contains("hide"));
   RANK_FROM = cur || "home"; RANK_Y = window.scrollY;
   show("rankView");
-  const box = $("viewRankBox");
-  render(box, false);
+  rankSwitch(render);
+}
+/* Affiche un classement dans la page des classements (sans changer l'écran de retour) et relance la mise à jour toutes les 30 s */
+function rankSwitch(render){
+  if (window._rankLive) { clearInterval(window._rankLive); window._rankLive = null; }
+  const box = $("viewRankBox"); box.dataset.fq = "";
+  render(box, false); window.scrollTo(0, 0);
   window._rankLive = setInterval(() => { if (!box.querySelector("input:not(.fsInput)") && !(document.activeElement && (document.activeElement.classList.contains("fsInput") || document.activeElement.classList.contains("grpSel"))) && !($("grpModal") && !$("grpModal").classList.contains("hide"))) render(box, true); }, 30000);
 }
 
