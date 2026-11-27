@@ -312,6 +312,11 @@ body:not(.home-bg) .playcount{display:none}
 /* groupes d'amis (25/11) */
 #grpModal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}
 #grpModal.hide{display:none}
+#decModal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}#decModal.hide{display:none}
+#decModal .qmBox{max-width:360px;width:100%;text-align:center;margin:0;background:#0b2413}#decModal h2{margin:0 0 6px;font-size:19px}#decModal p{margin:0 0 10px;font-size:14.5px;line-height:1.4}
+#decModal .decOpts{display:flex;flex-direction:column;gap:8px;margin-top:12px}#decModal .decOpts button{width:100%;white-space:nowrap}
+#decModal .decOpts button.on{background:#fff;border-color:#fff;color:#123d1c;font-weight:600}#decModal #decOk{width:100%;margin-top:21px}
+#dpDec{margin:12px 0 0;text-align:center;font-size:12px}#dpDec .linkBtn{background:none;border:0;color:var(--accent);text-decoration:underline;font-size:inherit;padding:0;width:auto}
 #grpModal .qmBox{max-width:360px;width:100%;text-align:center;margin:0;background:#0b2413}
 #grpModal h2{margin:0 0 6px;font-size:19px}
 #grpModal p{margin:0 0 10px;font-size:14.5px;line-height:1.4}
@@ -377,7 +382,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
   <!-- ACCUEIL -->
   <section id="home">
     <div class="grid">
-      <div class="dailyWrap"><button class="big" id="btnDaily"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</strong><small id="dailySub">Les mêmes 5 joueurs pour tout le monde aujourd'hui</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
+      <div class="dailyWrap"><button class="big" id="btnDaily"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</strong><small id="dailySub">5 nouveaux joueurs chaque jour</small></button><button class="rankBtn hide" id="dailyRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnClm"><strong><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>Contre-la-montre</strong><small id="clmSub">30 secondes maximum par fiche</small></button><button class="rankBtn hide" id="clmRankBtn">Classement</button></div>
       <div class="dailyWrap"><button class="big" id="btnTrio"><strong><svg class="ico ico3" viewBox="0 0 30 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M2 4.5 L8 2.5 L14 4.5 V11 C14 15.5 11.3 18.6 8 20.5 C4.7 18.6 2 15.5 2 11 Z"/><path d="M16 4.5 L22 2.5 L28 4.5 V11 C28 15.5 25.3 18.6 22 20.5 C18.7 18.6 16 15.5 16 11 Z"/><path d="M5 8.5 H11 M19 8.5 H25" stroke-linecap="round"/></svg>Qui a joué dans ces 2 clubs ?</strong><small id="trioSub">2 minutes pour trouver le maximum de joueurs</small></button><button class="rankBtn hide" id="trioRankBtn">Classement</button></div>
     </div>
@@ -500,10 +505,11 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
     <button class="back" data-home>← Accueil</button>
     <div class="card clmPickCard">
       <h2 class="pickTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,Arial">5</text></svg>Les 5 fiches du jour</h2>
-      <p class="small muted" id="dpDesc" style="margin:0 0 10px;text-align:center"><span class="dpD1">Les mêmes 5&nbsp;joueurs pour tout le monde.<br></span><span class="dpD2">Une seule partie classée par jour.</span></p>
+      <p class="small muted" id="dpDesc" style="margin:0 0 10px;text-align:center"><span class="dpD1"></span><span class="dpD2">Une seule partie classée par jour.</span></p>
       <div id="dpDay"></div>
       <button id="dpInvite" style="width:100%">📲 Envoyer à des amis</button>
       <div class="dpRanks"><button id="dpRank">Classement du jour</button><button id="dpWeek">Classement de la semaine</button></div>
+      <div id="dpDec"></div>
     </div>
     <div class="card clmPickCard" id="dpTrain" style="margin-top:69px">
       <h3 style="margin:0 0 6px;text-align:center">Entraînement</h3>
@@ -552,7 +558,7 @@ body.home-bg h1.brand{margin-top:38px}body.home-bg #shareGame{top:-36px}   /* ac
         <li>Envie de te mesurer à tes amis&nbsp;? Crée un groupe depuis un classement et envoie-leur le lien.</li>
       </ul></div>
       <div class="rsec" data-g="daily"><h3>Les 5 fiches du jour</h3>
-      <p>Les mêmes 5 joueurs pour tout le monde, chaque jour&nbsp;: 2 faciles, 2 moyens, 1 difficile.</p>
+      <p>Chaque jour, 5 joueurs tirés dans les décennies de ton choix&nbsp;: 2 faciles, 2 moyens, 1 difficile. Un seul classement pour tous.</p>
       <ul>
         <li>Une seule réponse par fiche&nbsp;: 100 points si c'est juste.</li>
         <li>Un coup de pouce&nbsp;? Le poste coûte 25 points, la nationalité 50. Une faute de frappe, 10.</li>
@@ -2508,7 +2514,7 @@ function seededRand(str){
   for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
   return function(){ h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
 }
-function dailyPickRaw(key, excl){
+function dailyPickOld(key, excl){
   const rnd = seededRand("TALLsmall-" + key);
   const byName = PLAYERS.map((p,i)=>i).filter(i => !PLAYERS[i].x || PLAYERS[i].x <= key).sort((a,b) => PLAYERS[a].n.localeCompare(PLAYERS[b].n));   // x = date d'ajout : une fiche ajoutée n'entre dans le tirage qu'à partir de ce jour-là
   const pick = (lvl, n) => { let c = byName.filter(i => PLAYERS[i].d === lvl); if (excl) { const f = c.filter(i => !excl.has(PLAYERS[i].n)); if (f.length >= n) c = f; } const out = []; while (out.length < n && c.length) out.push(c.splice(Math.floor(rnd()*c.length),1)[0]); return out; };
@@ -2519,17 +2525,44 @@ function dailyPickRaw(key, excl){
 const DP_START = "2026-11-25", DP_GAP = 30, DP_CACHE = {};
 const dpKey = t => { const d = new Date(t); return d.getUTCFullYear() + "-" + String(d.getUTCMonth()+1).padStart(2,"0") + "-" + String(d.getUTCDate()).padStart(2,"0"); };
 const dpTime = k => { const [y,m,d] = k.split("-").map(Number); return Date.UTC(y, m-1, d); };
-function dailyPick(key){
-  if (key < DP_START) return dailyPickRaw(key);
+function dailyPickRaw(key){
+  if (key < DP_START) return dailyPickOld(key);
   if (DP_CACHE[key]) return DP_CACHE[key];
   const end = dpTime(key);
   for (let t = dpTime(DP_START); t <= end; t += 864e5) {
     const k = dpKey(t); if (DP_CACHE[k]) continue;
     const excl = new Set();
-    for (let j = 1; j <= DP_GAP; j++) { const pk = dpKey(t - j*864e5); (pk < DP_START ? dailyPickRaw(pk) : DP_CACHE[pk] || []).forEach(i => excl.add(PLAYERS[i].n)); }
-    DP_CACHE[k] = dailyPickRaw(k, excl);
+    for (let j = 1; j <= DP_GAP; j++) { const pk = dpKey(t - j*864e5); (pk < DP_START ? dailyPickOld(pk) : DP_CACHE[pk] || []).forEach(i => excl.add(PLAYERS[i].n)); }
+    DP_CACHE[k] = dailyPickOld(k, excl);
   }
   return DP_CACHE[key];
+}
+/* Depuis le 28/11/2026 (idée de Maxime) : chaque participant choisit ses décennies (3 tirages par jour), même classement pour tous.
+   Ordre des fiches : facile, moyen, facile, difficile, moyen. Règle des 30 jours appliquée tirage par tirage (les jours antérieurs comptent pour tous). */
+const DEC_START = "2026-11-28";
+const DEC_SETS = { A: ["90","00","10","20"], B: ["90","00","10"], C: ["00","10","20"] };
+const DEC_LBL = { A: "1990 · 2000 · 2010 · 2020", B: "1990 · 2000 · 2010", C: "2000 · 2010 · 2020" };
+const decCur = () => { const d = lsGet("ts_dec", null); return DEC_SETS[d] ? d : "A"; };
+const decFor = key => { const l = lsGet("ts_dec_day", null); return l && l.key === key && DEC_SETS[l.dec] ? l.dec : decCur(); };   // décennies figées pour le jour dès que la partie est lancée
+function dailyPickDec(key, excl, dec){
+  const rnd = seededRand("TALLsmall-" + key + "-" + dec), eras = DEC_SETS[dec];
+  const byName = PLAYERS.map((p,i)=>i).filter(i => (!PLAYERS[i].x || PLAYERS[i].x <= key) && eras.includes(PLAYERS[i].e)).sort((a,b) => PLAYERS[a].n.localeCompare(PLAYERS[b].n));
+  const pick = (lvl, n) => { let c = byName.filter(i => PLAYERS[i].d === lvl); const f = c.filter(i => !excl.has(PLAYERS[i].n)); if (f.length >= n) c = f; const out = []; while (out.length < n && c.length) out.push(c.splice(Math.floor(rnd()*c.length),1)[0]); return out; };
+  const f = pick("facile",2), m = pick("moyen",2), d = pick("difficile",1);
+  return [f[0], m[0], f[1], d[0], m[1]].filter(i => i !== undefined);
+}
+function dailyPick(key, dec){
+  if (key < DEC_START) return dailyPickRaw(key);
+  dec = DEC_SETS[dec] ? dec : decFor(key);
+  if (DP_CACHE[dec + key]) return DP_CACHE[dec + key];
+  const end = dpTime(key);
+  for (let t = dpTime(DEC_START); t <= end; t += 864e5) {
+    const k = dpKey(t); if (DP_CACHE[dec + k]) continue;
+    const excl = new Set();
+    for (let j = 1; j <= DP_GAP; j++) { const pk = dpKey(t - j*864e5); (pk < DEC_START ? dailyPickRaw(pk) : DP_CACHE[dec + pk] || []).forEach(i => excl.add(PLAYERS[i].n)); }
+    DP_CACHE[dec + k] = dailyPickDec(k, excl, dec);
+  }
+  return DP_CACHE[dec + key];
 }
 const SYMB = r => !r.won ? "🔴" : r.tries === 0 ? "🟢" : r.tries === 1 ? "🟡" : "🟠";
 const DOTS = res => `<span class="dpDots">${res.map(r => `<span class="dpDot ${r.won ? "ok" : "ko"}"></span>`).join("")}</span>`;
@@ -2732,7 +2765,7 @@ function dailyDoneSub(saved){
   saved = saved || lsGet("ts_daily", null);
   const n = 5, done = saved && saved.key === todayKey() && (saved.res||[]).length >= n;
   $("dailyRankBtn").classList.toggle("hide", !done); $("dailyRankBtn").parentElement.classList.toggle("hasRank", !!done);
-  if (!done) { $("dailySub").textContent = "Les mêmes 5 joueurs pour tout le monde aujourd'hui"; return; }
+  if (!done) { $("dailySub").textContent = "5 nouveaux joueurs chaque jour"; return; }
   const t = saved.res.reduce((s,r)=>s+r.pts,0), ms = (saved.end || 0) - (saved.start || 0), f = saved.res.filter(r=>r.won).length;
   $("dailySub").innerHTML = `Déjà joué aujourd'hui : ${f}/${n} trouvé${f>1?"s":""}<span class="sq">${saved.res.map(SYMB).join("")}</span>`;
 }
@@ -3136,6 +3169,25 @@ function dpRender(){
   }
   $("dtBox").classList.toggle("hide", !done); $("dtLock").classList.toggle("hide", done);
   if (done) dtRender();
+  const later = !!cur && decFor(key) !== decCur();
+  $("dpDec").innerHTML = `<button type="button" class="linkBtn" id="dpDecMod">Modifier les années sélectionnées</button>` + (later ? `<div class="muted" style="margin-top:2px">Nouveau choix appliqué demain.</div>` : "");
+  $("dpDecMod").onclick = decOpen;
+  if (lsGet("ts_dec", null) === null && !$("dailyPage").classList.contains("hide")) decOpen();
+}
+/* Fenêtre du choix des décennies : à la première visite, puis via « Modifier » */
+function decOpen(){
+  let m = $("decModal"); if (!m) { m = document.createElement("div"); m.id = "decModal"; document.body.appendChild(m); }
+  const key = todayKey(), sv = lsGet("ts_daily", null), started = !!(sv && sv.key === key && sv.start);
+  let sel = decCur();
+  m.innerHTML = `<div class="card qmBox"><h2>Tes décennies</h2><p class="muted">Les 5 fiches du jour comprendront des footballeurs des années suivantes\u00a0:</p>
+    <div class="decOpts">${Object.keys(DEC_SETS).map(k => `<button type="button" data-k="${k}">${DEC_LBL[k]}</button>`).join("")}</div>
+    <p class="small muted" style="margin:12px 0 10px">${started ? "Partie du jour déjà lancée\u00a0: ton choix s'appliquera demain." : "Modifiable à tout moment."}</p>
+    <button class="primary" type="button" id="decOk">Valider</button></div>`;
+  const paint = () => m.querySelectorAll(".decOpts button").forEach(b => b.classList.toggle("on", b.dataset.k === sel));
+  m.querySelectorAll(".decOpts button").forEach(b => b.onclick = () => { sel = b.dataset.k; paint(); });
+  paint();
+  $("decOk").onclick = () => { lsSet("ts_dec", sel); m.classList.add("hide"); dpRender(); };
+  m.classList.remove("hide");
 }
 $("dpRank").onclick = () => openRank((el, q) => showRank(el, q));
 $("dpWeek").onclick = () => openRank((el, q) => showWeekRank(el, q));
@@ -3196,7 +3248,7 @@ function dailyGo(){
     DAILY.res = saved.res || []; DAILY.idx = saved.res.length; DAILY.start = saved.start || Date.now();   // reprise : le chrono continue depuis le début de la série
   }
   if (!(saved && saved.key === key && saved.start)) logPlay("daily");
-  if (!(saved && saved.key === key && saved.start)) lsSet("ts_daily", { key, res: [], start: DAILY.start, end: 0 });
+  if (!(saved && saved.key === key && saved.start)) { lsSet("ts_daily", { key, res: [], start: DAILY.start, end: 0 }); lsSet("ts_dec_day", { key, dec: decCur() }); }
   dailyStart();
 };
 
